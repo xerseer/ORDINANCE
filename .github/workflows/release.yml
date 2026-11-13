@@ -1,0 +1,61 @@
+name: Release
+
+# Pushing a tag like v0.2.0 builds the framework and:
+#   1. attaches Ordnance.rbxm, OrdnancePlugin.rbxm and the bundle to a GitHub Release
+#   2. publishes the bundle to the `dist` branch, which is what the plugin's
+#      updater reads (raw.githubusercontent.com: one domain, no API rate limit)
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check the tag matches Version.luau
+        run: |
+          version=$(sed -n 's/^return "\(.*\)"$/\1/p' src/Framework/Version.luau)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match src/Framework/Version.luau ($version)"
+            exit 1
+          fi
+
+      - name: Build
+        run: |
+          mkdir -p build/dist/versions/$GITHUB_REF_NAME
+          rojo build framework.project.json -o build/Ordnance.rbxm
+          rojo build plugin.project.json -o build/OrdnancePlugin.rbxm
+          node tools/bundle.mjs --out build/dist
+          cp build/dist/ordnance.bundle.json build/dist/versions/$GITHUB_REF_NAME/
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            build/Ordnance.rbxm
+            build/OrdnancePlugin.rbxm
+            build/dist/ordnance.bundle.json
+
+      - name: Publish to dist branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: dist
+          publish_dir: build/dist
+          keep_files: true
+          commit_message: "dist: ${{ github.ref_name }}"
