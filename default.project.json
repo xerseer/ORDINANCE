@@ -1,0 +1,12 @@
+{
+	"name": "Ordnance Dev Place",
+	"emitLegacyScripts": false,
+	"tree": {
+		"$className": "DataModel",
+		"ReplicatedStorage": {
+			"Ordnance": {
+				"$path": "src"
+			}
+		}
+	}
+}

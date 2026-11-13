@@ -1,0 +1,7 @@
+{
+	"name": "Ordnance",
+	"emitLegacyScripts": false,
+	"tree": {
+		"$path": "src"
+	}
+}
