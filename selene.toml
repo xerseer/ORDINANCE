@@ -1,0 +1,7 @@
+std = "roblox"
+
+[lints]
+# Weapon and preset modules are plain data tables; long ones are expected.
+too_many_arguments = "allow"
+multiple_statements = "allow"
+shadowing = "allow"

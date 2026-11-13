@@ -1,0 +1,6 @@
+{
+	"name": "OrdnancePlugin",
+	"tree": {
+		"$path": "plugin/src"
+	}
+}
