@@ -12,7 +12,7 @@
 local ChangeHistoryService = game:GetService("ChangeHistoryService")
 
 local Installer = require(script.Parent.Parent.Installer)
-local Source = require(script.Parent.Parent.Source)
+local Writer = require(script.Parent.Parent.Writer)
 local Theme = require(script.Parent.Parent.Theme)
 local UI = require(script.Parent.Parent.UI)
 
@@ -532,7 +532,7 @@ function Config.build(parent: Frame)
 			return
 		end
 		local recording = ChangeHistoryService:TryBeginRecording("Edit Ordnance config")
-		configModule.Source = Source.module(overrides, HEADER)
+		configModule.Source = Writer.module(overrides, HEADER)
 		if recording then
 			ChangeHistoryService:FinishRecording(recording, Enum.FinishRecordingOperation.Commit)
 		end
@@ -578,7 +578,7 @@ function Config.applyPreset(name: string?): (boolean, string)
 	local data: { [string]: any } = if ok and type(value) == "table" then value else {}
 	data.Preset = name
 	local recording = ChangeHistoryService:TryBeginRecording("Set Ordnance preset")
-	module.Source = Source.module(data, HEADER)
+	module.Source = Writer.module(data, HEADER)
 	if recording then
 		ChangeHistoryService:FinishRecording(recording, Enum.FinishRecordingOperation.Commit)
 	end

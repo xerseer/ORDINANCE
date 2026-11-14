@@ -10,7 +10,7 @@ local ChangeHistoryService = game:GetService("ChangeHistoryService")
 
 local ConfigTab = require(script.Parent.Config)
 local Installer = require(script.Parent.Parent.Installer)
-local Source = require(script.Parent.Parent.Source)
+local Writer = require(script.Parent.Parent.Writer)
 local Theme = require(script.Parent.Parent.Theme)
 local UI = require(script.Parent.Parent.UI)
 
@@ -224,7 +224,7 @@ function Presets.build(parent: Frame)
 		end
 		local data = table.clone(value)
 		data.Preset = nil
-		addPreset(saveName.Text, Source.module(data, `{saveName.Text}\nSaved from Ordnance.Config.`))
+		addPreset(saveName.Text, Writer.module(data, `{saveName.Text}\nSaved from Ordnance.Config.`))
 	end, 15)
 
 	refresh = rebuild

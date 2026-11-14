@@ -14,7 +14,7 @@ local ChangeHistoryService = game:GetService("ChangeHistoryService")
 local KeyframeSequenceProvider = game:GetService("KeyframeSequenceProvider")
 local Selection = game:GetService("Selection")
 
-local Source = require(script.Parent.Parent.Source)
+local Writer = require(script.Parent.Parent.Writer)
 local Theme = require(script.Parent.Parent.Theme)
 local UI = require(script.Parent.Parent.UI)
 
@@ -70,17 +70,14 @@ local function channelFor(pose: string, mapping: { [string]: string }): string
 		return "Right"
 	elseif string.find(lowered, "left") and (string.find(lowered, "hand") or string.find(lowered, "arm")) then
 		return "Left"
-	elseif
-		lowered == "weapon"
-		or lowered == "gun"
-		or lowered == "handle"
-		or lowered == "humanoidrootpart"
-		or lowered == "torso"
-	then
+	elseif lowered == "weapon" or lowered == "gun" or lowered == "handle" then
 		return "Weapon"
 	end
 	return pose
 end
+
+-- The rig's root carries no motion of its own; its children are what move.
+local ROOTS = { humanoidrootpart = true, torso = true, uppertorso = true, lowertorso = true }
 
 local function collect(pose: Instance, into: { Pose }, mapping: { [string]: string })
 	for _, child in pose:GetChildren() do
@@ -114,7 +111,7 @@ function Converter.convert(sequence: KeyframeSequence, options: Options): (strin
 		local entry: { [string]: any } = { Time = round(keyframe.Time, 3) }
 		local easing: string? = nil
 		for _, pose in poses do
-			if pose.Weight <= 0 then
+			if pose.Weight <= 0 or (ROOTS[string.lower(pose.Name)] and options.mapping[pose.Name] == nil) then
 				continue
 			end
 			local values = numbers(pose.CFrame)
@@ -143,7 +140,8 @@ function Converter.convert(sequence: KeyframeSequence, options: Options): (strin
 	end
 
 	local data: { [string]: any } = { Keyframes = out }
-	if sequence.Loop then
+	-- KeyframeSequences loop by default, so only an idle keeps it.
+	if sequence.Loop and options.slot == "Idle" then
 		data.Loop = true
 	end
 	local names = {}
@@ -166,7 +164,7 @@ function Converter.convert(sequence: KeyframeSequence, options: Options): (strin
 		table.sort(keys)
 		local parts = { `Time = {entry.Time}` }
 		for _, key in keys do
-			table.insert(parts, `{key} = {Source.value(entry[key])}`)
+			table.insert(parts, `{key} = {Writer.value(entry[key])}`)
 		end
 		if entry.Easing then
 			table.insert(parts, `Easing = "{entry.Easing}"`)
@@ -240,7 +238,7 @@ function Converter.build(parent: Frame)
 	UI.section(content, "Pose names", 6)
 	UI.caption(
 		content,
-		"Poses named like a hand become Left or Right; Weapon, Gun and Handle move the whole weapon; any other name is taken to be a part of the weapon. Rename with one line each, Pose = Channel.",
+		"Poses named like a hand become Left or Right; Weapon, Gun and Handle move the whole weapon; the rig's root and torso are skipped; any other name is taken to be a part of the weapon. Rename with one line each, Pose = Channel.",
 		7
 	)
 	local mapBox = UI.input(

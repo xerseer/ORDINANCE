@@ -1,6 +1,6 @@
 --!strict
 --[[
-	Source
+	Writer
 	Turns Lua values into readable source code, for writing the config module,
 	presets and converted animations back into the place.
 
@@ -8,7 +8,7 @@
 	file produces a small diff.
 ]]
 
-local Source = {}
+local Writer = {}
 
 local function isIdentifier(key: string): boolean
 	return string.match(key, "^[%a_][%w_]*$") ~= nil
@@ -128,16 +128,16 @@ local function write(value: any, indent: string, lines: { string }, trail: strin
 end
 
 -- Source for a value, ending without a trailing newline.
-function Source.value(value: any, indent: string?): string
+function Writer.value(value: any, indent: string?): string
 	local lines: { string } = {}
 	write(value, indent or "", lines, "")
 	return table.concat(lines, "\n")
 end
 
 -- A module that returns `value`, with an optional comment block on top.
-function Source.module(value: any, header: string?): string
+function Writer.module(value: any, header: string?): string
 	local top = if header then `--[[\n{header}\n]]\n\n` else ""
-	return `{top}return {Source.value(value)}\n`
+	return `{top}return {Writer.value(value)}\n`
 end
 
-return Source
+return Writer

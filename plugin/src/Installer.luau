@@ -248,6 +248,7 @@ end
 ]]
 function Installer.install(bundle: Bundle): Result
 	local problems: { string } = {}
+	local updated = false
 	local recording = ChangeHistoryService:TryBeginRecording("Install Ordnance")
 	local ok, err = pcall(function()
 		local fresh = build(bundle.root, problems) :: ModuleScript
@@ -258,6 +259,7 @@ function Installer.install(bundle: Bundle): Result
 			return
 		end
 
+		updated = true;
 		(existing :: any).Source = (fresh :: any).Source
 		local old = existing:FindFirstChild("Framework")
 		local new = fresh:FindFirstChild("Framework")
@@ -294,7 +296,11 @@ function Installer.install(bundle: Bundle): Result
 		return { ok = false, message = `Install failed: {err}` }
 	end
 	local suffix = if #problems > 0 then `, with {#problems} property warnings` else ""
-	return { ok = true, message = `Ordnance {bundle.version} installed{suffix}.`, version = bundle.version }
+	return {
+		ok = true,
+		message = `Ordnance {bundle.version} {if updated then "updated, your files kept" else "installed"}{suffix}.`,
+		version = bundle.version,
+	}
 end
 
 -- Removes the framework completely.
