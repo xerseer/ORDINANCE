@@ -1,0 +1,87 @@
+{
+	"format": 1,
+	"version": "0.1.0",
+	"entries": [
+		{
+			"id": "G36C",
+			"kind": "weapon",
+			"name": "G36C",
+			"description": "A select-fire rifle. The fire mode key switches between automatic, burst and semi-automatic.",
+			"author": "xerseer",
+			"version": "0.1.0",
+			"path": "catalogue/weapons/G36C.json"
+		},
+		{
+			"id": "Glock17",
+			"kind": "weapon",
+			"name": "Glock17",
+			"description": "The simplest kind of weapon: a model and a handful of numbers. Everything not written here comes from the global config and the framework defaults.",
+			"author": "xerseer",
+			"version": "0.1.0",
+			"path": "catalogue/weapons/Glock17.json"
+		},
+		{
+			"id": "M203",
+			"kind": "weapon",
+			"name": "M203",
+			"description": "A grenade launcher. The round is a physical projectile: it leaves slowly, arcs under gravity and explodes on the first thing it touches.",
+			"author": "xerseer",
+			"version": "0.1.0",
+			"path": "catalogue/weapons/M203.json"
+		},
+		{
+			"id": "Remington700",
+			"kind": "weapon",
+			"name": "Remington700",
+			"description": "A bolt-action rifle with the realism options on: the chambered round is tracked separately from the magazine, and every shot needs the bolt cycled before the next.",
+			"author": "xerseer",
+			"version": "0.1.0",
+			"path": "catalogue/weapons/Remington700.json"
+		},
+		{
+			"id": "Remington870",
+			"kind": "weapon",
+			"name": "Remington870",
+			"description": "A pump-action shotgun: several pellets per shell, a pump between shots, and shells loaded one at a time. Firing interrupts the reload.",
+			"author": "xerseer",
+			"version": "0.1.0",
+			"path": "catalogue/weapons/Remington870.json"
+		},
+		{
+			"id": "Arcade",
+			"kind": "preset",
+			"name": "Arcade",
+			"description": "Point and click. No reserve to manage, generous accuracy, gentle recoil, quick reloads and nothing to learn beyond aim, shoot and reload.",
+			"author": "xerseer",
+			"version": "0.1.0",
+			"path": "catalogue/presets/Arcade.json"
+		},
+		{
+			"id": "Realistic",
+			"kind": "preset",
+			"name": "Realistic",
+			"description": "Everything on. The chamber is tracked, bolts and pumps are worked by hand, a dropped magazine takes its rounds with it, weapons can jam, and there is no crosshair or hitmarker to lean on. Hits are lethal.",
+			"author": "xerseer",
+			"version": "0.1.0",
+			"path": "catalogue/presets/Realistic.json"
+		},
+		{
+			"id": "Standard",
+			"kind": "preset",
+			"name": "Standard",
+			"description": "The framework defaults, unchanged. This preset exists so \"the defaults\" is something you can pick by name and copy as a starting point for your own.",
+			"author": "xerseer",
+			"version": "0.1.0",
+			"path": "catalogue/presets/Standard.json"
+		},
+		{
+			"id": "Tactical",
+			"kind": "preset",
+			"name": "Tactical",
+			"description": "Slower and more deliberate. Hip fire is loose, aimed fire is rewarded, recoil has to be controlled, and an early reload keeps the round in the chamber.",
+			"author": "xerseer",
+			"version": "0.1.0",
+			"path": "catalogue/presets/Tactical.json"
+		}
+	]
+}

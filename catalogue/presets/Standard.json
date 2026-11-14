@@ -1,0 +1,1 @@
+{"n":"Standard","c":"ModuleScript","s":"--[[\n\tStandard\n\tThe framework defaults, unchanged. This preset exists so \"the defaults\" is\n\tsomething you can pick by name and copy as a starting point for your own.\n]]\n\nreturn {}\n"}
