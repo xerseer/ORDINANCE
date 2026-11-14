@@ -28,7 +28,7 @@ local function specs()
 	return {
 		Glock17 = {
 			model = kit.SIDEARMS["GLOCK 17"],
-			handle = V(0.10, 0, -0.37),
+			handle = V(0.34, 0, -0.37), -- low on the grip, so the hand leaves the slide in view
 			muzzle = V(-0.31, 0, 0.60),
 			mag = V(0.08, 0, -0.37),
 			aim = V(-0.45, 0, -0.50),
@@ -44,7 +44,7 @@ local function specs()
 		},
 		G36C = {
 			model = kit["ASSAULT RIFLES"]["G36 VARIANTS"]["H&K G36C"],
-			handle = V(0.20, 0, -0.38),
+			handle = V(0.28, 0, -0.38),
 			muzzle = V(-0.31, 0, 1.85),
 			grip = V(0.05, 0, 1.05),
 			side = V(-0.34, 0.16, 0.31),
@@ -83,7 +83,7 @@ local function specs()
 		},
 		Remington870 = {
 			model = kit.SHOTGUNS["REMINGTON 870, PICATINNY RAIL"],
-			handle = V(0.22, 0, -0.80),
+			handle = V(0.3, 0, -0.80),
 			muzzle = V(-0.36, 0, 2.10),
 			grip = V(-0.05, 0, 0.97),
 			mag = V(-0.05, 0, -0.45),
@@ -98,7 +98,7 @@ local function specs()
 		},
 		M203 = {
 			model = kit["ASSAULT RIFLES"]["AR-15 VARIANTS"].CLASSICS["COLT M4A1, M203"],
-			handle = V(0.25, 0, -0.97),
+			handle = V(0.33, 0, -0.97),
 			muzzle = V(0.03, 0, 1.92), -- the launcher tube, not the rifle barrel
 			grip = V(0.22, 0, 1.0),
 			mag = V(0.03, 0, 0.75),
