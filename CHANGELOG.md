@@ -75,7 +75,16 @@ Decisions made without asking are listed under **Decisions** so they are easy to
 
 **Checked:** every page at 1280 and 375 pixels wide has no horizontal overflow, every internal link and anchor resolves, there are no duplicate ids or stray Markdown, and the filter works. **Not checked:** how it looks to the eye. The browser available to me could not paint while the app was in the background.
 
+#### Phase 6: polish and final review
+
+- **Real gunshots.** The default fire sound and the example weapons' sounds are recordings from Roblox's licensed Pro Sound Effects library, which any experience may use: a rifle shot by default, a pistol for the Glock, a heavy rifle for the Remington 700, and a slowed rifle shot for the 870. Each id was loaded in Studio on both server and client. Sounds ripped from commercial games are common on the Creator Store and were deliberately not used.
+- **Final review** of the server's shot handling, sessions and networking: every client value is type-checked, bounded and rate-limited, state is cleaned up when a player leaves, and every handler is isolated.
+- **Play-tested end to end** on the server: weapons come back after respawn; a torso shot does 26, a head shot 52 and a leg shot 20.8 with the Glock; a nine-pellet shotgun blast lands as one tallied hit; a shot before the pump finishes is refused; a shot from 40 studs off the head is refused; the M203 round arcs and explodes once for 132. The self-test still passes all 40 checks.
+
 ### Fixed
+
+- Bullets stopped on hats and hair, and an accessory counted as a limb, so a head shot on a character wearing a hat did less damage than a body shot. They now pass through accessories to the body, matching how players are already hit through lag compensation.
+- In the dev place, the plugin's source ran as a server script during every play test and failed on a Studio-only API. It is now disabled in `default.project.json`; the plugin build is unchanged.
 
 - Plugin: the Config, Presets and Converter tabs could not load, because the plugin root is a Script and `script.Parent.Parent.Source` read its `Source` property instead of the module of that name. The module is now `Writer`.
 - Plugin converter: the rig's root pose became an empty `Weapon` channel, and every conversion looped because KeyframeSequences loop by default. Root poses are skipped and only an Idle keeps `Loop`.
@@ -85,7 +94,8 @@ Decisions made without asking are listed under **Decisions** so they are easy to
 
 ### Known gaps
 
-- Default sounds are placeholders built from the few sounds that ship with Roblox. Real gunshots need asset ids.
+- Only the gunshots are recordings. Reload, empty and explosion sounds are the simple ones that ship with Studio, and the M203 uses a slowed explosion as its launch thump.
+- Not tested with more than one real player: the play tests ran one player against dummies on the server. Replication to other clients and touch and gamepad input were reviewed in the code, not played.
 - In third person the trigger hand never leaves the grip (the weapon is welded to it, as every Roblox Tool is), so a bolt is worked by the right hand only in first person.
 - R6 bodies do not turn or lean; an R6 torso is one piece. R6 arms slide at the shoulder to reach instead.
 - With a long rifle an R15 support hand may still fall a little short of the handguard; it then holds the weapon as far forward as it can reach.

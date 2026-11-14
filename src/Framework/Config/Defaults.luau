@@ -235,8 +235,9 @@ local Defaults = {
 	},
 
 	------------------------------------------------------------------------
-	-- Sound and visuals. Sounds accept any asset id; the defaults use sounds
-	-- that ship with Roblox so they always play.
+	-- Sound and visuals. Sounds accept any asset id. The fire sound is from
+	-- Roblox's licensed Pro Sound Effects library, free to use in any
+	-- experience; the rest ship with Studio so they always play.
 	------------------------------------------------------------------------
 	Effects = {
 		Tracer = {
@@ -260,9 +261,9 @@ local Defaults = {
 			Lifetime = 6,
 		},
 		Sounds = {
-			Fire = "rbxasset://sounds/impact_explosion_03.mp3",
-			FirePitch = 2.6,
-			FireVolume = 0.55,
+			Fire = "rbxassetid://9114727096", -- Gun Single Shots 10 (Pro Sound Effects)
+			FirePitch = 1,
+			FireVolume = 0.8,
 			Empty = "rbxasset://sounds/volume_slider.ogg",
 			Reload = "rbxasset://sounds/action_jump_land.mp3",
 			Explosion = "rbxasset://sounds/impact_explosion_03.mp3",

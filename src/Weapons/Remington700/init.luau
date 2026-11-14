@@ -55,4 +55,8 @@ return {
 	Realism = {
 		Chambering = true,
 	},
+
+	Effects = {
+		Sounds = { Fire = "rbxassetid://9118173739", FireVolume = 0.9, RollOffMax = 1500 }, -- Rifle Single Shots 1 (Pro Sound Effects)
+	},
 }

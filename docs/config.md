@@ -138,7 +138,7 @@ Each action takes a list of `Enum.KeyCode` or `Enum.UserInputType` names, keyboa
 
 ## Effects {#effects}
 
-Sounds accept any asset id. The defaults use sounds that ship with Roblox so they always play; they are placeholders, and real gunshots are the first thing to replace.
+Sounds accept any asset id. The default gunshot comes from Roblox's licensed Pro Sound Effects library, which any experience may use; the other defaults ship with Studio. The example weapons each set their own fire sound.
 
 {{config Effects}}
 

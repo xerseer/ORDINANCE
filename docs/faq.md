@@ -42,9 +42,9 @@ Add or move the `MainHandle` and `Grip` attachments on the handle. `Debug.Visual
 
 `Debug.Visualize.Hitboxes` draws the rewound hitboxes the server tested, which shows whether lag compensation is the cause.
 
-### Everything is silent, or sounds wrong {#sounds}
+### A sound does not play {#sounds}
 
-The default sounds are placeholders made from sounds that ship with Roblox, so that something always plays. Set `Effects.Sounds.Fire` and the others to your own asset ids.
+A sound id only plays if your experience is allowed to use it. Roblox's own libraries (search the Creator Store for "Pro Sound Effects") work everywhere; audio uploaded by someone else may be private. Output shows a `failed to load` line for each one that is refused.
 
 ## Questions {#questions}
 
@@ -76,7 +76,7 @@ Delete `ReplicatedStorage.Ordnance`. Nothing was put anywhere else.
 
 Said plainly, so you can plan around it:
 
-- **Real sounds.** The defaults are placeholders.
+- **Reload and handling sounds.** Only the gunshots are real recordings; the reload, empty and explosion sounds are the simple ones that ship with Studio. Encoded animations can play your own at any keyframe.
 - **Attachments as items.** Sights, grips and suppressors that players swap are not built in. `Custom` and the API leave room for your own.
 - **R6 stance.** R6 bodies do not turn or lean, and R6 arms may slide at the shoulder to reach.
 - **Third-person bolts.** In third person the trigger hand stays on the grip, so bolts are only worked by hand in first person.

@@ -110,7 +110,7 @@ The realism options change how rounds are counted, and are all off by default:
 
 The default. A round hits instantly along a ray up to `Ballistics.Range` studs. With `Ballistics.Penetration` above 0 it passes through that many studs of material in total. Damage drops with every stud crossed: a round that uses its whole allowance keeps 40% of its damage.
 
-Bullets ignore parts with CanCollide off (decorations, invisible triggers), but still hit characters.
+Bullets ignore parts with CanCollide off (decorations, invisible triggers), but still hit characters. They pass through hats and hair to the body behind, so a tall hat is not a bigger head.
 
 ### Projectile {#projectile}
 

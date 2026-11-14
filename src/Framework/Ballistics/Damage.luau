@@ -21,7 +21,8 @@ local TORSO: { [string]: boolean } = {
 }
 
 -- Which multiplier a body part uses. Works for R6 and R15 part names;
--- anything unrecognised (accessories, custom rigs) counts as a limb.
+-- anything unrecognised (parts of custom rigs) counts as a limb. Bullets
+-- pass through accessories, so a hat never reaches here.
 function Damage.group(partName: string): Group
 	if partName == "Head" then
 		return "Head"
