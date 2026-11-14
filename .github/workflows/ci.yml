@@ -33,3 +33,7 @@ jobs:
 
       - name: Build plugin
         run: rojo build plugin.project.json -o OrdnancePlugin.rbxm
+
+      # Fails when a config section or public API function has no docs.
+      - name: Build docs
+        run: node tools/docs.mjs
