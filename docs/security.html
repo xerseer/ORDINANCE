@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Security – Ordnance</title>
+<meta name="description" content="What the Ordnance server checks on every shot, what it trusts the client with, how lag compensation works, and what it cannot stop.">
+<meta property="og:title" content="Security – Ordnance">
+<meta property="og:description" content="What the Ordnance server checks on every shot, what it trusts the client with, how lag compensation works, and what it cannot stop.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" aria-label="Pages">
+    <a class="brand" href="index.html">Ordnance</a>
+    <span class="ver">v0.1.0</span>
+    <a class="get" href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">Get Ordnance&nbsp;↗</a>
+    <a class="item" href="index.html">Start here</a>
+    <a class="item" href="weapons.html">Weapons</a>
+    <a class="item" href="config.html">Configuration</a>
+    <a class="item" href="presets.html">Presets</a>
+    <a class="item" href="animation.html">Animation</a>
+    <a class="item" href="api.html">Scripting API</a>
+    <a class="item here" href="security.html" aria-current="page">Security</a><div class="subs"><a class="sub" href="#summary">The short version</a><a class="sub" href="#checks">Every shot</a><a class="sub" href="#lag">Lag compensation</a><a class="sub" href="#projectiles">Projectiles</a><a class="sub" href="#limits">What it cannot stop</a></div>
+    <a class="item" href="plugin.html">Studio plugin</a>
+    <a class="item" href="faq.html">Troubleshooting</a>
+    <a class="item out" href="https://github.com/xerseer/ORDINANCE" target="_blank" rel="noopener">Source&nbsp;↗</a>
+  </nav>
+  <main>
+<section id="top"><h1>Security</h1>
+<p class="lede">The client shoots; the server decides what happened. This page says exactly what that means, so you know what a cheater can and cannot do.</p>
+</section>
+<section id="summary"><h2>The short version</h2>
+<p>A client is trusted with two things, both bounded: <strong>where a shot started</strong>, which must be near the shooter's head and not behind a wall, and <strong>which way it pointed</strong>. Everything else is decided on the server: whether the weapon could fire, where the pellets went, what was hit and how much it hurt.</p>
+</section>
+<section id="checks"><h2>Every shot</h2>
+<p>When a shot arrives the server, in order:</p>
+<ol><li><strong>Rate-limits the message.</strong> Each player may send at most 60 shot messages a second, before any code runs. Anything beyond is dropped.</li><li><strong>Checks the weapon is in their hands</strong> and they are alive.</li><li><strong>Runs the weapon's own state machine</strong>: the same code the client used to predict the shot. A weapon that is reloading, cycling, jammed, empty or on Safe cannot fire, whatever the client says. Reload timing gets <code>Security.ReloadTolerance</code> of slack for network delay.</li><li><strong>Checks the cadence.</strong> An allowance refills at the weapon's rate of fire times <code>Security.FireRateTolerance</code>. It absorbs network jitter, but a client cannot fire faster than the weapon on average.</li><li><strong>Checks the origin</strong> is within <code>Security.MaxOriginError</code> studs of the shooter's head and, with <code>Security.ValidateLineOfSight</code>, not on the other side of a wall from it.</li><li><strong>Works out the pellets itself</strong> from a seed only the server and that client know. Spread is never sent, so it cannot be removed.</li><li><strong>Traces the shot</strong> against the level, and against every other player as they were when the shot was fired (see below).</li><li><strong>Applies damage</strong>, after team rules and your <a href="api.html#setdamagehandler">damage handler</a>.</li></ol>
+<p>A rejected shot costs the cheater nothing but a correction to their ammo count, and costs the server almost nothing. Turn <code>Debug.Logger.Level</code> up to <code>Debug</code> to see each rejection and its reason.</p>
+</section>
+<section id="lag"><h2>Lag compensation</h2>
+<p>On a network everyone sees everyone else slightly in the past. Without correction you would have to lead every target by your ping.</p>
+<p>The server records where every player's body parts were, <code>Security.SnapshotRate</code> times a second, for the last second. A hitscan shot is tested against boxes placed where those parts were at the moment the shooter fired: their time, minus half their ping, minus <code>Security.InterpolationDelay</code>. It never rewinds more than <code>Security.MaxRewind</code> seconds, so a player with a very bad connection does not get to shoot people who have long since reached cover.</p>
+<p>Players are never raycast directly; only the rewound boxes are tested. NPCs are hit by the ordinary trace.</p>
+<div class="note"><p>The trade-off every shooter makes: a player with high ping can hit you a moment after you reached cover on your own screen. <code>MaxRewind</code> caps how long that moment can be.</p></div>
+</section>
+<section id="projectiles"><h2>Projectiles</h2>
+<p>Projectiles are simulated on the server. The shooter sees their own straight away; the server's copy starts with a head start equal to the time the message took, so both arrive at the same place. Explosions happen on the server, which decides who is in the blast and behind cover.</p>
+</section>
+<section id="limits"><h2>What it cannot stop</h2>
+<p>Being honest about this matters more than any feature:</p>
+<ul><li><strong>Aimbots.</strong> The direction of a shot is the player's to choose. The server makes sure that shot was possible; it cannot tell whether a human aimed it. Detecting inhuman aim is a separate problem, and not one a weapon framework can solve well.</li><li><strong>Seeing through walls.</strong> Every client is told where every character is, because Roblox replicates characters to everyone. A modified client can draw them through walls.</li><li><strong>Shots from slightly off the head.</strong> <code>MaxOriginError</code> allows for movement and lag, so a cheater can move their origin within that radius. Lower it for slow-moving games.</li></ul>
+<div class="note limit"><span class="kicker">Roblox limit</span><p>Roblox gives every client every character's position, so no framework can hide players from a modified client. Ordnance makes sure what they do with that information still has to be a shot the weapon could make.</p></div>
+</section>
+    <footer>
+      <span>Ordnance v0.1.0. MIT licence.</span>
+      <a href="https://github.com/xerseer/ORDINANCE/blob/main/site/security.md">Edit this page&nbsp;↗</a>
+    </footer>
+  </main>
+</div>
+<script src="site.js"></script>
+</body>
+</html>

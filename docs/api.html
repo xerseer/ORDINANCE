@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scripting API – Ordnance</title>
+<meta name="description" content="The Ordnance scripting API: give and equip weapons, set ammo, change damage, and listen for shots, hits and kills.">
+<meta property="og:title" content="Scripting API – Ordnance">
+<meta property="og:description" content="The Ordnance scripting API: give and equip weapons, set ammo, change damage, and listen for shots, hits and kills.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" aria-label="Pages">
+    <a class="brand" href="index.html">Ordnance</a>
+    <span class="ver">v0.1.0</span>
+    <a class="get" href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">Get Ordnance&nbsp;↗</a>
+    <a class="item" href="index.html">Start here</a>
+    <a class="item" href="weapons.html">Weapons</a>
+    <a class="item" href="config.html">Configuration</a>
+    <a class="item" href="presets.html">Presets</a>
+    <a class="item" href="animation.html">Animation</a>
+    <a class="item here" href="api.html" aria-current="page">Scripting API</a><div class="subs"><a class="sub" href="#examples">Examples</a><a class="sub" href="#shared">Shared</a><a class="sub" href="#server">Server</a><a class="sub" href="#client">Client</a><a class="sub" href="#signals">Signals</a><a class="sub" href="#logging">Logging</a></div>
+    <a class="item" href="security.html">Security</a>
+    <a class="item" href="plugin.html">Studio plugin</a>
+    <a class="item" href="faq.html">Troubleshooting</a>
+    <a class="item out" href="https://github.com/xerseer/ORDINANCE" target="_blank" rel="noopener">Source&nbsp;↗</a>
+  </nav>
+  <main>
+<section id="top"><h1>Scripting API</h1>
+<p class="lede">You never have to require Ordnance: it starts by itself. Require it when your game wants to hand out weapons, react to hits or change damage.</p>
+<div class="code"><pre><code><span class="tk-kw">local</span> Ordnance = <span class="tk-fn">require</span>(game.ReplicatedStorage.Ordnance)</code></pre></div>
+<p>Calling a server function from a client, or the other way round, logs an error and does nothing. It never throws.</p>
+</section>
+<section id="examples"><h2>Examples</h2>
+<div class="pair">
+<div class="code"><div class="label">ServerScriptService.KillFeed</div><pre><code><span class="tk-kw">local</span> Ordnance = <span class="tk-fn">require</span>(game.ReplicatedStorage.Ordnance)
+
+Ordnance.Killed:<span class="tk-fn">Connect</span>(<span class="tk-kw">function</span>(info)
+	<span class="tk-kw">local</span> killer = info.attacker <span class="tk-kw">and</span> info.attacker.Name <span class="tk-kw">or</span> <span class="tk-str">&quot;The world&quot;</span>
+	<span class="tk-kw">local</span> victim = info.victimPlayer <span class="tk-kw">and</span> info.victimPlayer.Name <span class="tk-kw">or</span> info.victim.Parent.Name
+	<span class="tk-fn">print</span>(<span class="tk-str">`{killer} killed {victim} with {info.weapon}`</span>)
+<span class="tk-kw">end</span>)</code></pre></div>
+<div class="code"><div class="label">ServerScriptService.Armour</div><pre><code><span class="tk-kw">local</span> Ordnance = <span class="tk-fn">require</span>(game.ReplicatedStorage.Ordnance)
+
+Ordnance.<span class="tk-fn">SetDamageHandler</span>(<span class="tk-kw">function</span>(info)
+	<span class="tk-kw">if</span> info.victim.Parent:<span class="tk-fn">GetAttribute</span>(<span class="tk-str">&quot;SafeZone&quot;</span>) <span class="tk-kw">then</span>
+		<span class="tk-kw">return</span> <span class="tk-kw">false</span>
+	<span class="tk-kw">end</span>
+	<span class="tk-kw">if</span> info.group == <span class="tk-str">&quot;Torso&quot;</span> <span class="tk-kw">and</span> info.victim:<span class="tk-fn">GetAttribute</span>(<span class="tk-str">&quot;Vest&quot;</span>) <span class="tk-kw">then</span>
+		<span class="tk-kw">return</span> info.damage * <span class="tk-num">0.6</span>
+	<span class="tk-kw">end</span>
+<span class="tk-kw">end</span>)</code></pre></div>
+</div>
+<p>A class-based loadout, with <code>Inventory.Mode = &quot;Custom&quot;</code> so nothing is handed out automatically:</p>
+<div class="code"><div class="label">ServerScriptService.Loadouts</div><pre><code><span class="tk-kw">local</span> Players = game:<span class="tk-fn">GetService</span>(<span class="tk-str">&quot;Players&quot;</span>)
+<span class="tk-kw">local</span> Ordnance = <span class="tk-fn">require</span>(game.ReplicatedStorage.Ordnance)
+
+<span class="tk-kw">local</span> CLASSES = {
+	Assault = { <span class="tk-str">&quot;G36C&quot;</span>, <span class="tk-str">&quot;Glock17&quot;</span> },
+	Marksman = { <span class="tk-str">&quot;Remington700&quot;</span>, <span class="tk-str">&quot;Glock17&quot;</span> },
+}
+
+Players.PlayerAdded:<span class="tk-fn">Connect</span>(<span class="tk-kw">function</span>(player)
+	player.CharacterAdded:<span class="tk-fn">Connect</span>(<span class="tk-kw">function</span>()
+		<span class="tk-kw">local</span> class = player:<span class="tk-fn">GetAttribute</span>(<span class="tk-str">&quot;Class&quot;</span>) <span class="tk-kw">or</span> <span class="tk-str">&quot;Assault&quot;</span>
+		<span class="tk-kw">for</span> _, weapon <span class="tk-kw">in</span> CLASSES[class] <span class="tk-kw">do</span>
+			Ordnance.<span class="tk-fn">Give</span>(player, weapon)
+		<span class="tk-kw">end</span>
+		Ordnance.<span class="tk-fn">Equip</span>(player, CLASSES[class][<span class="tk-num">1</span>])
+	<span class="tk-kw">end</span>)
+<span class="tk-kw">end</span>)</code></pre></div>
+</section>
+<section id="shared"><h2>Shared</h2>
+<h3 id="getweapons">GetWeapons</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">GetWeapons</span>(): { string }</code></pre></div>
+<p>The ids of every loaded weapon, alphabetically. An id is the weapon module's name.</p>
+<h3 id="getconfig">GetConfig</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">GetConfig</span>(weaponId: string?): Config?</code></pre></div>
+<p>A weapon's resolved config, after every layer and <code>Tuning</code> has been applied, or the global config when no id is given. The table is frozen; read it, do not write it. Returns nil for a weapon that does not exist.</p>
+<div class="code"><pre><code><span class="tk-kw">local</span> glock = Ordnance.<span class="tk-fn">GetConfig</span>(<span class="tk-str">&quot;Glock17&quot;</span>)
+<span class="tk-fn">print</span>(glock.Ammo.Magazine, glock.Damage.Base) <span class="tk-com">-- 17 26</span></code></pre></div>
+<h3 id="version">Version</h3>
+<p><code>Ordnance.Version</code> is the framework's version string, such as <code>&quot;0.1.0&quot;</code>.</p>
+</section>
+<section id="server"><h2>Server</h2>
+<p>Weapons a player is given last for that life. A new character starts with full ammunition, nothing in hand and, in <code>Tool</code> mode, the loadout from <code>Inventory.Loadout</code>. In <code>Custom</code> mode give weapons again from <code>CharacterAdded</code>.</p>
+<h3 id="give">Give</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">Give</span>(player: Player, weaponId: string): boolean</code></pre></div>
+<p>Adds a weapon to a player's inventory, with full ammunition. In <code>Tool</code> mode it appears in their Backpack. Giving a weapon they already have does nothing. Returns false if no weapon has that id.</p>
+<h3 id="take">Take</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">Take</span>(player: Player, weaponId: string)</code></pre></div>
+<p>Removes a weapon, unequipping it first if it is in their hands.</p>
+<h3 id="equip">Equip</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">Equip</span>(player: Player, weaponId: string): boolean</code></pre></div>
+<p>Puts a weapon in the player's hands, giving it first if they do not have it. Returns false if they have no character, or no weapon has that id.</p>
+<h3 id="unequip">Unequip</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">Unequip</span>(player: Player)</code></pre></div>
+<p>Puts away whatever the player is holding.</p>
+<h3 id="setammo">SetAmmo</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">SetAmmo</span>(player: Player, weaponId: string, magazine: number?, reserve: number?)</code></pre></div>
+<p>Sets the rounds loaded and in reserve. Leave either out to keep it. The magazine is clamped to the weapon's capacity. The player's client is corrected straight away.</p>
+<div class="code"><pre><code><span class="tk-com">-- An ammo crate: top up the reserve of whatever they are holding.</span>
+Ordnance.<span class="tk-fn">SetAmmo</span>(player, weaponId, <span class="tk-kw">nil</span>, <span class="tk-num">120</span>)</code></pre></div>
+<h3 id="setdamagehandler">SetDamageHandler</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">SetDamageHandler</span>(handler: ((info: DamageInfo) -&gt; number | <span class="tk-kw">false</span> | <span class="tk-kw">nil</span>)?)</code></pre></div>
+<p>Sets one function that sees every hit before damage is applied, bullets and explosions alike. Return a number to change the damage, <code>false</code> to cancel it, or nothing to leave it alone. Pass nil to remove it. An error inside the handler is reported and the hit goes ahead unchanged.</p>
+</section>
+<section id="client"><h2>Client</h2>
+<p>For custom HUDs and client effects, from a LocalScript.</p>
+<h3 id="getequipped">GetEquipped</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">GetEquipped</span>(): string?</code></pre></div>
+<p>The id of the weapon the local player is holding, or nil.</p>
+<h3 id="getammo">GetAmmo</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">GetAmmo</span>(): (number?, number?)</code></pre></div>
+<p>Rounds loaded and in reserve for the held weapon. With chambering on, the loaded count includes the chambered round.</p>
+<h3 id="isaiming">IsAiming</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">IsAiming</span>(): boolean</code></pre></div>
+</section>
+<section id="signals"><h2>Signals</h2>
+<p>Connect with <code>:Connect(handler)</code>, which returns a connection with <code>:Disconnect()</code>. <code>:Once</code> and <code>:Wait</code> work too. Handlers run in their own thread, so an error in one never stops the others.</p>
+<p>The server and each client have their own copy of every signal. On the server, <code>Fired</code> means the server accepted a shot; on a client it means the local player fired.</p>
+<h3 id="damaged">Damaged</h3>
+<p>Server. <code>(info: DamageInfo)</code> after damage has been applied.</p>
+<h3 id="killed">Killed</h3>
+<p>Server. <code>(info: DamageInfo)</code> when that damage killed.</p>
+<h3 id="fired">Fired</h3>
+<p>Server: <code>(player, weaponId, origin, direction)</code>. Client: <code>(weaponId, origin, direction)</code>.</p>
+<h3 id="equipped">Equipped</h3>
+<p>Server: <code>(player, weaponId)</code>. Client: <code>(weaponId)</code>.</p>
+<h3 id="unequipped">Unequipped</h3>
+<p>Same arguments as <code>Equipped</code>.</p>
+<h3 id="reloaded">Reloaded</h3>
+<p>Same arguments as <code>Equipped</code>, when a reload starts.</p>
+<h3 id="exploded">Exploded</h3>
+<p>Both sides: <code>(position: Vector3, weaponId)</code>.</p>
+<h3 id="damageinfo">DamageInfo</h3>
+<div class="tbl"><table><thead><tr><th>Field</th><th>Type</th><th>Meaning</th></tr></thead><tbody><tr><td><code>attacker</code></td><td><code>Player?</code></td><td>Who fired.</td></tr><tr><td><code>victim</code></td><td><code>Humanoid</code></td><td>What was hit. Works for NPCs as well as players.</td></tr><tr><td><code>victimPlayer</code></td><td><code>Player?</code></td><td>The victim's player, if they have one.</td></tr><tr><td><code>weapon</code></td><td><code>string</code></td><td>The weapon's id.</td></tr><tr><td><code>damage</code></td><td><code>number</code></td><td>The damage, after multipliers and falloff.</td></tr><tr><td><code>part</code></td><td><code>string</code></td><td>The name of the body part hit.</td></tr><tr><td><code>group</code></td><td><code>string</code></td><td><code>&quot;Head&quot;</code>, <code>&quot;Torso&quot;</code> or <code>&quot;Limb&quot;</code>.</td></tr><tr><td><code>distance</code></td><td><code>number</code></td><td>Studs from the shooter.</td></tr><tr><td><code>position</code></td><td><code>Vector3</code></td><td>Where the hit landed.</td></tr><tr><td><code>explosive</code></td><td><code>boolean</code></td><td>True for blast damage.</td></tr></tbody></table></div>
+</section>
+<section id="logging"><h2>Logging</h2>
+<p>Everything Ordnance prints is tagged <code>[Ordnance:Scope]</code>, so it can be filtered in the Output window. How much it prints, and whether a framework error warns or throws, is set under <a href="config.html#debug"><code>Debug.Logger</code></a>. <code>Ordnance.Logger</code> is the same logger, for your own scripts that want to match.</p>
+</section>
+    <footer>
+      <span>Ordnance v0.1.0. MIT licence.</span>
+      <a href="https://github.com/xerseer/ORDINANCE/blob/main/site/api.md">Edit this page&nbsp;↗</a>
+    </footer>
+  </main>
+</div>
+<script src="site.js"></script>
+</body>
+</html>

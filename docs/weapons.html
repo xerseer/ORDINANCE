@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Weapons – Ordnance</title>
+<meta name="description" content="How to make an Ordnance weapon: the module, the model and its attachments, and the settings for each kind of gun.">
+<meta property="og:title" content="Weapons – Ordnance">
+<meta property="og:description" content="How to make an Ordnance weapon: the module, the model and its attachments, and the settings for each kind of gun.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" aria-label="Pages">
+    <a class="brand" href="index.html">Ordnance</a>
+    <span class="ver">v0.1.0</span>
+    <a class="get" href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">Get Ordnance&nbsp;↗</a>
+    <a class="item" href="index.html">Start here</a>
+    <a class="item here" href="weapons.html" aria-current="page">Weapons</a><div class="subs"><a class="sub" href="#module">The module</a><a class="sub" href="#model">The model</a><a class="sub" href="#firing">Firing</a><a class="sub" href="#ammo">Ammunition</a><a class="sub" href="#ballistics">Ballistics</a><a class="sub" href="#damage">Damage</a><a class="sub" href="#feel">Feel</a><a class="sub" href="#examples">The examples</a></div>
+    <a class="item" href="config.html">Configuration</a>
+    <a class="item" href="presets.html">Presets</a>
+    <a class="item" href="animation.html">Animation</a>
+    <a class="item" href="api.html">Scripting API</a>
+    <a class="item" href="security.html">Security</a>
+    <a class="item" href="plugin.html">Studio plugin</a>
+    <a class="item" href="faq.html">Troubleshooting</a>
+    <a class="item out" href="https://github.com/xerseer/ORDINANCE" target="_blank" rel="noopener">Source&nbsp;↗</a>
+  </nav>
+  <main>
+<section id="top"><h1>Weapons</h1>
+<p class="lede">A weapon is a ModuleScript in <code>Ordnance.Weapons</code> with its model inside it. Drop one in and it loads at the next Play. There is no list to register it in.</p>
+</section>
+<section id="module"><h2>The module</h2>
+<p>The module returns a table of settings. Only write what differs from the global config; everything else falls through to it, and from there to the defaults.</p>
+<div class="code"><div class="label">Weapons.Glock17</div><pre><code><span class="tk-kw">return</span> {
+	Name = <span class="tk-str">&quot;Glock 17&quot;</span>,
+	Description = <span class="tk-str">&quot;9mm semi-automatic pistol.&quot;</span>,
+	Fire = { Modes = { <span class="tk-str">&quot;Semi&quot;</span> }, RPM = <span class="tk-num">420</span> },
+	Ammo = { Magazine = <span class="tk-num">17</span>, Reserve = <span class="tk-num">68</span>, ReloadTime = <span class="tk-num">1.6</span> },
+	Damage = { Base = <span class="tk-num">26</span>, Falloff = { Start = <span class="tk-num">60</span>, End = <span class="tk-num">220</span> } },
+	Recoil = { Vertical = <span class="tk-num">1.4</span>, Horizontal = <span class="tk-num">0.5</span> },
+}</code></pre></div>
+<p>The module's name is the weapon's id: what the scripting API, the loadout and the logs call it. <code>Name</code> is what players see. Leave <code>Name</code> out and the id is used.</p>
+<p>Folders inside <code>Weapons</code> are fine for organising; only ModuleScripts are weapons. ModuleScripts inside a weapon belong to it and are not loaded as weapons of their own.</p>
+</section>
+<section id="model"><h2>The model</h2>
+<p>Put the model inside the module and call it <code>Model</code>, or point <code>Model</code> at a different child by name. It needs very little:</p>
+<ul><li><strong>A part named <code>Handle</code></strong>, or a <code>PrimaryPart</code>. Its front face (−Z) points down the barrel and its top face (+Y) points up. This is the one thing that has to be right.</li><li><strong>Everything else is joined to the handle for you</strong> when the weapon loads. Models do not need welds, and anchored parts are fine: they are unanchored when the weapon is built. Parts you have already jointed yourself keep their joints.</li></ul>
+<p>The model can also be a single part, a Tool or a Folder of parts. A weapon with no model at all gets a plain block gun, so you can try out numbers before the art exists.</p>
+<p>The handle's orientation is how the framework knows which way the weapon faces. If shots leave from the stock or the gun is held sideways, the handle is turned the wrong way; rotate the part, not the model.</p>
+<h3 id="attachments">Attachments</h3>
+<p>Attachments on the handle tell the animation system where things are. All are optional; missing ones are worked out from the model's shape. The plugin's <a href="plugin.html#helper">IK Helper</a> checks a model and places any that are missing.</p>
+<div class="tbl"><table><thead><tr><th>Attachment</th><th>What it marks</th><th>Without it</th></tr></thead><tbody><tr><td><code>MainHandle</code></td><td>Where the trigger hand holds.</td><td>The handle's centre.</td></tr><tr><td><code>Barrel</code></td><td>The muzzle. Shots, tracers and the flash start here. <code>Muzzle</code> is accepted too.</td><td>The furthest-forward point of the model.</td></tr><tr><td><code>Grip</code></td><td>Where the support hand rests.</td><td>The support hand cups the trigger hand, as on a pistol.</td></tr><tr><td><code>Mag</code></td><td>The magazine. The support hand goes here to reload.</td><td>The reload has no hand motion.</td></tr><tr><td><code>Side</code></td><td>The bolt or charging handle.</td><td>Bolts and pumps are worked from the grip.</td></tr><tr><td><code>Aim</code></td><td>The sight line, centred behind the sight, facing forward.</td><td>The weapon is raised toward the centre, roughly.</td></tr></tbody></table></div>
+<p>Attachment names are only matched against Attachments. A part called <code>Barrel</code> and an attachment called <code>Barrel</code> can sit side by side.</p>
+<h3 id="moving-parts">Moving parts</h3>
+<p>Parts with these names move by themselves. Give the part the name and nothing else is needed.</p>
+<div class="tbl"><table><thead><tr><th>Part</th><th>Moves</th></tr></thead><tbody><tr><td><code>Mag</code></td><td>Drops out and comes back during a magazine reload.</td></tr><tr><td><code>Bolt</code>, <code>Slide</code></td><td>Snap back on every shot, and travel with the hand on a cycle.</td></tr><tr><td><code>Pump</code></td><td>Slides back and forward with the support hand.</td></tr></tbody></table></div>
+<p>An <a href="animation.html#encoded">encoded animation</a> can move any other part by naming it.</p>
+</section>
+<section id="firing"><h2>Firing</h2>
+<p><code>Fire.Modes</code> is the list the fire-mode key steps through; <code>Fire.Mode</code> is where it starts. If the starting mode is not in the list, the first mode in the list is used.</p>
+<div class="tbl"><table><thead><tr><th>Mode</th><th>Behaviour</th></tr></thead><tbody><tr><td><code>Semi</code></td><td>One round per trigger pull.</td></tr><tr><td><code>Burst</code></td><td><code>Fire.BurstCount</code> rounds at <code>Fire.BurstRPM</code> (or <code>RPM</code> when that is 0).</td></tr><tr><td><code>Auto</code></td><td>Fires at <code>Fire.RPM</code> while held.</td></tr><tr><td><code>Safe</code></td><td>Does not fire. Useful as a position in the list.</td></tr></tbody></table></div>
+<p>A trigger pull made a moment too early, before the next round is ready, is remembered for <code>Fire.InputBuffer</code> seconds, so fast clicking does not eat shots.</p>
+<h3 id="actions">Actions</h3>
+<p><code>Fire.Action</code> decides what happens between shots.</p>
+<ul><li><code>SelfLoading</code> cycles by itself. Pistols, rifles, machine guns.</li><li><code>Bolt</code> and <code>Pump</code> need a cycle after every shot, which takes <code>Fire.CycleTime</code> seconds. The cycle runs by itself unless <code>Realism.ManualCycle</code> is on, in which case the player presses the Cycle key.</li></ul>
+<h3 id="pellets">Pellets</h3>
+<p><code>Fire.Pellets</code> above 1 makes a shotgun: every pellet is its own ray with its own damage. The pattern comes from a seed the server and the client share, so it is never sent over the network and cannot be forged.</p>
+</section>
+<section id="ammo"><h2>Ammunition</h2>
+<div class="tbl"><table><thead><tr><th>You want</th><th>Set</th></tr></thead><tbody><tr><td>A magazine swap</td><td><code>ReloadType = &quot;Magazine&quot;</code>, with <code>ReloadTime</code>, and optionally a longer <code>ReloadEmptyTime</code>.</td></tr><tr><td>Shells one at a time</td><td><code>ReloadType = &quot;Single&quot;</code>, with <code>ShellTime</code> per round. Firing interrupts the reload.</td></tr><tr><td>No reserve to manage</td><td><code>Infinite = true</code>.</td></tr><tr><td>Unlimited spare rounds</td><td><code>Reserve = math.huge</code>.</td></tr><tr><td>The trigger to reload an empty gun</td><td><code>AutoReload = true</code> (the default).</td></tr></tbody></table></div>
+<p>The realism options change how rounds are counted, and are all off by default:</p>
+<ul><li><code>Realism.Chambering</code>: the round in the chamber is separate from the magazine, so a reload before empty ends with one extra (30 + 1).</li><li><code>Realism.DropMagazine</code>: rounds left in a swapped magazine are lost, not returned to the reserve.</li><li><code>Realism.Malfunctions</code>: a shot can jam the weapon at <code>Chance</code> per shot. The Cycle key clears it.</li></ul>
+</section>
+<section id="ballistics"><h2>Ballistics</h2>
+<h3 id="hitscan">Hitscan</h3>
+<p>The default. A round hits instantly along a ray up to <code>Ballistics.Range</code> studs. With <code>Ballistics.Penetration</code> above 0 it passes through that many studs of material in total. Damage drops with every stud crossed: a round that uses its whole allowance keeps 40% of its damage.</p>
+<p>Bullets ignore parts with CanCollide off (decorations, invisible triggers), but still hit characters. They pass through hats and hair to the body behind, so a tall hat is not a bigger head.</p>
+<h3 id="projectile">Projectile</h3>
+<p><code>Ballistics.Type = &quot;Projectile&quot;</code> fires something that flies: it leaves at <code>Velocity</code>, falls under <code>workspace.Gravity × Gravity</code>, slows with <code>Drag</code>, and is removed after <code>Lifetime</code> seconds. It can bounce (<code>Bounce.Count</code>), and it can explode.</p>
+<div class="code"><div class="label">Weapons.M203 (part)</div><pre><code>Ballistics = {
+	Type = <span class="tk-str">&quot;Projectile&quot;</span>,
+	Velocity = <span class="tk-num">190</span>,
+	Drag = <span class="tk-num">0.05</span>,
+	Explosive = {
+		Enabled = <span class="tk-kw">true</span>,
+		Damage = <span class="tk-num">140</span>,
+		Radius = <span class="tk-num">20</span>,
+		DetonateOnImpact = <span class="tk-kw">true</span>,
+		SelfDamageScale = <span class="tk-num">0.6</span>,
+	},
+},</code></pre></div>
+<p>For a timed, bouncing grenade instead, turn impact detonation off and give it a fuse:</p>
+<div class="code"><pre><code>Explosive = { Enabled = <span class="tk-kw">true</span>, DetonateOnImpact = <span class="tk-kw">false</span>, Fuse = <span class="tk-num">3</span> },
+Bounce = { Count = <span class="tk-num">4</span> },</code></pre></div>
+<p>Explosions hurt everyone in <code>Radius</code> with a clear line to the centre (turn that off with <code>RequireLineOfSight = false</code>), fading from <code>Damage</code> toward <code>Damage × MinScale</code> at the edge.</p>
+</section>
+<section id="damage"><h2>Damage</h2>
+<p>A hit's damage is <code>Damage.Base</code>, times the multiplier for the body part hit (<code>Head</code>, <code>Torso</code> or <code>Limb</code>), times the falloff for its distance:</p>
+<ul><li>up to <code>Falloff.Start</code> studs, full damage;</li><li>between <code>Start</code> and <code>End</code>, it drops in a straight line;</li><li>from <code>End</code> on, <code>Base × Falloff.MinScale</code>.</li></ul>
+<p><code>Damage.FriendlyFire = false</code> stops players on the same team hurting each other. For anything else (armour, safe zones, your own team rules) use <a href="api.html#setdamagehandler"><code>SetDamageHandler</code></a>.</p>
+</section>
+<section id="feel"><h2>Feel</h2>
+<ul><li><strong>Spread</strong> is a cone, in degrees from the centre: <code>Hip</code> or <code>Aim</code>, plus <code>Moving</code> and <code>Airborne</code> while those apply, plus <code>PerShot</code> for each round fired, capped at <code>Max</code> and recovering at <code>Recovery</code> degrees per second.</li><li><strong>Recoil</strong> kicks the camera by <code>Vertical</code> and up to <code>Horizontal</code> degrees per shot, and returns <code>Recovery</code> of the way back. <code>Speed</code> and <code>Damping</code> shape the spring.</li><li><strong>Handling</strong> covers equip and aim time, the aimed field of view, and walk speed while holding and aiming.</li></ul>
+<p>Offsets for how the weapon is held (<code>Viewmodel.Offset</code>, <code>ThirdPerson.Offset</code>, <code>ThirdPerson.AimOffset</code>) are six numbers: position right, up and back in studs, then rotation in degrees. A pistol is held further out and nearer the middle than a rifle; the Glock example shows the numbers.</p>
+</section>
+<section id="examples"><h2>The examples</h2>
+<div class="tbl"><table><thead><tr><th>Module</th><th>What it is</th><th>Fire</th><th>RPM</th><th>Mag</th><th>Damage</th></tr></thead><tbody>
+<tr><td><a href="https://github.com/xerseer/ORDINANCE/tree/main/src/Weapons/G36C"><code>G36C</code></a></td><td>5.56mm compact assault rifle with automatic, burst and semi-automatic fire.</td><td>Auto, Burst, Semi</td><td>750</td><td>30</td><td>22</td></tr>
+<tr><td><a href="https://github.com/xerseer/ORDINANCE/tree/main/src/Weapons/Glock17"><code>Glock17</code></a></td><td>9mm semi-automatic pistol.</td><td>Semi</td><td>420</td><td>17</td><td>26</td></tr>
+<tr><td><a href="https://github.com/xerseer/ORDINANCE/tree/main/src/Weapons/M203"><code>M203</code></a></td><td>40mm grenade launcher. Rounds arc and explode on impact.</td><td>Semi</td><td>60</td><td>1</td><td>140 blast</td></tr>
+<tr><td><a href="https://github.com/xerseer/ORDINANCE/tree/main/src/Weapons/Remington700"><code>Remington700</code></a></td><td>Bolt-action .308 rifle. One shot, then work the bolt.</td><td>Semi, bolt</td><td>300</td><td>5</td><td>85</td></tr>
+<tr><td><a href="https://github.com/xerseer/ORDINANCE/tree/main/src/Weapons/Remington870"><code>Remington870</code></a></td><td>12 gauge pump-action shotgun.</td><td>Semi, pump</td><td>240</td><td>6</td><td>13 × 9</td></tr>
+</tbody></table></div>
+<h3 id="complete">A complete weapon module</h3>
+<p>The bolt-action rifle, with the realism options on:</p>
+<div class="code"><div class="label">Weapons.Remington700</div><pre><code><span class="tk-com">--[[
+	Remington 700
+	A bolt-action rifle with the realism options on: the chambered round is
+	tracked separately from the magazine, and every shot needs the bolt cycled
+	before the next.
+]]</span>
+
+<span class="tk-kw">return</span> {
+	Name = <span class="tk-str">&quot;Remington 700&quot;</span>,
+	Description = <span class="tk-str">&quot;Bolt-action .308 rifle. One shot, then work the bolt.&quot;</span>,
+
+	Fire = {
+		Modes = { <span class="tk-str">&quot;Semi&quot;</span> },
+		RPM = <span class="tk-num">300</span>,
+		Action = <span class="tk-str">&quot;Bolt&quot;</span>,
+		CycleTime = <span class="tk-num">1.15</span>,
+	},
+
+	Ammo = {
+		Magazine = <span class="tk-num">5</span>,
+		Reserve = <span class="tk-num">30</span>,
+		ReloadTime = <span class="tk-num">3.2</span>,
+	},
+
+	Ballistics = {
+		Range = <span class="tk-num">3000</span>,
+		Penetration = <span class="tk-num">1.5</span>,
+	},
+
+	Damage = {
+		Base = <span class="tk-num">85</span>,
+		Multipliers = { Head = <span class="tk-num">2.5</span>, Torso = <span class="tk-num">1.1</span>, Limb = <span class="tk-num">0.8</span> },
+		Falloff = { Start = <span class="tk-num">600</span>, End = <span class="tk-num">2000</span>, MinScale = <span class="tk-num">0.75</span> },
+	},
+
+	Spread = {
+		Hip = <span class="tk-num">4.5</span>,
+		Aim = <span class="tk-num">0.02</span>,
+		Moving = <span class="tk-num">2.5</span>,
+		PerShot = <span class="tk-num">0</span>,
+	},
+
+	Recoil = {
+		Vertical = <span class="tk-num">3.2</span>,
+		Horizontal = <span class="tk-num">0.7</span>,
+		Recovery = <span class="tk-num">0.75</span>,
+	},
+
+	Handling = {
+		AimFOV = <span class="tk-num">22</span>,
+		AimTime = <span class="tk-num">0.3</span>,
+		AimWalkSpeedScale = <span class="tk-num">0.5</span>,
+	},
+
+	Realism = {
+		Chambering = <span class="tk-kw">true</span>,
+	},
+
+	Effects = {
+		Sounds = { Fire = <span class="tk-str">&quot;rbxassetid://9118173739&quot;</span>, FireVolume = <span class="tk-num">0.9</span>, RollOffMax = <span class="tk-num">1500</span> }, <span class="tk-com">-- Rifle Single Shots 1 (Pro Sound Effects)</span>
+	},
+}</code></pre></div>
+</section>
+    <footer>
+      <span>Ordnance v0.1.0. MIT licence.</span>
+      <a href="https://github.com/xerseer/ORDINANCE/blob/main/site/weapons.md">Edit this page&nbsp;↗</a>
+    </footer>
+  </main>
+</div>
+<script src="site.js"></script>
+</body>
+</html>

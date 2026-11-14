@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 /*
-	Builds the documentation site into build/site.
+	Builds the documentation site into docs/, which GitHub Pages serves from
+	main. docs/ is generated: edit site/ and rebuild, and commit both. CI
+	fails if the committed docs/ does not match a fresh build.
 
-	Pages are written in docs/*.md, in a small Markdown dialect (see render()).
+	Pages are written in site/*.md, in a small Markdown dialect (see render()).
 	The parts that describe the code are not written by hand: the config
 	reference, the preset comparison and the example weapons are read from the
 	Luau sources, so they cannot fall out of date. The build fails when a
@@ -20,8 +22,8 @@ import { dirname, extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const docsDir = join(root, "docs");
-const outDir = join(root, "build", "site");
+const docsDir = join(root, "site");
+const outDir = join(root, "docs");
 const REPO = "https://github.com/xerseer/ORDINANCE";
 
 const read = (path) => readFileSync(join(root, path), "utf8").replace(/\r\n/g, "\n");
@@ -658,7 +660,7 @@ function layout(page, pages, version) {
 ${page.html}
     <footer>
       <span>Ordnance v${version}. MIT licence.</span>
-      <a href="${REPO}/blob/main/docs/${page.source}">Edit this page&nbsp;↗</a>
+      <a href="${REPO}/blob/main/site/${page.source}">Edit this page&nbsp;↗</a>
     </footer>
   </main>
 </div>
@@ -673,7 +675,7 @@ function build() {
 	const directives = makeDirectives(fw);
 	const sources = readdirSync(docsDir).filter((file) => file.endsWith(".md"));
 	const pages = sources.map((source) => {
-		const text = read(`docs/${source}`).replace(/\{\{version\}\}/g, fw.version);
+		const text = read(`site/${source}`).replace(/\{\{version\}\}/g, fw.version);
 		const page = render(text, directives);
 		return { ...page, source, file: source === "index.md" ? "index.html" : source.replace(/\.md$/, ".html") };
 	});

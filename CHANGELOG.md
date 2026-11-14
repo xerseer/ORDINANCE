@@ -71,7 +71,8 @@ Decisions made without asking are listed under **Decisions** so they are easy to
 - **Generated where it can be.** `tools/docs.mjs` reads `Defaults.luau` and `Schema.luau` with a small Luau table parser, so the configuration reference (160 settings: default, accepted values, description, scope), the preset comparison and the example-weapon table always match the code. The build fails if a config section or a public API function or signal has no entry, and CI runs it.
 - **Look.** The xnet docs' visual language: warm paper or warm near-black following the system theme, one olive accent, Schibsted Grotesk and JetBrains Mono, square corners, a left rail that lists the current page's sections. Code is highlighted at build time; the only scripts are copy buttons, the rail marker and a settings filter (press `/`).
 - **No dependencies.** Markdown dialect, highlighter and dev server (`--serve`, rebuilds on change) are in the one script.
-- `.github/workflows/docs.yml` publishes the site to GitHub Pages from `main`.
+- The built site is committed in `docs/` (with `index.html` and `.nojekyll`) and GitHub Pages serves it from `main`; the Markdown sources live in `site/`. CI fails if `docs/` does not match a fresh build. This replaced an Actions deploy workflow so Pages needs only "Deploy from a branch".
+- `main` is the only branch; the `dev` and `phase/*` branches were merged and deleted.
 
 **Checked:** every page at 1280 and 375 pixels wide has no horizontal overflow, every internal link and anchor resolves, there are no duplicate ids or stray Markdown, and the filter works. **Not checked:** how it looks to the eye. The browser available to me could not paint while the app was in the background.
 

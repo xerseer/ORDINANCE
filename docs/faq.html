@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Troubleshooting – Ordnance</title>
+<meta name="description" content="Fixes for the common Ordnance problems, answers to common questions, and what Ordnance cannot do yet.">
+<meta property="og:title" content="Troubleshooting – Ordnance">
+<meta property="og:description" content="Fixes for the common Ordnance problems, answers to common questions, and what Ordnance cannot do yet.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" aria-label="Pages">
+    <a class="brand" href="index.html">Ordnance</a>
+    <span class="ver">v0.1.0</span>
+    <a class="get" href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">Get Ordnance&nbsp;↗</a>
+    <a class="item" href="index.html">Start here</a>
+    <a class="item" href="weapons.html">Weapons</a>
+    <a class="item" href="config.html">Configuration</a>
+    <a class="item" href="presets.html">Presets</a>
+    <a class="item" href="animation.html">Animation</a>
+    <a class="item" href="api.html">Scripting API</a>
+    <a class="item" href="security.html">Security</a>
+    <a class="item" href="plugin.html">Studio plugin</a>
+    <a class="item here" href="faq.html" aria-current="page">Troubleshooting</a><div class="subs"><a class="sub" href="#problems">Common problems</a><a class="sub" href="#questions">Questions</a><a class="sub" href="#limits">Not there yet</a></div>
+    <a class="item out" href="https://github.com/xerseer/ORDINANCE" target="_blank" rel="noopener">Source&nbsp;↗</a>
+  </nav>
+  <main>
+<section id="top"><h1>Troubleshooting</h1>
+<p class="lede">Start with the Output window. Everything Ordnance reports is tagged <code>[Ordnance:…]</code>; type <code>Ordnance</code> in its filter box to see only that.</p>
+</section>
+<section id="problems"><h2>Common problems</h2>
+<h3 id="missing-weapon">A weapon does not appear</h3>
+<ul><li>It must be a <strong>ModuleScript</strong> directly in <code>Ordnance.Weapons</code> (or in a folder there) that returns a table. A Script or LocalScript is not a weapon.</li><li>If it fails to load, Output says why, naming the weapon. The other weapons still load.</li><li>With <code>Inventory.Loadout</code> set to a list, a weapon that is not in it is not handed out. <code>{ &quot;*&quot; }</code> hands out all of them.</li><li>With <code>Inventory.Mode = &quot;Custom&quot;</code>, nothing is handed out; <a href="api.html#give"><code>Ordnance.Give</code></a> is up to you.</li></ul>
+<h3 id="setting-ignored">A setting has no effect</h3>
+<p>Look for a warning naming it. The usual causes:</p>
+<ul><li>A misspelt name. The warning suggests the closest real one.</li><li>The wrong type, such as <code>&quot;30&quot;</code> for <code>30</code>. It is left out and the default used.</li><li>A global-only section (<code>Inventory</code>, <code>Security</code>, <code>Debug</code>) set in a weapon module. Set it in <code>Ordnance.Config</code>.</li><li>A weapon module that sets the same thing. The weapon's value wins over the global config.</li></ul>
+<h3 id="backwards">The gun is held backwards, sideways, or shoots from the stock</h3>
+<p>The <code>Handle</code> part is turned the wrong way. Its front face (−Z) must point down the barrel and its top face (+Y) up. Rotate the part, not the model. The plugin's <a href="plugin.html#helper">IK Helper</a> says when the muzzle is behind the handle.</p>
+<h3 id="hands">The hands are in the wrong place</h3>
+<p>Add or move the <code>MainHandle</code> and <code>Grip</code> attachments on the handle. <code>Debug.Visualize.IK</code> marks where each first-person hand is being asked to grip, and <code>Debug.Visualize.Attachments</code> marks the weapon's attachments.</p>
+<h3 id="no-damage">Shots that clearly hit do no damage</h3>
+<ul><li><code>Damage.FriendlyFire</code> is off and the target is on the same team.</li><li>Your <a href="api.html#setdamagehandler">damage handler</a> returned <code>false</code> or 0.</li><li>The server rejected the shot. Set <code>Debug.Logger.Level = &quot;Debug&quot;</code> to see each rejection and its reason. <code>origin too far from the character</code> on a fast-moving character means <code>Security.MaxOriginError</code> is too small for your game.</li></ul>
+<p><code>Debug.Visualize.Hitboxes</code> draws the rewound hitboxes the server tested, which shows whether lag compensation is the cause.</p>
+<h3 id="sounds">A sound does not play</h3>
+<p>A sound id only plays if your experience is allowed to use it. Roblox's own libraries (search the Creator Store for &quot;Pro Sound Effects&quot;) work everywhere; audio uploaded by someone else may be private. Output shows a <code>failed to load</code> line for each one that is refused.</p>
+</section>
+<section id="questions"><h2>Questions</h2>
+<h3 id="rigs">Does it work with my own character rig?</h3>
+<p>Any R15 or R6 character works, including custom bodies and the newer AnimationConstraint joints. Rigs built some other way are not supported.</p>
+<h3 id="npcs">Can NPCs be shot?</h3>
+<p>Yes. Anything with a Humanoid takes damage. NPCs cannot use Ordnance weapons themselves.</p>
+<h3 id="roblox-animations">Can I use Roblox animations instead?</h3>
+<p>Not directly: weapon animations are encoded or procedural. The plugin's <a href="plugin.html#converter">Converter</a> turns a KeyframeSequence into an encoded animation, which then needs no upload and works on every rig.</p>
+<h3 id="devices">Does it work on phones and gamepads?</h3>
+<p>Keybinds take gamepad buttons alongside keys, and touch devices get on-screen buttons for each action. In <code>Tool</code> mode the hotbar works as it does in any Roblox game.</p>
+<h3 id="update">How do I update?</h3>
+<p>With the plugin, press <strong>Update &amp; Install</strong>. By hand, replace the <code>Framework</code> folder and the root module's source with the new release's; keep your own <code>Config</code>, <code>Weapons</code> and <code>Presets</code>.</p>
+<h3 id="remove">How do I remove it?</h3>
+<p>Delete <code>ReplicatedStorage.Ordnance</code>. Nothing was put anywhere else.</p>
+</section>
+<section id="limits"><h2>Not there yet</h2>
+<p>Said plainly, so you can plan around it:</p>
+<ul><li><strong>Reload and handling sounds.</strong> Only the gunshots are real recordings; the reload, empty and explosion sounds are the simple ones that ship with Studio. Encoded animations can play your own at any keyframe.</li><li><strong>Attachments as items.</strong> Sights, grips and suppressors that players swap are not built in. <code>Custom</code> and the API leave room for your own.</li><li><strong>R6 stance.</strong> R6 bodies do not turn or lean, and R6 arms may slide at the shoulder to reach.</li><li><strong>Third-person bolts.</strong> In third person the trigger hand stays on the grip, so bolts are only worked by hand in first person.</li><li><strong>Aimbot detection.</strong> See <a href="security.html#limits">Security</a>.</li><li><strong>Creator Store.</strong> The framework and the plugin are not listed there yet; releases on GitHub are the official copies.</li></ul>
+</section>
+    <footer>
+      <span>Ordnance v0.1.0. MIT licence.</span>
+      <a href="https://github.com/xerseer/ORDINANCE/blob/main/site/faq.md">Edit this page&nbsp;↗</a>
+    </footer>
+  </main>
+</div>
+<script src="site.js"></script>
+</body>
+</html>

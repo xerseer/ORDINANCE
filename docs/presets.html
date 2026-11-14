@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Presets – Ordnance</title>
+<meta name="description" content="Ordnance's ready-made configs, from Arcade to Realistic, what each one changes, and how to write your own.">
+<meta property="og:title" content="Presets – Ordnance">
+<meta property="og:description" content="Ordnance's ready-made configs, from Arcade to Realistic, what each one changes, and how to write your own.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" aria-label="Pages">
+    <a class="brand" href="index.html">Ordnance</a>
+    <span class="ver">v0.1.0</span>
+    <a class="get" href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">Get Ordnance&nbsp;↗</a>
+    <a class="item" href="index.html">Start here</a>
+    <a class="item" href="weapons.html">Weapons</a>
+    <a class="item" href="config.html">Configuration</a>
+    <a class="item here" href="presets.html" aria-current="page">Presets</a><div class="subs"><a class="sub" href="#list">The four</a><a class="sub" href="#compare">What each changes</a><a class="sub" href="#custom">Your own</a></div>
+    <a class="item" href="animation.html">Animation</a>
+    <a class="item" href="api.html">Scripting API</a>
+    <a class="item" href="security.html">Security</a>
+    <a class="item" href="plugin.html">Studio plugin</a>
+    <a class="item" href="faq.html">Troubleshooting</a>
+    <a class="item out" href="https://github.com/xerseer/ORDINANCE" target="_blank" rel="noopener">Source&nbsp;↗</a>
+  </nav>
+  <main>
+<section id="top"><h1>Presets</h1>
+<p class="lede">A preset is a config you start from. Pick one by name and your own settings go on top of it.</p>
+<div class="code"><div class="label">Ordnance.Config</div><pre><code><span class="tk-kw">return</span> {
+	Preset = <span class="tk-str">&quot;Tactical&quot;</span>,
+}</code></pre></div>
+</section>
+<section id="list"><h2>The four</h2>
+<dl class="defs"><dt><code>Standard</code></dt><dd>The framework defaults, unchanged. This preset exists so &quot;the defaults&quot; is something you can pick by name and copy as a starting point for your own. </dd><dt><code>Arcade</code></dt><dd>Point and click. No reserve to manage, generous accuracy, gentle recoil, quick reloads and nothing to learn beyond aim, shoot and reload. </dd><dt><code>Tactical</code></dt><dd>Slower and more deliberate. Hip fire is loose, aimed fire is rewarded, recoil has to be controlled, and an early reload keeps the round in the chamber. </dd><dt><code>Realistic</code></dt><dd>Everything on. The chamber is tracked, bolts and pumps are worked by hand, a dropped magazine takes its rounds with it, weapons can jam, and there is no crosshair or hitmarker to lean on. Hits are lethal. </dd></dl>
+</section>
+<section id="compare"><h2>What each changes</h2>
+<p>Every setting a preset touches, beside its default. A dash means the preset leaves it alone. <code>Tuning</code> values multiply every weapon's own numbers, so a preset retunes the whole arsenal without knowing what weapons you have.</p>
+<div class="tbl"><table class="compare"><thead><tr><th>Setting</th><th>Default</th><th>Arcade</th><th>Tactical</th><th>Realistic</th></tr></thead><tbody>
+<tr><td><a href="config.html#ammo-infinite"><code>Ammo.Infinite</code></a></td><td><code>false</code></td><td><code>true</code></td><td><span class="dim">–</span></td><td><span class="dim">–</span></td></tr>
+<tr><td><a href="config.html#ammo-autoreload"><code>Ammo.AutoReload</code></a></td><td><code>true</code></td><td><code>true</code></td><td><span class="dim">–</span></td><td><code>false</code></td></tr>
+<tr><td><a href="config.html#damage-multipliers-head"><code>Damage.Multipliers.Head</code></a></td><td><code>2</code></td><td><span class="dim">–</span></td><td><code>2.5</code></td><td><code>4</code></td></tr>
+<tr><td><a href="config.html#damage-multipliers-torso"><code>Damage.Multipliers.Torso</code></a></td><td><code>1</code></td><td><span class="dim">–</span></td><td><code>1</code></td><td><code>1.2</code></td></tr>
+<tr><td><a href="config.html#damage-multipliers-limb"><code>Damage.Multipliers.Limb</code></a></td><td><code>0.8</code></td><td><span class="dim">–</span></td><td><code>0.7</code></td><td><code>0.6</code></td></tr>
+<tr><td><a href="config.html#damage-falloff-minscale"><code>Damage.Falloff.MinScale</code></a></td><td><code>0.5</code></td><td><code>0.8</code></td><td><span class="dim">–</span></td><td><span class="dim">–</span></td></tr>
+<tr><td><a href="config.html#damage-friendlyfire"><code>Damage.FriendlyFire</code></a></td><td><code>false</code></td><td><span class="dim">–</span></td><td><span class="dim">–</span></td><td><code>true</code></td></tr>
+<tr><td><a href="config.html#spread-moving"><code>Spread.Moving</code></a></td><td><code>1.2</code></td><td><span class="dim">–</span></td><td><code>1.8</code></td><td><code>2.4</code></td></tr>
+<tr><td><a href="config.html#spread-airborne"><code>Spread.Airborne</code></a></td><td><code>3</code></td><td><span class="dim">–</span></td><td><code>4.5</code></td><td><code>6</code></td></tr>
+<tr><td><a href="config.html#spread-recovery"><code>Spread.Recovery</code></a></td><td><code>9</code></td><td><span class="dim">–</span></td><td><code>7</code></td><td><code>5</code></td></tr>
+<tr><td><a href="config.html#recoil-recovery"><code>Recoil.Recovery</code></a></td><td><code>0.55</code></td><td><code>0.9</code></td><td><code>0.4</code></td><td><code>0.25</code></td></tr>
+<tr><td><a href="config.html#recoil-damping"><code>Recoil.Damping</code></a></td><td><code>0.8</code></td><td><span class="dim">–</span></td><td><span class="dim">–</span></td><td><code>0.65</code></td></tr>
+<tr><td><a href="config.html#handling-equiptime"><code>Handling.EquipTime</code></a></td><td><code>0.35</code></td><td><code>0.2</code></td><td><code>0.5</code></td><td><code>0.65</code></td></tr>
+<tr><td><a href="config.html#handling-aimtime"><code>Handling.AimTime</code></a></td><td><code>0.18</code></td><td><code>0.12</code></td><td><code>0.24</code></td><td><code>0.3</code></td></tr>
+<tr><td><a href="config.html#handling-walkspeedscale"><code>Handling.WalkSpeedScale</code></a></td><td><code>1</code></td><td><span class="dim">–</span></td><td><code>0.95</code></td><td><code>0.9</code></td></tr>
+<tr><td><a href="config.html#handling-aimwalkspeedscale"><code>Handling.AimWalkSpeedScale</code></a></td><td><code>0.75</code></td><td><code>0.9</code></td><td><code>0.6</code></td><td><code>0.45</code></td></tr>
+<tr><td><a href="config.html#realism-chambering"><code>Realism.Chambering</code></a></td><td><code>false</code></td><td><code>false</code></td><td><code>true</code></td><td><code>true</code></td></tr>
+<tr><td><a href="config.html#realism-manualcycle"><code>Realism.ManualCycle</code></a></td><td><code>false</code></td><td><code>false</code></td><td><span class="dim">–</span></td><td><code>true</code></td></tr>
+<tr><td><a href="config.html#realism-dropmagazine"><code>Realism.DropMagazine</code></a></td><td><code>false</code></td><td><code>false</code></td><td><span class="dim">–</span></td><td><code>true</code></td></tr>
+<tr><td><a href="config.html#realism-malfunctions-enabled"><code>Realism.Malfunctions.Enabled</code></a></td><td><code>false</code></td><td><code>false</code></td><td><span class="dim">–</span></td><td><code>true</code></td></tr>
+<tr><td><a href="config.html#realism-malfunctions-chance"><code>Realism.Malfunctions.Chance</code></a></td><td><code>0.003</code></td><td><span class="dim">–</span></td><td><span class="dim">–</span></td><td><code>0.002</code></td></tr>
+<tr><td><a href="config.html#tuning-damage"><code>Tuning.Damage</code></a></td><td><code>1</code></td><td><span class="dim">–</span></td><td><span class="dim">–</span></td><td><code>1.6</code></td></tr>
+<tr><td><a href="config.html#tuning-recoil"><code>Tuning.Recoil</code></a></td><td><code>1</code></td><td><code>0.5</code></td><td><code>1.25</code></td><td><code>1.5</code></td></tr>
+<tr><td><a href="config.html#tuning-spread"><code>Tuning.Spread</code></a></td><td><code>1</code></td><td><code>0.6</code></td><td><code>1.15</code></td><td><code>1.2</code></td></tr>
+<tr><td><a href="config.html#tuning-reloadtime"><code>Tuning.ReloadTime</code></a></td><td><code>1</code></td><td><code>0.7</code></td><td><code>1.1</code></td><td><code>1.2</code></td></tr>
+<tr><td><a href="config.html#hud-crosshair"><code>HUD.Crosshair</code></a></td><td><code>true</code></td><td><span class="dim">–</span></td><td><span class="dim">–</span></td><td><code>false</code></td></tr>
+<tr><td><a href="config.html#hud-hitmarker"><code>HUD.Hitmarker</code></a></td><td><code>true</code></td><td><span class="dim">–</span></td><td><span class="dim">–</span></td><td><code>false</code></td></tr>
+</tbody></table></div>
+</section>
+<section id="custom"><h2>Your own</h2>
+<p>A preset is a ModuleScript in <code>Ordnance.Presets</code> that returns a partial config, exactly like <code>Ordnance.Config</code>. It cannot name another preset, and it cannot set weapon-only fields such as <code>Name</code> or <code>Model</code>.</p>
+<div class="code"><div class="label">Presets.Hardcore</div><pre><code><span class="tk-com">--[[
+	Hardcore
+	Tactical handling, no HUD, and every hit counts double.
+]]</span>
+
+<span class="tk-kw">return</span> {
+	Tuning = { Damage = <span class="tk-num">2</span>, Recoil = <span class="tk-num">1.25</span> },
+	Realism = { Chambering = <span class="tk-kw">true</span>, DropMagazine = <span class="tk-kw">true</span> },
+	HUD = { Enabled = <span class="tk-kw">false</span> },
+}</code></pre></div>
+<p>The first line of the comment block is the name and the paragraph under it is the description; the plugin and the catalogue show both. The plugin's <a href="plugin.html#presets">Presets tab</a> can also save your current <code>Ordnance.Config</code> as a new preset, and export or import one as text to share.</p>
+<p>Updates add presets that ship with new versions and never touch the ones you made or edited.</p>
+</section>
+    <footer>
+      <span>Ordnance v0.1.0. MIT licence.</span>
+      <a href="https://github.com/xerseer/ORDINANCE/blob/main/site/presets.md">Edit this page&nbsp;↗</a>
+    </footer>
+  </main>
+</div>
+<script src="site.js"></script>
+</body>
+</html>

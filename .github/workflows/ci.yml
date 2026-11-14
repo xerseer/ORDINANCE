@@ -34,6 +34,10 @@ jobs:
       - name: Build plugin
         run: rojo build plugin.project.json -o OrdnancePlugin.rbxm
 
-      # Fails when a config section or public API function has no docs.
+      # Fails when a config section or public API function has no docs,
+      # or when the committed site in docs/ is out of date.
       - name: Build docs
         run: node tools/docs.mjs
+
+      - name: Check docs/ is up to date
+        run: git diff --exit-code --stat -- docs || (echo "docs/ is stale. Run node tools/docs.mjs and commit." && exit 1)

@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Configuration – Ordnance</title>
+<meta name="description" content="Every Ordnance setting with its default, the values it accepts and what it does, generated from the framework's own schema.">
+<meta property="og:title" content="Configuration – Ordnance">
+<meta property="og:description" content="Every Ordnance setting with its default, the values it accepts and what it does, generated from the framework's own schema.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" aria-label="Pages">
+    <a class="brand" href="index.html">Ordnance</a>
+    <span class="ver">v0.1.0</span>
+    <a class="get" href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">Get Ordnance&nbsp;↗</a>
+    <a class="item" href="index.html">Start here</a>
+    <a class="item" href="weapons.html">Weapons</a>
+    <a class="item here" href="config.html" aria-current="page">Configuration</a><div class="subs"><a class="sub" href="#how">How it works</a><a class="sub" href="#identity">Identity</a><a class="sub" href="#fire">Fire</a><a class="sub" href="#ammo">Ammo</a><a class="sub" href="#ballistics">Ballistics</a><a class="sub" href="#damage">Damage</a><a class="sub" href="#spread">Spread</a><a class="sub" href="#recoil">Recoil</a><a class="sub" href="#handling">Handling</a><a class="sub" href="#realism">Realism</a><a class="sub" href="#tuning-ref">Tuning</a><a class="sub" href="#camera">Camera</a><a class="sub" href="#viewmodel">Viewmodel</a><a class="sub" href="#thirdperson">Third person</a><a class="sub" href="#animation">Animation</a><a class="sub" href="#sway">Sway</a><a class="sub" href="#keybinds">Keybinds</a><a class="sub" href="#controls">Controls</a><a class="sub" href="#effects">Effects</a><a class="sub" href="#hud">HUD</a><a class="sub" href="#inventory">Inventory</a><a class="sub" href="#security">Security</a><a class="sub" href="#debug">Debug</a></div>
+    <a class="item" href="presets.html">Presets</a>
+    <a class="item" href="animation.html">Animation</a>
+    <a class="item" href="api.html">Scripting API</a>
+    <a class="item" href="security.html">Security</a>
+    <a class="item" href="plugin.html">Studio plugin</a>
+    <a class="item" href="faq.html">Troubleshooting</a>
+    <a class="item out" href="https://github.com/xerseer/ORDINANCE" target="_blank" rel="noopener">Source&nbsp;↗</a>
+  </nav>
+  <main>
+<section id="top"><h1>Configuration</h1>
+<p class="lede">Every setting, its default, and what it accepts. This page is generated from the framework's schema, so it always matches the version you download.</p>
+</section>
+<section id="how"><h2>How it works</h2>
+<p>There is one shape of config. <code>Ordnance.Config</code>, every preset and every weapon module are partial copies of it, layered lowest to highest:</p>
+<div class="tree">Defaults  <span class="dim">&lt;</span>  Preset  <span class="dim">&lt;</span>  Ordnance.Config  <span class="dim">&lt;</span>  the weapon's module</div>
+<p>Write only what you change. Tables merge setting by setting, so <code>Damage = { Base = 30 }</code> keeps the default multipliers and falloff. Lists are the exception: <code>Fire.Modes</code> or a keybind list replaces the one below it whole.</p>
+<div class="code"><div class="label">Ordnance.Config</div><pre><code><span class="tk-kw">return</span> {
+	Preset = <span class="tk-str">&quot;Tactical&quot;</span>,
+
+	Keybinds = { Reload = { <span class="tk-str">&quot;R&quot;</span>, <span class="tk-str">&quot;ButtonX&quot;</span> } },
+	HUD = { Accent = Color3.<span class="tk-fn">fromRGB</span>(<span class="tk-num">230</span>, <span class="tk-num">120</span>, <span class="tk-num">80</span>) },
+	Inventory = { Loadout = { <span class="tk-str">&quot;Glock17&quot;</span>, <span class="tk-str">&quot;G36C&quot;</span> } },
+}</code></pre></div>
+<p>Nothing here can break the game. A wrong type, an out-of-range number or a misspelt name is reported in the Output window with its path, and the value is clamped or left out so the default applies. The Studio plugin's <a href="plugin.html#config">Config tab</a> edits this file with a form and checks each value as you enter it.</p>
+<h3 id="scope">Global and per-weapon</h3>
+<p>Most settings work in both places: set them globally for every weapon, or in one weapon's module for just that one. A few only make sense once:</p>
+<ul><li><code>Inventory</code>, <code>Security</code> and <code>Debug</code> are global only. A weapon that sets them is told so and ignored.</li><li><code>Name</code>, <code>Description</code>, <code>Model</code>, <code>Custom</code> and <code>Animations</code> belong in a weapon module.</li></ul>
+<h3 id="tuning">Tuning</h3>
+<p><code>Tuning</code> multiplies a weapon's own numbers: damage, recoil, spread, reload time, fire rate. Set it globally, or in a preset, to rebalance the whole game without touching a single weapon. Like any setting, the deepest layer wins: a weapon that sets <code>Tuning.Damage</code> replaces the global value for that weapon rather than multiplying it.</p>
+<div class="filter"><input type="search" placeholder="Filter settings (press /)" aria-label="Filter settings"><span class="count"></span></div>
+</section>
+<section id="identity"><h2>Identity</h2>
+<p>Top-level settings.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Where</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="preset name of a module in ordnance.presets to start from. global config only."><td><code id="preset">Preset</code></td><td><code>&quot;&quot;</code></td><td>Global</td><td>Name of a module in Ordnance.Presets to start from. Global config only.</td></tr>
+<tr data-search="name display name. defaults to the weapon module's name."><td><code id="name">Name</code></td><td><code>&quot;&quot;</code></td><td>Weapon</td><td>Display name. Defaults to the weapon module's name.</td></tr>
+<tr data-search="description short text shown in menus and the catalogue."><td><code id="description">Description</code></td><td><code>&quot;&quot;</code></td><td>Weapon</td><td>Short text shown in menus and the catalogue.</td></tr>
+<tr data-search="model the weapon model: a child of the weapon module by name, or an instance."><td><code id="model">Model</code></td><td><code>&quot;Model&quot;</code></td><td>Weapon</td><td>The weapon model: a child of the weapon module by name, or an Instance.</td></tr>
+<tr data-search="custom your own data. ordnance copies it through untouched."><td><code id="custom">Custom</code></td><td><code>{}</code></td><td>Weapon</td><td>Your own data. Ordnance copies it through untouched.</td></tr>
+<tr data-search="animations encoded animations: keyframe tables by action name."><td><code id="animations">Animations</code></td><td><code>{}</code></td><td>Weapon</td><td>Encoded animations: keyframe tables by action name.</td></tr>
+</tbody></table></div>
+</section>
+<section id="fire"><h2>Fire</h2>
+<p>How the trigger behaves. See <a href="weapons.html#firing">Firing</a>.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="fire.mode fire mode the weapon starts in."><td><code id="fire-mode">Mode</code></td><td><code>&quot;Auto&quot;</code></td><td><code>Safe</code> <code>Semi</code> <code>Burst</code> <code>Auto</code></td><td>Fire mode the weapon starts in.</td></tr>
+<tr data-search="fire.modes fire modes the player can switch between."><td><code id="fire-modes">Modes</code></td><td><code>{ &quot;Auto&quot; }</code></td><td>list of <code>Safe</code> <code>Semi</code> <code>Burst</code> <code>Auto</code></td><td>Fire modes the player can switch between.</td></tr>
+<tr data-search="fire.rpm rounds per minute."><td><code id="fire-rpm">RPM</code></td><td><code>600</code></td><td>1 to 6000</td><td>Rounds per minute.</td></tr>
+<tr data-search="fire.burstcount rounds fired per trigger pull in burst mode."><td><code id="fire-burstcount">BurstCount</code></td><td><code>3</code></td><td>whole, 2 to 20</td><td>Rounds fired per trigger pull in Burst mode.</td></tr>
+<tr data-search="fire.burstrpm rate of fire inside a burst. 0 uses rpm."><td><code id="fire-burstrpm">BurstRPM</code></td><td><code>0</code></td><td>0 to 6000</td><td>Rate of fire inside a burst. 0 uses RPM.</td></tr>
+<tr data-search="fire.pellets projectiles per round. more than 1 makes a shotgun."><td><code id="fire-pellets">Pellets</code></td><td><code>1</code></td><td>whole, 1 to 64</td><td>Projectiles per round. More than 1 makes a shotgun.</td></tr>
+<tr data-search="fire.action selfloading cycles by itself. bolt and pump need a cycle after every shot."><td><code id="fire-action">Action</code></td><td><code>&quot;SelfLoading&quot;</code></td><td><code>SelfLoading</code> <code>Bolt</code> <code>Pump</code></td><td>SelfLoading cycles by itself. Bolt and Pump need a cycle after every shot.</td></tr>
+<tr data-search="fire.cycletime seconds a bolt or pump cycle takes."><td><code id="fire-cycletime">CycleTime</code></td><td><code>0.8</code></td><td>0 to 10</td><td>Seconds a bolt or pump cycle takes.</td></tr>
+<tr data-search="fire.inputbuffer seconds a trigger pull is remembered if the weapon is not ready yet."><td><code id="fire-inputbuffer">InputBuffer</code></td><td><code>0.12</code></td><td>0 to 1</td><td>Seconds a trigger pull is remembered if the weapon is not ready yet.</td></tr>
+</tbody></table></div>
+</section>
+<section id="ammo"><h2>Ammo</h2>
+<p>Rounds and reloading. See <a href="weapons.html#ammo">Ammunition</a>.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="ammo.magazine rounds a magazine holds."><td><code id="ammo-magazine">Magazine</code></td><td><code>30</code></td><td>whole, 1 to 9999</td><td>Rounds a magazine holds.</td></tr>
+<tr data-search="ammo.reserve spare rounds carried. math.huge is allowed."><td><code id="ammo-reserve">Reserve</code></td><td><code>120</code></td><td>0 or more</td><td>Spare rounds carried. math.huge is allowed.</td></tr>
+<tr data-search="ammo.infinite reloading never uses up the reserve."><td><code id="ammo-infinite">Infinite</code></td><td><code>false</code></td><td>true or false</td><td>Reloading never uses up the reserve.</td></tr>
+<tr data-search="ammo.reloadtype magazine swaps the whole magazine. single loads one round at a time and can be interrupted."><td><code id="ammo-reloadtype">ReloadType</code></td><td><code>&quot;Magazine&quot;</code></td><td><code>Magazine</code> <code>Single</code></td><td>Magazine swaps the whole magazine. Single loads one round at a time and can be interrupted.</td></tr>
+<tr data-search="ammo.reloadtime seconds for a magazine reload."><td><code id="ammo-reloadtime">ReloadTime</code></td><td><code>2.2</code></td><td>0 to 30</td><td>Seconds for a magazine reload.</td></tr>
+<tr data-search="ammo.reloademptytime seconds for a reload from empty. 0 uses reloadtime."><td><code id="ammo-reloademptytime">ReloadEmptyTime</code></td><td><code>0</code></td><td>0 to 30</td><td>Seconds for a reload from empty. 0 uses ReloadTime.</td></tr>
+<tr data-search="ammo.shelltime seconds per round for a single reload."><td><code id="ammo-shelltime">ShellTime</code></td><td><code>0.55</code></td><td>0.05 to 10</td><td>Seconds per round for a Single reload.</td></tr>
+<tr data-search="ammo.autoreload pulling the trigger on an empty weapon starts a reload."><td><code id="ammo-autoreload">AutoReload</code></td><td><code>true</code></td><td>true or false</td><td>Pulling the trigger on an empty weapon starts a reload.</td></tr>
+</tbody></table></div>
+</section>
+<section id="ballistics"><h2>Ballistics</h2>
+<p>What leaves the barrel. <code>Range</code> and <code>Penetration</code> apply to hitscan; <code>Velocity</code> to <code>Lifetime</code>, <code>Bounce</code> and <code>Explosive</code> to projectiles.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="ballistics.type hitscan hits instantly. projectile flies, drops and can bounce or explode."><td><code id="ballistics-type">Type</code></td><td><code>&quot;Hitscan&quot;</code></td><td><code>Hitscan</code> <code>Projectile</code></td><td>Hitscan hits instantly. Projectile flies, drops and can bounce or explode.</td></tr>
+<tr data-search="ballistics.range furthest a round travels, in studs."><td><code id="ballistics-range">Range</code></td><td><code>1200</code></td><td>1 to 20000</td><td>Furthest a round travels, in studs.</td></tr>
+<tr data-search="ballistics.penetration studs of material a round can pass through. hitscan only."><td><code id="ballistics-penetration">Penetration</code></td><td><code>0</code></td><td>0 to 50</td><td>Studs of material a round can pass through. Hitscan only.</td></tr>
+<tr data-search="ballistics.velocity muzzle velocity in studs per second. projectile only."><td><code id="ballistics-velocity">Velocity</code></td><td><code>1800</code></td><td>1 to 20000</td><td>Muzzle velocity in studs per second. Projectile only.</td></tr>
+<tr data-search="ballistics.gravity multiplier on workspace.gravity. 0 flies straight."><td><code id="ballistics-gravity">Gravity</code></td><td><code>1</code></td><td>-10 to 10</td><td>Multiplier on workspace.Gravity. 0 flies straight.</td></tr>
+<tr data-search="ballistics.drag fraction of speed lost per second."><td><code id="ballistics-drag">Drag</code></td><td><code>0</code></td><td>0 to 20</td><td>Fraction of speed lost per second.</td></tr>
+<tr data-search="ballistics.lifetime seconds before a projectile is removed."><td><code id="ballistics-lifetime">Lifetime</code></td><td><code>6</code></td><td>0.05 to 120</td><td>Seconds before a projectile is removed.</td></tr>
+<tr data-search="ballistics.bounce.count times a projectile may bounce before it stops."><td><code id="ballistics-bounce-count">Bounce.Count</code></td><td><code>0</code></td><td>whole, 0 to 50</td><td>Times a projectile may bounce before it stops.</td></tr>
+<tr data-search="ballistics.bounce.elasticity speed kept after a bounce, 0 to 1."><td><code id="ballistics-bounce-elasticity">Bounce.Elasticity</code></td><td><code>0.45</code></td><td>0 to 1</td><td>Speed kept after a bounce, 0 to 1.</td></tr>
+<tr data-search="ballistics.bounce.minspeed below this speed a projectile stops instead of bouncing."><td><code id="ballistics-bounce-minspeed">Bounce.MinSpeed</code></td><td><code>12</code></td><td>0 to 1000</td><td>Below this speed a projectile stops instead of bouncing.</td></tr>
+<tr data-search="ballistics.explosive.enabled the projectile explodes."><td><code id="ballistics-explosive-enabled">Explosive.Enabled</code></td><td><code>false</code></td><td>true or false</td><td>The projectile explodes.</td></tr>
+<tr data-search="ballistics.explosive.damage damage at the centre of the blast."><td><code id="ballistics-explosive-damage">Explosive.Damage</code></td><td><code>120</code></td><td>0 to 100000</td><td>Damage at the centre of the blast.</td></tr>
+<tr data-search="ballistics.explosive.radius blast radius in studs."><td><code id="ballistics-explosive-radius">Explosive.Radius</code></td><td><code>16</code></td><td>0.5 to 500</td><td>Blast radius in studs.</td></tr>
+<tr data-search="ballistics.explosive.falloff how damage fades toward the edge of the blast."><td><code id="ballistics-explosive-falloff">Explosive.Falloff</code></td><td><code>&quot;Linear&quot;</code></td><td><code>None</code> <code>Linear</code> <code>Quadratic</code></td><td>How damage fades toward the edge of the blast.</td></tr>
+<tr data-search="ballistics.explosive.minscale damage multiplier at the very edge of the blast."><td><code id="ballistics-explosive-minscale">Explosive.MinScale</code></td><td><code>0.1</code></td><td>0 to 1</td><td>Damage multiplier at the very edge of the blast.</td></tr>
+<tr data-search="ballistics.explosive.fuse seconds until it explodes by itself. 0 turns the fuse off."><td><code id="ballistics-explosive-fuse">Explosive.Fuse</code></td><td><code>0</code></td><td>0 to 60</td><td>Seconds until it explodes by itself. 0 turns the fuse off.</td></tr>
+<tr data-search="ballistics.explosive.detonateonimpact explode on the first thing it touches."><td><code id="ballistics-explosive-detonateonimpact">Explosive.DetonateOnImpact</code></td><td><code>true</code></td><td>true or false</td><td>Explode on the first thing it touches.</td></tr>
+<tr data-search="ballistics.explosive.requirelineofsight walls protect from the blast."><td><code id="ballistics-explosive-requirelineofsight">Explosive.RequireLineOfSight</code></td><td><code>true</code></td><td>true or false</td><td>Walls protect from the blast.</td></tr>
+<tr data-search="ballistics.explosive.selfdamagescale multiplier on damage to the shooter. 0 makes them immune."><td><code id="ballistics-explosive-selfdamagescale">Explosive.SelfDamageScale</code></td><td><code>1</code></td><td>0 to 10</td><td>Multiplier on damage to the shooter. 0 makes them immune.</td></tr>
+<tr data-search="ballistics.explosive.knockback push applied to characters in the blast."><td><code id="ballistics-explosive-knockback">Explosive.Knockback</code></td><td><code>60</code></td><td>0 to 2000</td><td>Push applied to characters in the blast.</td></tr>
+</tbody></table></div>
+</section>
+<section id="damage"><h2>Damage</h2>
+<p>Per round, or per pellet for a shotgun.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="damage.base damage per round, before multipliers."><td><code id="damage-base">Base</code></td><td><code>24</code></td><td>0 to 100000</td><td>Damage per round, before multipliers.</td></tr>
+<tr data-search="damage.multipliers.head multiplier for head hits."><td><code id="damage-multipliers-head">Multipliers.Head</code></td><td><code>2</code></td><td>0 to 100</td><td>Multiplier for head hits.</td></tr>
+<tr data-search="damage.multipliers.torso multiplier for torso hits."><td><code id="damage-multipliers-torso">Multipliers.Torso</code></td><td><code>1</code></td><td>0 to 100</td><td>Multiplier for torso hits.</td></tr>
+<tr data-search="damage.multipliers.limb multiplier for arm and leg hits."><td><code id="damage-multipliers-limb">Multipliers.Limb</code></td><td><code>0.8</code></td><td>0 to 100</td><td>Multiplier for arm and leg hits.</td></tr>
+<tr data-search="damage.falloff.start distance in studs where damage starts to drop."><td><code id="damage-falloff-start">Falloff.Start</code></td><td><code>120</code></td><td>0 to 20000</td><td>Distance in studs where damage starts to drop.</td></tr>
+<tr data-search="damage.falloff.end distance in studs where damage stops dropping."><td><code id="damage-falloff-end">Falloff.End</code></td><td><code>400</code></td><td>0 to 20000</td><td>Distance in studs where damage stops dropping.</td></tr>
+<tr data-search="damage.falloff.minscale damage multiplier at and beyond falloff.end."><td><code id="damage-falloff-minscale">Falloff.MinScale</code></td><td><code>0.5</code></td><td>0 to 1</td><td>Damage multiplier at and beyond Falloff.End.</td></tr>
+<tr data-search="damage.friendlyfire players on the same team can damage each other."><td><code id="damage-friendlyfire">FriendlyFire</code></td><td><code>false</code></td><td>true or false</td><td>Players on the same team can damage each other.</td></tr>
+</tbody></table></div>
+</section>
+<section id="spread"><h2>Spread</h2>
+<p>Accuracy, in degrees from the centre of the cone.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="spread.hip cone half-angle in degrees when not aiming."><td><code id="spread-hip">Hip</code></td><td><code>2.2</code></td><td>0 to 45</td><td>Cone half-angle in degrees when not aiming.</td></tr>
+<tr data-search="spread.aim cone half-angle in degrees when aiming."><td><code id="spread-aim">Aim</code></td><td><code>0.25</code></td><td>0 to 45</td><td>Cone half-angle in degrees when aiming.</td></tr>
+<tr data-search="spread.moving degrees added while moving."><td><code id="spread-moving">Moving</code></td><td><code>1.2</code></td><td>0 to 45</td><td>Degrees added while moving.</td></tr>
+<tr data-search="spread.airborne degrees added while in the air."><td><code id="spread-airborne">Airborne</code></td><td><code>3</code></td><td>0 to 45</td><td>Degrees added while in the air.</td></tr>
+<tr data-search="spread.pershot degrees added by each shot."><td><code id="spread-pershot">PerShot</code></td><td><code>0.35</code></td><td>0 to 45</td><td>Degrees added by each shot.</td></tr>
+<tr data-search="spread.max most the cone can open, in degrees."><td><code id="spread-max">Max</code></td><td><code>6</code></td><td>0 to 60</td><td>Most the cone can open, in degrees.</td></tr>
+<tr data-search="spread.recovery degrees of shot bloom recovered per second."><td><code id="spread-recovery">Recovery</code></td><td><code>9</code></td><td>0 to 500</td><td>Degrees of shot bloom recovered per second.</td></tr>
+</tbody></table></div>
+</section>
+<section id="recoil"><h2>Recoil</h2>
+<p>Camera kick per shot.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="recoil.vertical upward camera kick per shot, in degrees."><td><code id="recoil-vertical">Vertical</code></td><td><code>1.1</code></td><td>0 to 45</td><td>Upward camera kick per shot, in degrees.</td></tr>
+<tr data-search="recoil.horizontal largest sideways kick per shot, in degrees."><td><code id="recoil-horizontal">Horizontal</code></td><td><code>0.45</code></td><td>0 to 45</td><td>Largest sideways kick per shot, in degrees.</td></tr>
+<tr data-search="recoil.aimscale recoil multiplier while aiming."><td><code id="recoil-aimscale">AimScale</code></td><td><code>0.65</code></td><td>0 to 4</td><td>Recoil multiplier while aiming.</td></tr>
+<tr data-search="recoil.recovery fraction of the kick the camera returns from, 0 to 1."><td><code id="recoil-recovery">Recovery</code></td><td><code>0.55</code></td><td>0 to 1</td><td>Fraction of the kick the camera returns from, 0 to 1.</td></tr>
+<tr data-search="recoil.speed how fast the kick is applied and recovered."><td><code id="recoil-speed">Speed</code></td><td><code>22</code></td><td>1 to 200</td><td>How fast the kick is applied and recovered.</td></tr>
+<tr data-search="recoil.damping spring damping. below 1 overshoots, 1 settles cleanly."><td><code id="recoil-damping">Damping</code></td><td><code>0.8</code></td><td>0.05 to 3</td><td>Spring damping. Below 1 overshoots, 1 settles cleanly.</td></tr>
+</tbody></table></div>
+</section>
+<section id="handling"><h2>Handling</h2>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="handling.equiptime seconds before the weapon can fire after equipping."><td><code id="handling-equiptime">EquipTime</code></td><td><code>0.35</code></td><td>0 to 10</td><td>Seconds before the weapon can fire after equipping.</td></tr>
+<tr data-search="handling.aimtime seconds to aim down sights."><td><code id="handling-aimtime">AimTime</code></td><td><code>0.18</code></td><td>0 to 5</td><td>Seconds to aim down sights.</td></tr>
+<tr data-search="handling.aimfov camera field of view while aiming."><td><code id="handling-aimfov">AimFOV</code></td><td><code>50</code></td><td>5 to 120</td><td>Camera field of view while aiming.</td></tr>
+<tr data-search="handling.walkspeedscale walk speed multiplier while holding the weapon."><td><code id="handling-walkspeedscale">WalkSpeedScale</code></td><td><code>1</code></td><td>0 to 4</td><td>Walk speed multiplier while holding the weapon.</td></tr>
+<tr data-search="handling.aimwalkspeedscale walk speed multiplier while aiming."><td><code id="handling-aimwalkspeedscale">AimWalkSpeedScale</code></td><td><code>0.75</code></td><td>0 to 4</td><td>Walk speed multiplier while aiming.</td></tr>
+</tbody></table></div>
+</section>
+<section id="realism"><h2>Realism</h2>
+<p>Opt-in. Everything is off by default; the Realistic preset turns it all on.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="realism.chambering track the chambered round separately: reloading early keeps one extra."><td><code id="realism-chambering">Chambering</code></td><td><code>false</code></td><td>true or false</td><td>Track the chambered round separately: reloading early keeps one extra.</td></tr>
+<tr data-search="realism.manualcycle bolt and pump weapons wait for the cycle key instead of cycling by themselves."><td><code id="realism-manualcycle">ManualCycle</code></td><td><code>false</code></td><td>true or false</td><td>Bolt and pump weapons wait for the Cycle key instead of cycling by themselves.</td></tr>
+<tr data-search="realism.dropmagazine rounds left in a swapped magazine are lost."><td><code id="realism-dropmagazine">DropMagazine</code></td><td><code>false</code></td><td>true or false</td><td>Rounds left in a swapped magazine are lost.</td></tr>
+<tr data-search="realism.malfunctions.enabled the weapon can jam. clear a jam with the cycle key."><td><code id="realism-malfunctions-enabled">Malfunctions.Enabled</code></td><td><code>false</code></td><td>true or false</td><td>The weapon can jam. Clear a jam with the Cycle key.</td></tr>
+<tr data-search="realism.malfunctions.chance chance per shot of a jam, 0 to 1."><td><code id="realism-malfunctions-chance">Malfunctions.Chance</code></td><td><code>0.003</code></td><td>0 to 1</td><td>Chance per shot of a jam, 0 to 1.</td></tr>
+</tbody></table></div>
+</section>
+<section id="tuning-ref"><h2>Tuning</h2>
+<p>Multipliers on the numbers above. 1 changes nothing.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="tuning.damage multiplier on bullet and explosion damage."><td><code id="tuning-damage">Damage</code></td><td><code>1</code></td><td>0 to 100</td><td>Multiplier on bullet and explosion damage.</td></tr>
+<tr data-search="tuning.recoil multiplier on camera kick."><td><code id="tuning-recoil">Recoil</code></td><td><code>1</code></td><td>0 to 10</td><td>Multiplier on camera kick.</td></tr>
+<tr data-search="tuning.spread multiplier on every spread angle."><td><code id="tuning-spread">Spread</code></td><td><code>1</code></td><td>0 to 10</td><td>Multiplier on every spread angle.</td></tr>
+<tr data-search="tuning.reloadtime multiplier on reload and shell times."><td><code id="tuning-reloadtime">ReloadTime</code></td><td><code>1</code></td><td>0.05 to 10</td><td>Multiplier on reload and shell times.</td></tr>
+<tr data-search="tuning.firerate multiplier on rounds per minute."><td><code id="tuning-firerate">FireRate</code></td><td><code>1</code></td><td>0.05 to 10</td><td>Multiplier on rounds per minute.</td></tr>
+</tbody></table></div>
+</section>
+<section id="camera"><h2>Camera</h2>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="camera.mode both follows the player's zoom. firstperson and thirdperson lock the view while a weapon is held."><td><code id="camera-mode">Mode</code></td><td><code>&quot;Both&quot;</code></td><td><code>Both</code> <code>FirstPerson</code> <code>ThirdPerson</code></td><td>Both follows the player's zoom. FirstPerson and ThirdPerson lock the view while a weapon is held.</td></tr>
+<tr data-search="camera.shoulderoffset camera shift in third person, so the character is not in the way of the crosshair."><td><code id="camera-shoulderoffset">ShoulderOffset</code></td><td><code>Vector3.new(1.4, 0.3, 0)</code></td><td>Vector3</td><td>Camera shift in third person, so the character is not in the way of the crosshair.</td></tr>
+<tr data-search="camera.faceaim in third person the character turns to face where it is aiming."><td><code id="camera-faceaim">FaceAim</code></td><td><code>true</code></td><td>true or false</td><td>In third person the character turns to face where it is aiming.</td></tr>
+</tbody></table></div>
+</section>
+<section id="viewmodel"><h2>Viewmodel</h2>
+<p>The first-person weapon and arms. Offsets are six numbers: position right, up and back in studs, then rotation x, y, z in degrees.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="viewmodel.enabled show first-person arms and weapon. off leaves first person to the plain character."><td><code id="viewmodel-enabled">Enabled</code></td><td><code>true</code></td><td>true or false</td><td>Show first-person arms and weapon. Off leaves first person to the plain character.</td></tr>
+<tr data-search="viewmodel.offset where the weapon's handle sits relative to the camera at the hip."><td><code id="viewmodel-offset">Offset</code></td><td><code>{ 0.7, -0.85, -1.4, 0, 0, 0 }</code></td><td>six numbers</td><td>Where the weapon's handle sits relative to the camera at the hip.</td></tr>
+<tr data-search="viewmodel.aimdistance studs from the camera to the weapon's aim attachment when aiming."><td><code id="viewmodel-aimdistance">AimDistance</code></td><td><code>1.25</code></td><td>0.2 to 6</td><td>Studs from the camera to the weapon's Aim attachment when aiming.</td></tr>
+<tr data-search="viewmodel.sleeves show the character's shirt on the first-person arms."><td><code id="viewmodel-sleeves">Sleeves</code></td><td><code>true</code></td><td>true or false</td><td>Show the character's shirt on the first-person arms.</td></tr>
+</tbody></table></div>
+</section>
+<section id="thirdperson"><h2>Third person</h2>
+<p>How a character holds the weapon, as everyone else sees it.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="thirdperson.offset where the handle sits relative to the character's eyes at the hip."><td><code id="thirdperson-offset">Offset</code></td><td><code>{ 0.42, -0.74, -0.3, 0, 12, 0 }</code></td><td>six numbers</td><td>Where the handle sits relative to the character's eyes at the hip.</td></tr>
+<tr data-search="thirdperson.aimoffset where the handle sits relative to the character's eyes when aiming."><td><code id="thirdperson-aimoffset">AimOffset</code></td><td><code>{ 0.22, -0.5, -0.42, 0, 6, 0 }</code></td><td>six numbers</td><td>Where the handle sits relative to the character's eyes when aiming.</td></tr>
+<tr data-search="thirdperson.bodyturn degrees the upper body turns side-on while holding a weapon, so the support hand can reach. r15 only."><td><code id="thirdperson-bodyturn">BodyTurn</code></td><td><code>28</code></td><td>0 to 60</td><td>Degrees the upper body turns side-on while holding a weapon, so the support hand can reach. R15 only.</td></tr>
+<tr data-search="thirdperson.bodypitch how much of the aim's up and down the upper body leans with, 0 to 1. r15 only."><td><code id="thirdperson-bodypitch">BodyPitch</code></td><td><code>0.5</code></td><td>0 to 1</td><td>How much of the aim's up and down the upper body leans with, 0 to 1. R15 only.</td></tr>
+</tbody></table></div>
+</section>
+<section id="animation"><h2>Animation</h2>
+<p>See <a href="animation.html">Animation</a>.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="animation.mode procedural, encoded, or both (encoded where the weapon has one, procedural otherwise)."><td><code id="animation-mode">Mode</code></td><td><code>&quot;Both&quot;</code></td><td><code>Procedural</code> <code>Encoded</code> <code>Both</code></td><td>Procedural, Encoded, or Both (encoded where the weapon has one, procedural otherwise).</td></tr>
+</tbody></table></div>
+</section>
+<section id="sway"><h2>Sway</h2>
+<p>First-person weapon sway. Each motion is a multiplier: 0 turns it off, 2 doubles it.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="sway.enabled procedural weapon sway in first person."><td><code id="sway-enabled">Enabled</code></td><td><code>true</code></td><td>true or false</td><td>Procedural weapon sway in first person.</td></tr>
+<tr data-search="sway.mouse how much the weapon lags behind the camera when you look around."><td><code id="sway-mouse">Mouse</code></td><td><code>1</code></td><td>0 to 10</td><td>How much the weapon lags behind the camera when you look around.</td></tr>
+<tr data-search="sway.bob how much the weapon bobs while walking."><td><code id="sway-bob">Bob</code></td><td><code>1</code></td><td>0 to 10</td><td>How much the weapon bobs while walking.</td></tr>
+<tr data-search="sway.breath how much the weapon drifts while standing still."><td><code id="sway-breath">Breath</code></td><td><code>1</code></td><td>0 to 10</td><td>How much the weapon drifts while standing still.</td></tr>
+<tr data-search="sway.landing how much the weapon dips when you land."><td><code id="sway-landing">Landing</code></td><td><code>1</code></td><td>0 to 10</td><td>How much the weapon dips when you land.</td></tr>
+<tr data-search="sway.tilt how much the weapon rolls when strafing."><td><code id="sway-tilt">Tilt</code></td><td><code>1</code></td><td>0 to 10</td><td>How much the weapon rolls when strafing.</td></tr>
+<tr data-search="sway.kick how much the weapon jumps in the hands per shot."><td><code id="sway-kick">Kick</code></td><td><code>1</code></td><td>0 to 10</td><td>How much the weapon jumps in the hands per shot.</td></tr>
+<tr data-search="sway.aimscale sway multiplier while aiming."><td><code id="sway-aimscale">AimScale</code></td><td><code>0.3</code></td><td>0 to 2</td><td>Sway multiplier while aiming.</td></tr>
+<tr data-search="sway.speed how quickly sway springs respond."><td><code id="sway-speed">Speed</code></td><td><code>12</code></td><td>1 to 60</td><td>How quickly sway springs respond.</td></tr>
+<tr data-search="sway.damping sway spring damping. lower is looser."><td><code id="sway-damping">Damping</code></td><td><code>0.7</code></td><td>0.1 to 2</td><td>Sway spring damping. Lower is looser.</td></tr>
+</tbody></table></div>
+</section>
+<section id="keybinds"><h2>Keybinds</h2>
+<p>Each action takes a list of <code>Enum.KeyCode</code> or <code>Enum.UserInputType</code> names, keyboard, mouse and gamepad together. Touch devices get on-screen buttons for the same actions.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="keybinds.fire fire."><td><code id="keybinds-fire">Fire</code></td><td><code>{ &quot;MouseButton1&quot;, &quot;ButtonR2&quot; }</code></td><td>list of key names</td><td>Fire.</td></tr>
+<tr data-search="keybinds.aim aim down sights."><td><code id="keybinds-aim">Aim</code></td><td><code>{ &quot;MouseButton2&quot;, &quot;ButtonL2&quot; }</code></td><td>list of key names</td><td>Aim down sights.</td></tr>
+<tr data-search="keybinds.reload reload."><td><code id="keybinds-reload">Reload</code></td><td><code>{ &quot;R&quot;, &quot;ButtonX&quot; }</code></td><td>list of key names</td><td>Reload.</td></tr>
+<tr data-search="keybinds.firemode switch fire mode."><td><code id="keybinds-firemode">FireMode</code></td><td><code>{ &quot;V&quot;, &quot;DPadUp&quot; }</code></td><td>list of key names</td><td>Switch fire mode.</td></tr>
+<tr data-search="keybinds.cycle cycle the action or clear a jam."><td><code id="keybinds-cycle">Cycle</code></td><td><code>{ &quot;F&quot;, &quot;ButtonY&quot; }</code></td><td>list of key names</td><td>Cycle the action or clear a jam.</td></tr>
+</tbody></table></div>
+</section>
+<section id="controls"><h2>Controls</h2>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="controls.aimtoggle press to aim instead of hold."><td><code id="controls-aimtoggle">AimToggle</code></td><td><code>false</code></td><td>true or false</td><td>Press to aim instead of hold.</td></tr>
+<tr data-search="controls.touchbuttons show on-screen buttons on touch devices."><td><code id="controls-touchbuttons">TouchButtons</code></td><td><code>true</code></td><td>true or false</td><td>Show on-screen buttons on touch devices.</td></tr>
+</tbody></table></div>
+</section>
+<section id="effects"><h2>Effects</h2>
+<p>Sounds accept any asset id. The default gunshot comes from Roblox's licensed Pro Sound Effects library, which any experience may use; the other defaults ship with Studio. The example weapons each set their own fire sound.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="effects.tracer.enabled draw tracers."><td><code id="effects-tracer-enabled">Tracer.Enabled</code></td><td><code>true</code></td><td>true or false</td><td>Draw tracers.</td></tr>
+<tr data-search="effects.tracer.color tracer colour."><td><code id="effects-tracer-color">Tracer.Color</code></td><td><span class="swatch" style="background:rgb(255,214,140)"></span><code>Color3.fromRGB(255, 214, 140)</code></td><td>Color3</td><td>Tracer colour.</td></tr>
+<tr data-search="effects.tracer.width tracer thickness in studs."><td><code id="effects-tracer-width">Tracer.Width</code></td><td><code>0.06</code></td><td>0.005 to 2</td><td>Tracer thickness in studs.</td></tr>
+<tr data-search="effects.tracer.length tracer length in studs."><td><code id="effects-tracer-length">Tracer.Length</code></td><td><code>9</code></td><td>0.1 to 200</td><td>Tracer length in studs.</td></tr>
+<tr data-search="effects.tracer.speed tracer speed in studs per second. hitscan only."><td><code id="effects-tracer-speed">Tracer.Speed</code></td><td><code>900</code></td><td>10 to 20000</td><td>Tracer speed in studs per second. Hitscan only.</td></tr>
+<tr data-search="effects.tracer.every draw a tracer every n shots."><td><code id="effects-tracer-every">Tracer.Every</code></td><td><code>1</code></td><td>whole, 1 to 100</td><td>Draw a tracer every N shots.</td></tr>
+<tr data-search="effects.muzzleflash.enabled flash a light at the muzzle."><td><code id="effects-muzzleflash-enabled">MuzzleFlash.Enabled</code></td><td><code>true</code></td><td>true or false</td><td>Flash a light at the muzzle.</td></tr>
+<tr data-search="effects.muzzleflash.color flash colour."><td><code id="effects-muzzleflash-color">MuzzleFlash.Color</code></td><td><span class="swatch" style="background:rgb(255,196,120)"></span><code>Color3.fromRGB(255, 196, 120)</code></td><td>Color3</td><td>Flash colour.</td></tr>
+<tr data-search="effects.muzzleflash.brightness flash brightness."><td><code id="effects-muzzleflash-brightness">MuzzleFlash.Brightness</code></td><td><code>4</code></td><td>0 to 40</td><td>Flash brightness.</td></tr>
+<tr data-search="effects.muzzleflash.range flash range in studs."><td><code id="effects-muzzleflash-range">MuzzleFlash.Range</code></td><td><code>12</code></td><td>0 to 60</td><td>Flash range in studs.</td></tr>
+<tr data-search="effects.muzzleflash.duration seconds the flash lasts."><td><code id="effects-muzzleflash-duration">MuzzleFlash.Duration</code></td><td><code>0.045</code></td><td>0.01 to 1</td><td>Seconds the flash lasts.</td></tr>
+<tr data-search="effects.impact.enabled leave a mark where rounds land."><td><code id="effects-impact-enabled">Impact.Enabled</code></td><td><code>true</code></td><td>true or false</td><td>Leave a mark where rounds land.</td></tr>
+<tr data-search="effects.impact.size mark size in studs."><td><code id="effects-impact-size">Impact.Size</code></td><td><code>0.25</code></td><td>0.02 to 10</td><td>Mark size in studs.</td></tr>
+<tr data-search="effects.impact.lifetime seconds a mark stays."><td><code id="effects-impact-lifetime">Impact.Lifetime</code></td><td><code>6</code></td><td>0 to 120</td><td>Seconds a mark stays.</td></tr>
+<tr data-search="effects.sounds.fire sound played per shot."><td><code id="effects-sounds-fire">Sounds.Fire</code></td><td><code>&quot;rbxassetid://9114727096&quot;</code></td><td>sound id</td><td>Sound played per shot.</td></tr>
+<tr data-search="effects.sounds.firepitch playback speed of the fire sound."><td><code id="effects-sounds-firepitch">Sounds.FirePitch</code></td><td><code>1</code></td><td>0.05 to 10</td><td>Playback speed of the fire sound.</td></tr>
+<tr data-search="effects.sounds.firevolume volume of the fire sound."><td><code id="effects-sounds-firevolume">Sounds.FireVolume</code></td><td><code>0.8</code></td><td>0 to 10</td><td>Volume of the fire sound.</td></tr>
+<tr data-search="effects.sounds.empty sound played when the trigger is pulled on an empty weapon."><td><code id="effects-sounds-empty">Sounds.Empty</code></td><td><code>&quot;rbxasset://sounds/volume_slider.ogg&quot;</code></td><td>sound id</td><td>Sound played when the trigger is pulled on an empty weapon.</td></tr>
+<tr data-search="effects.sounds.reload sound played when a reload starts."><td><code id="effects-sounds-reload">Sounds.Reload</code></td><td><code>&quot;rbxasset://sounds/action_jump_land.mp3&quot;</code></td><td>sound id</td><td>Sound played when a reload starts.</td></tr>
+<tr data-search="effects.sounds.explosion sound played by explosions."><td><code id="effects-sounds-explosion">Sounds.Explosion</code></td><td><code>&quot;rbxasset://sounds/impact_explosion_03.mp3&quot;</code></td><td>sound id</td><td>Sound played by explosions.</td></tr>
+<tr data-search="effects.sounds.rolloffmax distance in studs at which shots can no longer be heard."><td><code id="effects-sounds-rolloffmax">Sounds.RollOffMax</code></td><td><code>600</code></td><td>10 to 10000</td><td>Distance in studs at which shots can no longer be heard.</td></tr>
+<tr data-search="effects.projectile.size diameter of the visible projectile in studs."><td><code id="effects-projectile-size">Projectile.Size</code></td><td><code>0.35</code></td><td>0.02 to 20</td><td>Diameter of the visible projectile in studs.</td></tr>
+<tr data-search="effects.projectile.color colour of the visible projectile."><td><code id="effects-projectile-color">Projectile.Color</code></td><td><span class="swatch" style="background:rgb(64,66,60)"></span><code>Color3.fromRGB(64, 66, 60)</code></td><td>Color3</td><td>Colour of the visible projectile.</td></tr>
+<tr data-search="effects.projectile.trail draw a trail behind the projectile."><td><code id="effects-projectile-trail">Projectile.Trail</code></td><td><code>true</code></td><td>true or false</td><td>Draw a trail behind the projectile.</td></tr>
+</tbody></table></div>
+</section>
+<section id="hud"><h2>HUD</h2>
+<p>The built-in display is small on purpose: ammo, fire mode, a reload bar, a crosshair that opens with spread, and a hitmarker. Turn it off and build your own from the <a href="api.html#client">client API</a> if your game needs more.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="hud.enabled show the built-in ammo display."><td><code id="hud-enabled">Enabled</code></td><td><code>true</code></td><td>true or false</td><td>Show the built-in ammo display.</td></tr>
+<tr data-search="hud.crosshair show the built-in crosshair."><td><code id="hud-crosshair">Crosshair</code></td><td><code>true</code></td><td>true or false</td><td>Show the built-in crosshair.</td></tr>
+<tr data-search="hud.hitmarker flash a marker when a shot lands."><td><code id="hud-hitmarker">Hitmarker</code></td><td><code>true</code></td><td>true or false</td><td>Flash a marker when a shot lands.</td></tr>
+<tr data-search="hud.accent accent colour of the built-in hud."><td><code id="hud-accent">Accent</code></td><td><span class="swatch" style="background:rgb(179,191,125)"></span><code>Color3.fromRGB(179, 191, 125)</code></td><td>Color3</td><td>Accent colour of the built-in HUD.</td></tr>
+</tbody></table></div>
+</section>
+<section id="inventory"><h2>Inventory</h2>
+<p>In <code>Tool</code> mode every weapon is a Backpack Tool, so the hotbar, gamepad and mobile all work as players expect. In <code>Custom</code> mode nothing is handed out, and your code gives and equips weapons with the <a href="api.html#server">server API</a>.</p>
+<p class="scope">Global only: read from <code>Ordnance.Config</code> or a preset. A weapon that sets it is told so and ignored.</p><div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="inventory.mode tool gives weapons as backpack tools. custom gives nothing; use ordnance.equip yourself."><td><code id="inventory-mode">Mode</code></td><td><code>&quot;Tool&quot;</code></td><td><code>Tool</code> <code>Custom</code></td><td>Tool gives weapons as Backpack tools. Custom gives nothing; use Ordnance.Equip yourself.</td></tr>
+<tr data-search="inventory.loadout weapon names every player receives. { &quot;*&quot; } means all of them."><td><code id="inventory-loadout">Loadout</code></td><td><code>{ &quot;*&quot; }</code></td><td>list of names</td><td>Weapon names every player receives. { &quot;*&quot; } means all of them.</td></tr>
+<tr data-search="inventory.giveonspawn hand out the loadout whenever a character spawns."><td><code id="inventory-giveonspawn">GiveOnSpawn</code></td><td><code>true</code></td><td>true or false</td><td>Hand out the loadout whenever a character spawns.</td></tr>
+</tbody></table></div>
+</section>
+<section id="security"><h2>Security</h2>
+<p>How strictly the server checks shots. The defaults suit most games; see <a href="security.html">Security</a> before changing them.</p>
+<p class="scope">Global only: read from <code>Ordnance.Config</code> or a preset. A weapon that sets it is told so and ignored.</p><div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="security.lagcompensation rewind other players to where the shooter saw them."><td><code id="security-lagcompensation">LagCompensation</code></td><td><code>true</code></td><td>true or false</td><td>Rewind other players to where the shooter saw them.</td></tr>
+<tr data-search="security.maxrewind most the server will rewind, in seconds."><td><code id="security-maxrewind">MaxRewind</code></td><td><code>0.4</code></td><td>0 to 1</td><td>Most the server will rewind, in seconds.</td></tr>
+<tr data-search="security.interpolationdelay extra rewind for client-side interpolation, in seconds."><td><code id="security-interpolationdelay">InterpolationDelay</code></td><td><code>0.05</code></td><td>0 to 0.3</td><td>Extra rewind for client-side interpolation, in seconds.</td></tr>
+<tr data-search="security.snapshotrate position snapshots recorded per second."><td><code id="security-snapshotrate">SnapshotRate</code></td><td><code>30</code></td><td>whole, 5 to 60</td><td>Position snapshots recorded per second.</td></tr>
+<tr data-search="security.maxoriginerror studs a shot may start from the server's idea of the shooter's head."><td><code id="security-maxoriginerror">MaxOriginError</code></td><td><code>9</code></td><td>1 to 100</td><td>Studs a shot may start from the server's idea of the shooter's head.</td></tr>
+<tr data-search="security.fireratetolerance how much faster than rpm a client may fire before shots are dropped."><td><code id="security-fireratetolerance">FireRateTolerance</code></td><td><code>1.2</code></td><td>1 to 3</td><td>How much faster than RPM a client may fire before shots are dropped.</td></tr>
+<tr data-search="security.reloadtolerance fraction of a reload the server forgives for network delay."><td><code id="security-reloadtolerance">ReloadTolerance</code></td><td><code>0.25</code></td><td>0 to 0.9</td><td>Fraction of a reload the server forgives for network delay.</td></tr>
+<tr data-search="security.validatelineofsight reject shots whose origin is on the other side of a wall from the shooter."><td><code id="security-validatelineofsight">ValidateLineOfSight</code></td><td><code>true</code></td><td>true or false</td><td>Reject shots whose origin is on the other side of a wall from the shooter.</td></tr>
+</tbody></table></div>
+</section>
+<section id="debug"><h2>Debug</h2>
+<p class="scope">Global only: read from <code>Ordnance.Config</code> or a preset. A weapon that sets it is told so and ignored.</p><div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="debug.logger.level most detailed message level to print."><td><code id="debug-logger-level">Logger.Level</code></td><td><code>&quot;Info&quot;</code></td><td><code>None</code> <code>Error</code> <code>Warn</code> <code>Info</code> <code>Debug</code></td><td>Most detailed message level to print.</td></tr>
+<tr data-search="debug.logger.errorbehavior what a framework error does."><td><code id="debug-logger-errorbehavior">Logger.ErrorBehavior</code></td><td><code>&quot;Warn&quot;</code></td><td><code>Throw</code> <code>Warn</code> <code>Info</code> <code>Print</code></td><td>What a framework error does.</td></tr>
+<tr data-search="debug.logger.tag prefix on every message. filter the output window by it."><td><code id="debug-logger-tag">Logger.Tag</code></td><td><code>&quot;Ordnance&quot;</code></td><td>text</td><td>Prefix on every message. Filter the Output window by it.</td></tr>
+<tr data-search="debug.logger.history messages kept for the debug overlay."><td><code id="debug-logger-history">Logger.History</code></td><td><code>200</code></td><td>whole, 0 to 5000</td><td>Messages kept for the debug overlay.</td></tr>
+<tr data-search="debug.logger.capturelogservice also record uncaught framework errors from logservice."><td><code id="debug-logger-capturelogservice">Logger.CaptureLogService</code></td><td><code>true</code></td><td>true or false</td><td>Also record uncaught framework errors from LogService.</td></tr>
+<tr data-search="debug.logger.traceback add a stack trace to caught errors."><td><code id="debug-logger-traceback">Logger.Traceback</code></td><td><code>true</code></td><td>true or false</td><td>Add a stack trace to caught errors.</td></tr>
+<tr data-search="debug.overlay show framework messages on screen."><td><code id="debug-overlay">Overlay</code></td><td><code>false</code></td><td>true or false</td><td>Show framework messages on screen.</td></tr>
+<tr data-search="debug.visualize.rays draw hitscan rays."><td><code id="debug-visualize-rays">Visualize.Rays</code></td><td><code>false</code></td><td>true or false</td><td>Draw hitscan rays.</td></tr>
+<tr data-search="debug.visualize.projectiles draw projectile paths."><td><code id="debug-visualize-projectiles">Visualize.Projectiles</code></td><td><code>false</code></td><td>true or false</td><td>Draw projectile paths.</td></tr>
+<tr data-search="debug.visualize.hitboxes draw the rewound hitboxes the server tested."><td><code id="debug-visualize-hitboxes">Visualize.Hitboxes</code></td><td><code>false</code></td><td>true or false</td><td>Draw the rewound hitboxes the server tested.</td></tr>
+<tr data-search="debug.visualize.ik mark where each first-person hand is being asked to grip."><td><code id="debug-visualize-ik">Visualize.IK</code></td><td><code>false</code></td><td>true or false</td><td>Mark where each first-person hand is being asked to grip.</td></tr>
+<tr data-search="debug.visualize.attachments mark the first-person weapon's attachments."><td><code id="debug-visualize-attachments">Visualize.Attachments</code></td><td><code>false</code></td><td>true or false</td><td>Mark the first-person weapon's attachments.</td></tr>
+<tr data-search="debug.visualize.lifetime seconds debug drawings stay."><td><code id="debug-visualize-lifetime">Visualize.Lifetime</code></td><td><code>2</code></td><td>0.05 to 60</td><td>Seconds debug drawings stay.</td></tr>
+</tbody></table></div>
+</section>
+    <footer>
+      <span>Ordnance v0.1.0. MIT licence.</span>
+      <a href="https://github.com/xerseer/ORDINANCE/blob/main/site/config.md">Edit this page&nbsp;↗</a>
+    </footer>
+  </main>
+</div>
+<script src="site.js"></script>
+</body>
+</html>

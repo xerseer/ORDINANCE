@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Studio plugin – Ordnance</title>
+<meta name="description" content="The Ordnance Studio plugin: install and update, a config editor, presets, an animation previewer and converter, an attachment helper and a catalogue of weapons.">
+<meta property="og:title" content="Studio plugin – Ordnance">
+<meta property="og:description" content="The Ordnance Studio plugin: install and update, a config editor, presets, an animation previewer and converter, an attachment helper and a catalogue of weapons.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" aria-label="Pages">
+    <a class="brand" href="index.html">Ordnance</a>
+    <span class="ver">v0.1.0</span>
+    <a class="get" href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">Get Ordnance&nbsp;↗</a>
+    <a class="item" href="index.html">Start here</a>
+    <a class="item" href="weapons.html">Weapons</a>
+    <a class="item" href="config.html">Configuration</a>
+    <a class="item" href="presets.html">Presets</a>
+    <a class="item" href="animation.html">Animation</a>
+    <a class="item" href="api.html">Scripting API</a>
+    <a class="item" href="security.html">Security</a>
+    <a class="item here" href="plugin.html" aria-current="page">Studio plugin</a><div class="subs"><a class="sub" href="#install">Getting it</a><a class="sub" href="#install-tab">Install</a><a class="sub" href="#config">Config</a><a class="sub" href="#presets">Presets</a><a class="sub" href="#previewer">Previewer</a><a class="sub" href="#converter">Converter</a><a class="sub" href="#helper">IK Helper</a><a class="sub" href="#catalogue">Catalogue</a></div>
+    <a class="item" href="faq.html">Troubleshooting</a>
+    <a class="item out" href="https://github.com/xerseer/ORDINANCE" target="_blank" rel="noopener">Source&nbsp;↗</a>
+  </nav>
+  <main>
+<section id="top"><h1>Studio plugin</h1>
+<p class="lede">One panel with seven tabs. Everything it does, you could do by editing modules by hand; the plugin just makes it quicker and catches mistakes.</p>
+</section>
+<section id="install"><h2>Getting it</h2>
+<p>Download <code>OrdnancePlugin.rbxm</code> from the <a href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">latest release&nbsp;↗</a>, open Studio's Plugins tab, choose <strong>Plugins Folder</strong>, and put the file there. An <strong>Ordnance</strong> button appears in the Plugins tab and opens the panel. The panel follows Studio's light or dark theme.</p>
+<p>Every change the plugin makes is one step in Studio's undo history.</p>
+</section>
+<section id="install-tab"><h2>Install</h2>
+<p>Shows the installed version and the latest release, and installs, updates or removes the framework.</p>
+<ul><li><strong>Update &amp; Install</strong> puts <code>Ordnance</code> in ReplicatedStorage, with the example weapons and presets, or updates the copy that is there. An update replaces <code>Framework</code> and the root module only. Your <code>Config</code>, your weapons and your presets are never touched; presets that shipped with the new version and are missing are added.</li><li><strong>Check for updates</strong> asks GitHub for the latest version.</li><li><strong>Install the bundled copy</strong> uses the copy of the framework the plugin carries, so installing works offline, or when you decline its HTTP request.</li><li><strong>Remove Ordnance from this place</strong> deletes the framework completely. Nothing is left behind.</li></ul>
+<div class="note limit"><span class="kicker">Roblox limit</span><p>Studio plugins can download text over HTTP but cannot load model files that way. So releases also ship the framework as a JSON description of its instances, and the plugin rebuilds it. Studio asks once whether the plugin may contact <code>raw.githubusercontent.com</code>; that is the only site it uses.</p></div>
+</section>
+<section id="config"><h2>Config</h2>
+<p>A form for <code>Ordnance.Config</code>, built from the installed framework's own schema: every setting with its range, its choices and a line saying what it does. New settings in a future version appear without a plugin update.</p>
+<p>Search by name or description, reset any setting to its default, and save. Only values that differ from the defaults are written, so the file stays short and readable. If <code>Ordnance.Config</code> was written by hand, the tab says so before saving over it, because comments are not kept.</p>
+</section>
+<section id="presets"><h2>Presets</h2>
+<p>Pick the preset your config starts from, and manage your own:</p>
+<ul><li><strong>Use</strong> makes a preset the starting point of your config; <strong>Stop using</strong> goes back to the defaults.</li><li><strong>Save as preset</strong> turns the settings you changed in <code>Ordnance.Config</code> into a new preset.</li><li><strong>Export</strong> shows a preset as text to copy; <strong>Add preset</strong> under Import checks pasted text against the schema before adding it.</li><li>Presets you made can be deleted; the four that ship cannot.</li></ul>
+</section>
+<section id="previewer"><h2>Previewer</h2>
+<p>A viewport that runs the installed framework's own animation code on a sample character, so what you see is what plays in game. Pick a weapon and an action, scrub through it or play it at any speed, and switch between first and third person, R15 and R6, hip and aimed.</p>
+<p>The third-person preview does not turn the body side-on as the game does.</p>
+</section>
+<section id="converter"><h2>Converter</h2>
+<p>Turns an animation into an <a href="animation.html#encoded">encoded animation</a>.</p>
+<ol><li>Select a KeyframeSequence in the Explorer.</li><li>Choose which action it plays for, and press <strong>Convert</strong>.</li><li>Copy the result, or select the weapon's module and press <strong>Add to selected weapon</strong>.</li></ol>
+<p>Poses named like a hand become <code>Left</code> or <code>Right</code>, <code>Weapon</code>, <code>Gun</code> and <code>Handle</code> become <code>Weapon</code>, the rig's root and torso are skipped, and any other name is taken to be a part of the weapon. Rename poses with one line each, such as <code>Rig_R_Hand = Right</code>. Easing carries over.</p>
+<div class="note limit"><span class="kicker">Roblox limit</span><p>Studio only lets plugins download animations you own. For anyone else's, open it in the Animation Editor and save it as a KeyframeSequence first.</p></div>
+</section>
+<section id="helper"><h2>IK Helper</h2>
+<p>Select a weapon model and press <strong>Check</strong>. The helper reports the handle and each <a href="weapons.html#attachments">attachment</a>, says which are required, recommended or optional, and catches the common mistakes: a handle facing backwards, a muzzle in the same place as the grip. <strong>Add missing attachments</strong> places the missing attachments from the model's shape, for you to nudge into place.</p>
+</section>
+<section id="catalogue"><h2>Catalogue</h2>
+<p>Weapons and presets published with Ordnance releases. Insert one and it lands in your <code>Weapons</code> or <code>Presets</code> folder, ready to use. A name that is already taken gets a number added.</p>
+<div class="note limit"><span class="kicker">Roblox limit</span><p>a plugin builds catalogue items from data, so it can recreate parts, meshes and attachments but not Unions, and it cannot show thumbnails, because plugins cannot display images from the web.</p></div>
+</section>
+    <footer>
+      <span>Ordnance v0.1.0. MIT licence.</span>
+      <a href="https://github.com/xerseer/ORDINANCE/blob/main/site/plugin.md">Edit this page&nbsp;↗</a>
+    </footer>
+  </main>
+</div>
+<script src="site.js"></script>
+</body>
+</html>

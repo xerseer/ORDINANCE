@@ -50,13 +50,15 @@ Formatting is StyLua, linting is Selene. Both run in CI.
 
 ### Docs
 
-The site is built from `docs/*.md` and the Luau sources by `tools/docs.mjs`, with no dependencies. The config reference, the preset comparison and the example-weapon tables are read from `Defaults.luau`, `Schema.luau`, `Presets` and `Weapons`, so they cannot go stale. The build fails if a config section or a public API function has no documentation.
+The site's pages are written in `site/*.md` and built, with the Luau sources, into `docs/` by `tools/docs.mjs`, with no dependencies. The config reference, the preset comparison and the example-weapon tables are read from `Defaults.luau`, `Schema.luau`, `Presets` and `Weapons`, so they cannot go stale. The build fails if a config section or a public API function has no documentation.
 
 ```bash
 node tools/docs.mjs --serve
 ```
 
-That serves the site on `http://127.0.0.1:4173` and rebuilds on every change. Pushes to `main` publish it to GitHub Pages.
+That serves the site on `http://127.0.0.1:4173` and rebuilds on every change. Commit the rebuilt `docs/` with your change; CI fails if it is stale.
+
+GitHub Pages serves `docs/` straight from `main` (Settings > Pages > Deploy from a branch > `main` / `/docs`), so nobody has to host the site themselves.
 
 ## Branches and releases
 

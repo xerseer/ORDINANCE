@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Animation – Ordnance</title>
+<meta name="description" content="How Ordnance animates weapons and arms: procedural motion from attachments, encoded keyframes stored as numbers, sway, and how first and third person, R6 and R15 are handled.">
+<meta property="og:title" content="Animation – Ordnance">
+<meta property="og:description" content="How Ordnance animates weapons and arms: procedural motion from attachments, encoded keyframes stored as numbers, sway, and how first and third person, R6 and R15 are handled.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" aria-label="Pages">
+    <a class="brand" href="index.html">Ordnance</a>
+    <span class="ver">v0.1.0</span>
+    <a class="get" href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">Get Ordnance&nbsp;↗</a>
+    <a class="item" href="index.html">Start here</a>
+    <a class="item" href="weapons.html">Weapons</a>
+    <a class="item" href="config.html">Configuration</a>
+    <a class="item" href="presets.html">Presets</a>
+    <a class="item here" href="animation.html" aria-current="page">Animation</a><div class="subs"><a class="sub" href="#systems">Two systems</a><a class="sub" href="#procedural">Procedural</a><a class="sub" href="#encoded">Encoded</a><a class="sub" href="#sway">Sway</a><a class="sub" href="#views">First and third person</a><a class="sub" href="#rigs">R15 and R6</a></div>
+    <a class="item" href="api.html">Scripting API</a>
+    <a class="item" href="security.html">Security</a>
+    <a class="item" href="plugin.html">Studio plugin</a>
+    <a class="item" href="faq.html">Troubleshooting</a>
+    <a class="item out" href="https://github.com/xerseer/ORDINANCE" target="_blank" rel="noopener">Source&nbsp;↗</a>
+  </nav>
+  <main>
+<section id="top"><h1>Animation</h1>
+<p class="lede">Weapons animate without uploading a single animation asset. Motion is either worked out from the weapon's attachments, or written as numbers in its module.</p>
+</section>
+<section id="systems"><h2>Two systems</h2>
+<div class="tbl"><table><thead><tr><th><code>Animation.Mode</code></th><th>What plays</th></tr></thead><tbody><tr><td><code>Procedural</code></td><td>Motion built from the weapon's attachments. Every weapon gets it for free.</td></tr><tr><td><code>Encoded</code></td><td>Only the keyframe tables in the weapon's <code>Animations</code>. Actions without one do not move.</td></tr><tr><td><code>Both</code></td><td>The default. An encoded animation where the weapon has one, procedural motion where it does not.</td></tr></tbody></table></div>
+<p>Both systems produce the same thing: where the weapon is, where each hand grips, and where each moving part sits. So they can stand in for each other action by action, and the arms are solved the same way whichever one ran.</p>
+</section>
+<section id="procedural"><h2>Procedural</h2>
+<p>From a model and a few <a href="weapons.html#attachments">attachments</a>, a weapon equips, reloads, cycles and kicks without any keyframes.</p>
+<ul><li>The trigger hand holds <code>MainHandle</code>; the support hand rests on <code>Grip</code>.</li><li>On a magazine reload the support hand goes to <code>Mag</code>, and a part named <code>Mag</code> drops out and comes back.</li><li>On a single-round reload the hand feeds shells at <code>Mag</code>, one per <code>ShellTime</code>.</li><li>On a bolt or pump cycle a hand works <code>Side</code> (or the grip), and parts named <code>Bolt</code>, <code>Slide</code> or <code>Pump</code> travel with it.</li><li>On every shot <code>Bolt</code> and <code>Slide</code> snap back.</li></ul>
+<p>Better attachments make better motion. The plugin's <a href="plugin.html#helper">IK Helper</a> shows what a model is missing.</p>
+</section>
+<section id="encoded"><h2>Encoded</h2>
+<p>An encoded animation is a table of keyframes in the weapon's module. Nothing is uploaded, so it ships with the weapon wherever the module goes.</p>
+<div class="code"><div class="label">Weapons.Glock17 (part)</div><pre><code>Animations = {
+	Reload = {
+		Keyframes = {
+			{ Time = <span class="tk-num">0</span>, Weapon = { <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span> }, Left = { <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span> }, Mag = { <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span> } },
+			{ Time = <span class="tk-num">0.18</span>, Weapon = { <span class="tk-num">0.05</span>, <span class="tk-num">0.05</span>, <span class="tk-num">0.06</span>, <span class="tk-num">20</span>, <span class="tk-num">0</span>, -<span class="tk-num">24</span> }, Easing = <span class="tk-str">&quot;SineOut&quot;</span> },
+			{ Time = <span class="tk-num">0.46</span>, Left = { -<span class="tk-num">0.2</span>, -<span class="tk-num">1.3</span>, <span class="tk-num">0.25</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span> }, Mag = { <span class="tk-num">0</span>, -<span class="tk-num">1.5</span>, <span class="tk-num">0.15</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span> }, Easing = <span class="tk-str">&quot;QuadIn&quot;</span> },
+			{ Time = <span class="tk-num">0.78</span>, Left = { <span class="tk-num">0</span>, -<span class="tk-num">0.3</span>, <span class="tk-num">0.02</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span> }, Mag = { <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span> }, Easing = <span class="tk-str">&quot;BackOut&quot;</span> },
+			{ Time = <span class="tk-num">1</span>, Weapon = { <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span> }, Left = { <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span> }, Easing = <span class="tk-str">&quot;Sine&quot;</span> },
+		},
+	},
+},</code></pre></div>
+<h3 id="values">Values</h3>
+<p>Every value is six numbers: position x, y, z in studs (right, up, back), then rotation x, y, z in degrees, in the same order as a part's Orientation. Each is an offset from rest, so six zeros always means &quot;where it normally is&quot;.</p>
+<h3 id="channels">Channels</h3>
+<div class="tbl"><table><thead><tr><th>Channel</th><th>Moves</th></tr></thead><tbody><tr><td><code>Weapon</code></td><td>The whole weapon, relative to where it is held.</td></tr><tr><td><code>Right</code>, <code>Left</code></td><td>Each hand, relative to its grip. The arms follow.</td></tr><tr><td>any other name</td><td>The part of the weapon model with that name: <code>Mag</code>, <code>Slide</code>, <code>Bolt</code>, a dust cover.</td></tr></tbody></table></div>
+<p>A keyframe only lists the channels that change at that time. Between keyframes each channel eases from its last value.</p>
+<h3 id="keyframe-fields">Keyframe fields</h3>
+<div class="tbl"><table><thead><tr><th>Field</th><th>Meaning</th></tr></thead><tbody><tr><td><code>Time</code></td><td>Seconds from the start. Required.</td></tr><tr><td><code>Easing</code></td><td>How this keyframe is approached: any <code>Enum.EasingStyle</code> name, optionally followed by <code>In</code>, <code>Out</code> or <code>InOut</code>. <code>Sine</code>, <code>QuadOut</code>, <code>BackOut</code>. Defaults to <code>Sine</code>, in and out.</td></tr><tr><td><code>Sound</code></td><td>An asset id played when the keyframe is reached.</td></tr></tbody></table></div>
+<h3 id="slots">Which animations play</h3>
+<div class="tbl"><table><thead><tr><th>Name</th><th>Plays</th></tr></thead><tbody><tr><td><code>Equip</code></td><td>When the weapon is drawn.</td></tr><tr><td><code>Reload</code></td><td>For a reload.</td></tr><tr><td><code>ReloadEmpty</code></td><td>For a reload from empty, if the weapon has one; otherwise <code>Reload</code>.</td></tr><tr><td><code>Cycle</code></td><td>For a bolt or pump cycle, and when clearing a jam.</td></tr><tr><td><code>Fire</code></td><td>From the start on every shot, on top of whatever else is playing.</td></tr><tr><td><code>Idle</code></td><td>Looped the whole time the weapon is held.</td></tr></tbody></table></div>
+<p>An animation is stretched to fit the action it plays for (<code>Reload</code> to the reload time, <code>Cycle</code> to <code>CycleTime</code>), so only the proportions of its times matter and changing <code>ReloadTime</code> never breaks it. Set <code>Fit = false</code> to play it at its written speed. <code>Length</code> overrides its length and <code>Loop = true</code> repeats it.</p>
+<p>A keyframe the framework cannot read is reported and skipped; the rest of the animation still plays.</p>
+<h3 id="converter">From Roblox animations</h3>
+<p>The plugin's <a href="plugin.html#converter">Converter</a> turns a KeyframeSequence, from the Animation Editor or any tool that saves one, into an <code>Animations</code> entry, and can add it to the weapon module for you.</p>
+</section>
+<section id="sway"><h2>Sway</h2>
+<p>In first person the weapon is held, not bolted to the camera. Six small motions, each with its own multiplier under <a href="config.html#sway"><code>Sway</code></a>:</p>
+<ul><li><strong>Mouse</strong>: the weapon lags behind when you look around.</li><li><strong>Bob</strong>: it bobs in step while you walk.</li><li><strong>Breath</strong>: it drifts while you stand still.</li><li><strong>Landing</strong>: it dips when you land.</li><li><strong>Tilt</strong>: it rolls into a strafe.</li><li><strong>Kick</strong>: it jumps in the hands with every shot.</li></ul>
+<p>All run on springs, and all but the kick shrink while aiming.</p>
+</section>
+<section id="views"><h2>First and third person</h2>
+<p><strong>First person</strong> draws a copy of the weapon and of the player's own arms at the camera, so the arms match their rig, skin and, with <code>Viewmodel.Sleeves</code>, their shirt. Nothing is pre-built or uploaded. The copy is local and cannot be hit.</p>
+<p><strong>Third person</strong> is what everyone else sees, and what you see when zoomed out. Every client poses every visible character that holds a weapon: the trigger hand on the grip, the support hand on the weapon, the arms and (on R15) the upper body following where the player aims. Only a little state is replicated per player (aim pitch, whether they are aiming, which action started), so this costs almost no bandwidth.</p>
+<p><code>Camera.Mode</code> decides which views are allowed while a weapon is held: <code>Both</code> follows the player's zoom, <code>FirstPerson</code> and <code>ThirdPerson</code> lock it.</p>
+</section>
+<section id="rigs"><h2>R15 and R6</h2>
+<p>Arms are solved with inverse kinematics on both rigs, with Motor6D joints or the newer AnimationConstraint joints.</p>
+<ul><li><strong>R15</strong> arms are two bones, so the elbow bends naturally and the hand lands exactly on the grip. The upper body turns side-on and leans with the aim.</li><li><strong>R6</strong> arms are a single block each. The trigger arm lines up with the weapon as a Roblox Tool does, and the support arm points at its grip from the shoulder.</li></ul>
+<div class="note limit"><span class="kicker">Roblox limit</span><p>an R6 torso is one piece, so R6 characters cannot turn or lean their upper body, and an R6 arm may slide out of its shoulder to reach a grip. That is the accepted look for R6 weapons.</p></div>
+<div class="note limit"><span class="kicker">Roblox limit</span><p>in third person the weapon is welded to the trigger hand, as every Roblox Tool is. The trigger hand therefore never leaves the grip there, so a bolt is worked by the right hand only in first person.</p></div>
+<p>With a long rifle an R15 support arm may fall a little short of the handguard; it then holds the weapon as far forward as it reaches.</p>
+</section>
+    <footer>
+      <span>Ordnance v0.1.0. MIT licence.</span>
+      <a href="https://github.com/xerseer/ORDINANCE/blob/main/site/animation.md">Edit this page&nbsp;↗</a>
+    </footer>
+  </main>
+</div>
+<script src="site.js"></script>
+</body>
+</html>
