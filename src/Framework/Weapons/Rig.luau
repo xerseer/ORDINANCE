@@ -104,17 +104,20 @@ end
 
 -- Finds an attachment on the weapon by name, wherever it was put.
 function Rig.attachment(model: Instance, name: string): Attachment?
-	local found = model:FindFirstChild(name, true)
-	if found and found:IsA("Attachment") then
-		return found
-	end
-	if name == "Barrel" then
-		local muzzle = model:FindFirstChild("Muzzle", true)
-		if muzzle and muzzle:IsA("Attachment") then
-			return muzzle
+	-- A part and the joint that holds it often share an attachment's name
+	-- ("Mag", "Barrel"), so match on class as well as name.
+	local alias = if name == "Barrel" then "Muzzle" else nil
+	local aliased: Attachment? = nil
+	for _, descendant in model:GetDescendants() do
+		if descendant:IsA("Attachment") then
+			if descendant.Name == name then
+				return descendant
+			elseif descendant.Name == alias then
+				aliased = descendant
+			end
 		end
 	end
-	return nil
+	return aliased
 end
 
 --[[
@@ -177,11 +180,14 @@ function Rig.prepare(source: Instance?, weaponName: string): Model
 			descendant.CanQuery = false
 			descendant.Massless = true
 			if descendant ~= handle and not jointed[descendant] then
-				local weld = Instance.new("WeldConstraint")
-				weld.Name = "OrdnanceWeld"
-				weld.Part0 = handle
-				weld.Part1 = descendant
-				weld.Parent = descendant
+				-- A Motor6D rather than a weld, so the part can be animated
+				-- through its Transform. It is named after the part it holds.
+				local joint = Instance.new("Motor6D")
+				joint.Name = descendant.Name
+				joint.Part0 = handle
+				joint.Part1 = descendant
+				joint.C0 = handle.CFrame:ToObjectSpace(descendant.CFrame)
+				joint.Parent = handle
 			end
 		end
 	end

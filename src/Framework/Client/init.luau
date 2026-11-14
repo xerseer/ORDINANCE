@@ -11,8 +11,11 @@ local RunService = game:GetService("RunService")
 
 local Framework = script.Parent
 
+local Animator = require(Framework.Animation.Animator)
+local Characters = require(script.Characters)
 local Config = require(Framework.Config)
 local Damage = require(Framework.Ballistics.Damage)
+local DebugOverlay = require(script.DebugOverlay)
 local Effects = require(script.Effects)
 local Events = require(Framework.Core.Events)
 local Hitscan = require(Framework.Ballistics.Hitscan)
@@ -27,6 +30,8 @@ local Rig = require(Framework.Weapons.Rig)
 local Spread = require(Framework.Ballistics.Spread)
 local State = require(Framework.Weapons.State)
 local Version = require(Framework.Version)
+local View = require(script.View)
+local Viewmodel = require(script.Viewmodel)
 local Visualizer = require(Framework.Core.Visualizer)
 
 type Entry = Registry.Entry
@@ -47,6 +52,11 @@ type Held = {
 	baseSpeed: number,
 	lastSpeed: number,
 	clickedEmpty: boolean,
+	animator: Animator.Animator,
+	seenAction: number, -- actionStart of the last action handed to the animators
+	reloadEmpty: boolean,
+	aimDirection: Vector3, -- unit vector from the head to what is aimed at
+	poseSentAt: number,
 }
 
 type ProjectileData = {
@@ -58,6 +68,8 @@ type ProjectileData = {
 
 local WEAPON_ATTRIBUTE = "OrdnanceWeapon"
 local MAX_SHOTS_PER_FRAME = 4
+local POSE_INTERVAL = 0.1
+local UPDATE_STEP = "OrdnanceUpdate"
 local VISUAL_BLEND_TIME = 0.18
 
 local log = Logger.scope("Client")
@@ -118,7 +130,8 @@ local function drawShot(
 	shotId: number
 )
 	local config = entry.config
-	local muzzle = muzzleOf(weapon, origin)
+	-- The local player's own shots leave from the first-person weapon when it is showing.
+	local muzzle = (if userId == player.UserId then Viewmodel.muzzle() else nil) or muzzleOf(weapon, origin)
 	local sounds = config.Effects.Sounds
 
 	Effects.muzzleFlash(muzzle, config)
@@ -223,6 +236,23 @@ end
 -- Firing
 ------------------------------------------------------------------------------
 
+-- The unit direction from the character's head to whatever is under the
+-- crosshair. Recomputed every frame: it aims the shots, the arms and the body.
+local function computeAim(character: Model, range: number): Vector3
+	local rayOrigin, rayDirection = View.ray()
+	local head = character:FindFirstChild("Head") or character.PrimaryPart
+	if head == nil or not head:IsA("BasePart") then
+		return rayDirection
+	end
+	local sight = Hitscan.raycast(rayOrigin, rayDirection * range, Hitscan.params({ character }))
+	local target = if sight then sight.Position else rayOrigin + rayDirection * range
+	local aim = target - head.Position
+	if aim.Magnitude < 3 or aim.Unit:Dot(rayDirection) < 0.2 then
+		return rayDirection -- the target is on top of us; do not aim backwards
+	end
+	return aim.Unit
+end
+
 local function sendAction(current: Held, kind: string)
 	Net.fire("Action", current.entry.id, kind)
 end
@@ -233,9 +263,11 @@ local function tryReload(current: Held): boolean
 		return false
 	end
 	local config = current.entry.config
+	local empty = not State.hasRound(state, config)
 	if not State.startReload(state, config, clock()) then
 		return false
 	end
+	current.reloadEmpty = empty
 	current.burstLeft = 0
 	sendAction(current, "Reload")
 	local sounds = config.Effects.Sounds
@@ -250,24 +282,15 @@ end
 
 local function fire(current: Held, state: State.State, character: Model, humanoid: Humanoid)
 	local config = current.entry.config
-	local camera = workspace.CurrentCamera
 	local head = character:FindFirstChild("Head") or character.PrimaryPart
-	if camera == nil or head == nil or not head:IsA("BasePart") then
+	if head == nil or not head:IsA("BasePart") then
 		return
 	end
 
-	-- Aim where the camera looks, but shoot from the character's head, so
-	-- the server can check the origin tightly in third person too.
+	-- Aim through the crosshair, but shoot from the character's head, so the
+	-- server can check the origin tightly in third person too.
 	local origin = head.Position
-	local look = camera.CFrame.LookVector
-	local params = Hitscan.params({ character })
-	local sight = Hitscan.raycast(camera.CFrame.Position, look * config.Ballistics.Range, params)
-	local target = if sight then sight.Position else camera.CFrame.Position + look * config.Ballistics.Range
-	local aim = target - origin
-	if aim.Magnitude < 3 or aim.Unit:Dot(look) < 0.2 then
-		aim = look -- the target is on top of us; do not shoot backwards
-	end
-	aim = aim.Unit
+	local aim = current.aimDirection
 
 	local moving = humanoid.MoveDirection.Magnitude > 0.1
 	local airborne = humanoid.FloorMaterial == Enum.Material.Air
@@ -292,6 +315,9 @@ local function fire(current: Held, state: State.State, character: Model, humanoi
 		shotId
 	)
 	Recoil.kick(config.Recoil, current.aim)
+	current.animator:fire(clock())
+	Viewmodel.kick(config, current.aim)
+	Characters.fire(player)
 	Events.Fired:Fire(current.entry.id, origin, aim)
 end
 
@@ -363,12 +389,14 @@ local function unequip()
 	held = nil
 	Input.unbind()
 	HUD.hide()
+	Viewmodel.hide()
 
 	local camera = workspace.CurrentCamera
 	if camera then
 		camera.FieldOfView = current.baseFov
 	end
 	local humanoid = humanoidOf(player.Character)
+	View.finish(humanoid)
 	if humanoid and humanoid.WalkSpeed == current.lastSpeed then
 		humanoid.WalkSpeed = current.baseSpeed
 	end
@@ -406,8 +434,26 @@ local function equip(entry: Entry, instance: Instance)
 		baseSpeed = speed,
 		lastSpeed = speed,
 		clickedEmpty = false,
+		animator = Animator.new(entry),
+		seenAction = -1,
+		reloadEmpty = false,
+		aimDirection = if camera then camera.CFrame.LookVector else -Vector3.zAxis,
+		poseSentAt = 0,
 	}
 	held = current
+
+	-- Sounds named in encoded animations play from the character.
+	current.animator.onSound = function(id: string)
+		local soundRoot = if player.Character then player.Character.PrimaryPart else nil
+		if soundRoot then
+			Effects.sound(id, soundRoot.Position, 0.6, 1, 80)
+		end
+	end
+	local body = player.Character
+	if body and humanoid then
+		Viewmodel.show(entry, current.animator.attachments, body)
+		View.begin(entry.config, humanoid)
+	end
 
 	local waiting = pendingSync[entry.id]
 	if waiting then
@@ -547,20 +593,54 @@ local function update(deltaTime: number)
 
 	current.bloom = math.max(0, current.bloom - config.Spread.Recovery * deltaTime)
 
+	-- Where the crosshair points. This aims the shots, the arms and the body.
+	local root = character.PrimaryPart
+	current.aimDirection = computeAim(character, config.Ballistics.Range)
+	local firstPerson = false
+	if root then
+		firstPerson = View.update(deltaTime, config, humanoid, root, current.aimDirection)
+	end
+	Viewmodel.setVisible(firstPerson)
+	Characters.setLocalFirstPerson(firstPerson and Viewmodel.isVisible())
+
 	local state = current.state
 	if state then
 		State.advance(state, config, now)
 		updateTrigger(current, state, character, humanoid)
+
+		-- Hand any action that has just begun to the animators.
+		if state.action ~= "Idle" and state.actionStart ~= current.seenAction then
+			current.seenAction = state.actionStart
+			local duration = state.actionEnd - state.actionStart
+			local empty = state.action == "Reload" and current.reloadEmpty
+			current.animator:setAction(state.action, state.actionStart, duration, empty)
+			Characters.setAction(player, state.action, duration, empty)
+		end
 	end
 
 	local moving = humanoid.MoveDirection.Magnitude > 0.1
 	local airborne = humanoid.FloorMaterial == Enum.Material.Air
+
+	local pose = current.animator:update(now)
+	local velocity = if root then root.AssemblyLinearVelocity else Vector3.zero
+	Viewmodel.update(deltaTime, pose, current.aim, velocity, not airborne)
+
+	-- Tell this client's third-person view, and ten times a second everyone
+	-- else's, where we are aiming.
+	local pitch = math.asin(math.clamp(current.aimDirection.Y, -1, 1))
+	Characters.setPose(player, pitch, current.aiming)
+	if now - current.poseSentAt >= POSE_INTERVAL then
+		current.poseSentAt = now
+		Net.fire("Pose", pitch, current.aiming)
+	end
+
 	HUD.update(
 		state,
 		config,
 		now,
 		Spread.angle(config, current.aim, moving, airborne, current.bloom),
-		current.aim
+		current.aim,
+		View.screenPoint()
 	)
 end
 
@@ -607,6 +687,23 @@ local function onReplicate(
 		end
 	end
 	drawShot(entry, character, weapon, userId, origin, aim, angle, seed, shotId)
+	Characters.fire(shooter, true)
+end
+
+-- Another player's aim, relayed by the server.
+local function onPoseOf(userId: number, pitch: number, aiming: boolean)
+	local other = Players:GetPlayerByUserId(userId)
+	if other and other ~= player then
+		Characters.setPose(other, pitch, aiming)
+	end
+end
+
+-- Another player started a reload or cycled their weapon.
+local function onAct(userId: number, _weaponId: string, action: string, duration: number, empty: boolean)
+	local other = Players:GetPlayerByUserId(userId)
+	if other and other ~= player then
+		Characters.setAction(other, action, duration, empty)
+	end
 end
 
 local function onExplode(position: Vector3, weaponId: string, key: string)
@@ -720,12 +817,20 @@ function Client.start(root: Instance)
 			Net.on("Replicate", onReplicate)
 			Net.on("Explode", onExplode)
 			Net.on("Equip", onEquipMessage)
+			Net.on("PoseOf", onPoseOf)
+			Net.on("Act", onAct)
 			if not Net.start(Framework) then
 				return
 			end
 
 			Recoil.start()
-			table.insert(connections, RunService.RenderStepped:Connect(log:Wrap(update)))
+			Characters.start()
+			if Config.global().Debug.Overlay then
+				DebugOverlay.start()
+			end
+			-- After the camera and the recoil have moved it, so the viewmodel
+			-- is placed against this frame's final camera.
+			RunService:BindToRenderStep(UPDATE_STEP, Enum.RenderPriority.Camera.Value + 2, log:Wrap(update))
 			table.insert(connections, player.CharacterAdded:Connect(log:Wrap(onCharacter)))
 			if player.Character then
 				onCharacter(player.Character)
@@ -761,7 +866,13 @@ function Client.stop()
 		connection:Disconnect()
 	end
 	table.clear(characterConnections)
+	pcall(function()
+		RunService:UnbindFromRenderStep(UPDATE_STEP)
+	end)
 	Recoil.stop()
+	Characters.stop()
+	DebugOverlay.stop()
+	Viewmodel.hide()
 	Input.unbind()
 	HUD.destroy()
 	Effects.clear()

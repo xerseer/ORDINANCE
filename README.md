@@ -2,7 +2,7 @@
 
 A modular gun framework for Roblox. Drop one object into ReplicatedStorage and you have working guns; open the config when you want more.
 
-> **Status: early development.** The core is in: config, weapons, hitscan and projectiles, server-authoritative damage, and five example weapons you can shoot. Animation, first-person view, the Studio plugin and the docs site are still to come; see the [changelog](CHANGELOG.md).
+> **Status: early development.** The framework itself is in: config, weapons, hitscan and projectiles, server-authoritative damage, encoded and procedural animation, first and third person on R6 and R15, and five example weapons. The Studio plugin and the docs site are still to come; see the [changelog](CHANGELOG.md).
 
 ## What it is
 
