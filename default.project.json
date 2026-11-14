@@ -10,7 +10,10 @@
 		},
 		"ServerStorage": {
 			"OrdnanceDev": {
-				"$path": "tools/studio"
+				"$path": "tools/studio",
+				"PluginSource": {
+					"$path": "plugin/src"
+				}
 			}
 		}
 	}

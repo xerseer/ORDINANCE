@@ -48,8 +48,27 @@ Decisions made without asking are listed under **Decisions** so they are easy to
 - The Glock 17 carries an encoded `Fire` and `Reload` as a worked example; the other four weapons are fully procedural.
 - `tools/studio/PosePreview.luau` draws the first-person view as text, and the self-test grew to 40 checks.
 
+#### Phase 4: Studio plugin
+
+- **One dock widget, seven tabs**, each its own module under `plugin/src/Tabs`. A tab that fails to load is replaced by its error; the rest keep working.
+- **Look.** Hand-built components (`UI.luau`) on one palette (`Theme.luau`) that follows Studio's light or dark theme live: flat, square, hairline-separated, one olive accent, the docs site's language.
+- **Install.** Shows installed and latest versions, installs or updates in one undo step, can remove the framework completely, and falls back to a copy of the framework embedded in the plugin when offline or when HTTP is declined. An update replaces `Framework` and the root module only; Config, Weapons and your own presets are never touched.
+- **Config.** A form generated from the installed framework's own schema and defaults (range, choices, description per setting), searchable, grouped, with per-setting reset. Only values that differ from the defaults are written to `Ordnance.Config`.
+- **Presets.** Use, export, import (validated before it is added), delete your own, and save your current Config as a preset.
+- **Previewer.** A viewport that runs the installed Animator and arm solver in first or third person, R15 or R6, with scrubber, play and pause, speed and an aim toggle.
+- **Converter.** Turns a selected KeyframeSequence (or an Animation you own) into an `Animations` entry, with pose renaming and easing carried over, and can add it to the selected weapon module.
+- **IK Helper.** Checks a weapon model for the attachments the animation system uses and places missing ones from the model's geometry.
+- **Catalogue.** Browses `catalogue.json` on the release branch and inserts weapons and presets. Feasible, with limits: weapons built from Unions need a Creator Store asset id, and thumbnails cannot be shown by a plugin.
+- `tools/bundle.mjs` now also writes the catalogue index and one JSON file per weapon and preset, and `--embed` puts the bundle inside the plugin. CI and the release workflow build the bundle before the plugin.
+
+**Tested in Studio:** every tab builds and shows without errors. The embedded bundle rebuilds the framework identically to the Rojo-synced copy (208 instances, every source, size and attachment equal). Fresh install, update (keeps Config, your weapons, and restores a deleted shipped preset) and uninstall work. Writing `Ordnance.Config` keeps every value, the IK helper places all five attachments on a stripped model, and converted animations load when added to a weapon module.
+
+**Not verified:** how the panel looks (Studio screenshots come back black to the tools used), the live HTTP update and catalogue (nothing has been released yet, and the test connection cannot make HTTP requests), and the previewer's camera framing.
+
 ### Fixed
 
+- Plugin: the Config, Presets and Converter tabs could not load, because the plugin root is a Script and `script.Parent.Parent.Source` read its `Source` property instead of the module of that name. The module is now `Writer`.
+- Plugin converter: the rig's root pose became an empty `Weapon` channel, and every conversion looped because KeyframeSequences loop by default. Root poses are skipped and only an Idle keeps `Loop`.
 - Attachments that shared a name with a part (`Mag`, `Barrel`) were not found, so muzzle effects started at the head and reloads had no hand motion.
 - The world weapon stayed visible in first person; Roblox hides the character there but not its Tool.
 - Walk speed collapsed toward zero while a weapon was held, because the speed written and the 32-bit value read back differed and were mistaken for an outside change.

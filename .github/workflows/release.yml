@@ -38,8 +38,8 @@ jobs:
         run: |
           mkdir -p build/dist/versions/$GITHUB_REF_NAME
           rojo build framework.project.json -o build/Ordnance.rbxm
+          node tools/bundle.mjs --out build/dist --embed
           rojo build plugin.project.json -o build/OrdnancePlugin.rbxm
-          node tools/bundle.mjs --out build/dist
           cp build/dist/ordnance.bundle.json build/dist/versions/$GITHUB_REF_NAME/
 
       - name: GitHub Release

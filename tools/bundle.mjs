@@ -17,7 +17,17 @@
 
 	Node format: { n: name, c: className, s?: source, p?: properties, k?: children }
 
-	Usage: node tools/bundle.mjs [--out build]
+	Also writes, next to the bundle:
+		latest.json            the version, for the updater to check cheaply
+		catalogue.json         an index of every weapon and preset in src
+		catalogue/<kind>/<name>.json   each one as an instance tree, for the
+		                       plugin's Catalogue tab to insert
+
+	With --embed the bundle is also written to plugin/src/Embedded.json, so the
+	plugin can install without a connection. That file is generated and ignored
+	by git.
+
+	Usage: node tools/bundle.mjs [--out build] [--embed]
 */
 
 import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
@@ -113,10 +123,38 @@ const bundle = { format: 1, name: "Ordnance", version, root: tree };
 
 mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, "ordnance.bundle.json"), JSON.stringify(bundle));
+if (args.includes("--embed")) {
+	writeFileSync(join(root, "plugin", "src", "Embedded.json"), JSON.stringify(bundle));
+}
+
+// Catalogue: one file per weapon and per preset, plus an index.
+function describe(node) {
+	const block = (node.s ?? "").match(/^--\[\[([\s\S]*?)\]\]/)?.[1];
+	if (!block) return undefined;
+	const lines = block.split("\n").map((line) => line.trim());
+	const text = [];
+	for (const line of lines.slice(2)) {
+		if (line === "") break;
+		text.push(line);
+	}
+	return text.join(" ") || undefined;
+}
+const entries = [];
+for (const [folder, kind] of [["Weapons", "weapon"], ["Presets", "preset"]]) {
+	const container = (tree.k ?? []).find((node) => node.n === folder);
+	for (const node of container?.k ?? []) {
+		if (node.c !== "ModuleScript") continue;
+		const path = `catalogue/${kind}s/${node.n}.json`;
+		mkdirSync(join(outDir, "catalogue", `${kind}s`), { recursive: true });
+		writeFileSync(join(outDir, path), JSON.stringify(node));
+		entries.push({ id: node.n, kind, name: node.n, description: describe(node), author: "xerseer", version, path });
+	}
+}
+writeFileSync(join(outDir, "catalogue.json"), JSON.stringify({ format: 1, version, entries }, null, "\t") + "\n");
 writeFileSync(
 	join(outDir, "latest.json"),
 	JSON.stringify({ format: 1, version, tag: `v${version}`, bundle: "ordnance.bundle.json" }, null, "\t") + "\n",
 );
 
 const bytes = statSync(join(outDir, "ordnance.bundle.json")).size;
-console.log(`bundle: Ordnance v${version}, ${count(tree)} instances, ${(bytes / 1024).toFixed(1)} KiB -> ${outDir}`);
+console.log(`bundle: Ordnance v${version}, ${count(tree)} instances, ${(bytes / 1024).toFixed(1)} KiB, ${entries.length} catalogue entries -> ${outDir}`);
