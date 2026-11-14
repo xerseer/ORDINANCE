@@ -191,10 +191,21 @@ end
 
 -- Refreshes the display. `spreadDegrees` drives the crosshair gap; `aim` is
 -- 0 (hip) to 1 (aimed) and fades the crosshair out.
-function HUD.update(state: State.State?, config: Config, now: number, spreadDegrees: number, aim: number)
+function HUD.update(
+	state: State.State?,
+	config: Config,
+	now: number,
+	spreadDegrees: number,
+	aim: number,
+	point: Vector2
+)
 	if gui == nil or not gui.Enabled then
 		return
 	end
+	-- The crosshair and hitmarker sit on the aim point: the cursor when the
+	-- mouse is free, the centre of the screen otherwise.
+	crosshair.Position = UDim2.fromOffset(point.X, point.Y)
+	marker.Position = UDim2.fromOffset(point.X, point.Y)
 
 	if state == nil then
 		magazine.Text = "--"

@@ -164,6 +164,59 @@ local Defaults = {
 	},
 
 	------------------------------------------------------------------------
+	-- Camera and how the weapon is held. Offsets are six numbers: position
+	-- x, y, z in studs (right, up, back), then rotation x, y, z in degrees.
+	------------------------------------------------------------------------
+	Camera = {
+		Mode = "Both",
+		ShoulderOffset = Vector3.new(1.4, 0.3, 0),
+		FaceAim = true,
+	},
+
+	Viewmodel = {
+		Enabled = true,
+		Offset = { 0.7, -0.85, -1.4, 0, 0, 0 },
+		AimDistance = 1.25,
+		Sleeves = true,
+	},
+
+	ThirdPerson = {
+		Offset = { 0.42, -0.74, -0.3, 0, 12, 0 },
+		AimOffset = { 0.22, -0.5, -0.42, 0, 6, 0 },
+		BodyTurn = 28,
+		BodyPitch = 0.5,
+	},
+
+	------------------------------------------------------------------------
+	-- Animation. "Procedural" moves the hands to the weapon's attachments by
+	-- itself; "Encoded" plays the keyframe tables in Animations; "Both" plays
+	-- an encoded animation where the weapon has one and falls back to
+	-- procedural motion where it does not.
+	------------------------------------------------------------------------
+	Animation = {
+		Mode = "Both",
+	},
+
+	Animations = {} :: { [string]: any },
+
+	------------------------------------------------------------------------
+	-- Procedural weapon sway in first person. Each entry is a multiplier:
+	-- 0 turns that motion off, 1 is the default, 2 doubles it.
+	------------------------------------------------------------------------
+	Sway = {
+		Enabled = true,
+		Mouse = 1,
+		Bob = 1,
+		Breath = 1,
+		Landing = 1,
+		Tilt = 1,
+		Kick = 1,
+		AimScale = 0.3,
+		Speed = 12,
+		Damping = 0.7,
+	},
+
+	------------------------------------------------------------------------
 	-- Controls. Each action takes a list of Enum.KeyCode or
 	-- Enum.UserInputType names; the first keyboard/mouse entry and the first
 	-- gamepad entry are the ones shown in the HUD.
@@ -264,6 +317,8 @@ local Defaults = {
 			Rays = false,
 			Projectiles = false,
 			Hitboxes = false,
+			IK = false,
+			Attachments = false,
 			Lifetime = 2,
 		},
 	},

@@ -23,7 +23,8 @@ export type Rule = {
 	-- "strings": list of free strings
 	-- "model": a child name or an Instance
 	-- "free": anything; copied through unchecked
-	kind: ("keys" | "choices" | "strings" | "model" | "free")?,
+	-- "frame": exactly six numbers (position x, y, z; rotation x, y, z in degrees)
+	kind: ("keys" | "choices" | "strings" | "model" | "free" | "frame")?,
 }
 
 export type Problem = {
@@ -216,6 +217,70 @@ local RULES: { [string]: Rule } = {
 	["Tuning.ReloadTime"] = { doc = "Multiplier on reload and shell times.", min = 0.05, max = 10 },
 	["Tuning.FireRate"] = { doc = "Multiplier on rounds per minute.", min = 0.05, max = 10 },
 
+	["Camera.Mode"] = {
+		doc = "Both follows the player's zoom. FirstPerson and ThirdPerson lock the view while a weapon is held.",
+		choices = { "Both", "FirstPerson", "ThirdPerson" },
+	},
+	["Camera.ShoulderOffset"] = {
+		doc = "Camera shift in third person, so the character is not in the way of the crosshair.",
+	},
+	["Camera.FaceAim"] = { doc = "In third person the character turns to face where it is aiming." },
+
+	["Viewmodel.Enabled"] = {
+		doc = "Show first-person arms and weapon. Off leaves first person to the plain character.",
+	},
+	["Viewmodel.Offset"] = {
+		doc = "Where the weapon's handle sits relative to the camera at the hip.",
+		kind = "frame",
+	},
+	["Viewmodel.AimDistance"] = {
+		doc = "Studs from the camera to the weapon's Aim attachment when aiming.",
+		min = 0.2,
+		max = 6,
+	},
+	["Viewmodel.Sleeves"] = { doc = "Show the character's shirt on the first-person arms." },
+
+	["ThirdPerson.Offset"] = {
+		doc = "Where the handle sits relative to the character's eyes at the hip.",
+		kind = "frame",
+	},
+	["ThirdPerson.AimOffset"] = {
+		doc = "Where the handle sits relative to the character's eyes when aiming.",
+		kind = "frame",
+	},
+
+	["ThirdPerson.BodyTurn"] = {
+		doc = "Degrees the upper body turns side-on while holding a weapon, so the support hand can reach. R15 only.",
+		min = 0,
+		max = 60,
+	},
+	["ThirdPerson.BodyPitch"] = {
+		doc = "How much of the aim's up and down the upper body leans with, 0 to 1. R15 only.",
+		min = 0,
+		max = 1,
+	},
+
+	["Animation.Mode"] = {
+		doc = "Procedural, Encoded, or Both (encoded where the weapon has one, procedural otherwise).",
+		choices = { "Procedural", "Encoded", "Both" },
+	},
+	["Animations"] = { doc = "Encoded animations: keyframe tables by action name.", kind = "free" },
+
+	["Sway.Enabled"] = { doc = "Procedural weapon sway in first person." },
+	["Sway.Mouse"] = {
+		doc = "How much the weapon lags behind the camera when you look around.",
+		min = 0,
+		max = 10,
+	},
+	["Sway.Bob"] = { doc = "How much the weapon bobs while walking.", min = 0, max = 10 },
+	["Sway.Breath"] = { doc = "How much the weapon drifts while standing still.", min = 0, max = 10 },
+	["Sway.Landing"] = { doc = "How much the weapon dips when you land.", min = 0, max = 10 },
+	["Sway.Tilt"] = { doc = "How much the weapon rolls when strafing.", min = 0, max = 10 },
+	["Sway.Kick"] = { doc = "How much the weapon jumps in the hands per shot.", min = 0, max = 10 },
+	["Sway.AimScale"] = { doc = "Sway multiplier while aiming.", min = 0, max = 2 },
+	["Sway.Speed"] = { doc = "How quickly sway springs respond.", min = 1, max = 60 },
+	["Sway.Damping"] = { doc = "Sway spring damping. Lower is looser.", min = 0.1, max = 2 },
+
 	["Keybinds.Fire"] = { doc = "Fire.", kind = "keys" },
 	["Keybinds.Aim"] = { doc = "Aim down sights.", kind = "keys" },
 	["Keybinds.Reload"] = { doc = "Reload.", kind = "keys" },
@@ -330,6 +395,8 @@ local RULES: { [string]: Rule } = {
 	["Debug.Visualize.Rays"] = { doc = "Draw hitscan rays." },
 	["Debug.Visualize.Projectiles"] = { doc = "Draw projectile paths." },
 	["Debug.Visualize.Hitboxes"] = { doc = "Draw the rewound hitboxes the server tested." },
+	["Debug.Visualize.IK"] = { doc = "Mark where each first-person hand is being asked to grip." },
+	["Debug.Visualize.Attachments"] = { doc = "Mark the first-person weapon's attachments." },
 	["Debug.Visualize.Lifetime"] = { doc = "Seconds debug drawings stay.", min = 0.05, max = 60 },
 }
 
@@ -347,6 +414,7 @@ local WEAPON_ONLY: { [string]: boolean } = {
 	Description = true,
 	Model = true,
 	Custom = true,
+	Animations = true,
 }
 
 local Schema = {}
@@ -462,6 +530,24 @@ local function checkValue(value: any, default: any, rule: Rule?, path: string, p
 			{ path = path, message = `expected a name or an Instance, got {typeof(value)}` }
 		)
 		return nil
+	end
+
+	if rule and rule.kind == "frame" then
+		local ok = type(value) == "table" and #value == 6
+		if ok then
+			for index = 1, 6 do
+				local item = value[index]
+				ok = ok and type(item) == "number" and item == item
+			end
+		end
+		if not ok then
+			table.insert(
+				problems,
+				{ path = path, message = "expected six numbers: x, y, z, then rotation x, y, z" }
+			)
+			return nil
+		end
+		return table.clone(value)
 	end
 
 	local expected = typeof(default)

@@ -30,12 +30,15 @@ local MESSAGES: { [string]: Message } = {
 	-- client -> server
 	Shoot = { from = "Client", reliable = true, rate = 60 },
 	Action = { from = "Client", reliable = true, rate = 20 },
+	Pose = { from = "Client", reliable = false, rate = 20 },
 	-- server -> client
 	Sync = { from = "Server", reliable = true },
 	Hit = { from = "Server", reliable = true },
 	Replicate = { from = "Server", reliable = false },
 	Explode = { from = "Server", reliable = true },
 	Equip = { from = "Server", reliable = true },
+	PoseOf = { from = "Server", reliable = false },
+	Act = { from = "Server", reliable = true },
 }
 
 -- Names travel as small integers. Sorted so both sides derive the same ids.

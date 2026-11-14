@@ -500,7 +500,9 @@ function Combat.onAction(player: Player, weaponId: any, kind: any)
 	State.advance(state, config, now, Config.global().Security.ReloadTolerance)
 
 	local ok = false
+	local empty = false
 	if kind == "Reload" then
+		empty = not State.hasRound(state, config)
 		ok = State.startReload(state, config, now)
 		if ok then
 			Events.Reloaded:Fire(player, weaponId)
@@ -514,7 +516,24 @@ function Combat.onAction(player: Player, weaponId: any, kind: any)
 	if not ok then
 		-- The client predicted something the server did not allow; put it right.
 		Sessions.sync(session, weaponId)
+	elseif kind ~= "Mode" then
+		-- Everyone else plays the same animation on this player's weapon.
+		local duration = state.actionEnd - state.actionStart
+		Net.fireExcept(player, "Act", player.UserId, weaponId, state.action, duration, empty)
 	end
+end
+
+-- Handles the "Pose" message: where a player is aiming, relayed to everyone
+-- else so their copy of the character points its weapon the same way.
+function Combat.onPose(player: Player, pitch: any, aiming: any)
+	if type(pitch) ~= "number" or pitch ~= pitch or type(aiming) ~= "boolean" then
+		return
+	end
+	local session = Sessions.get(player)
+	if session == nil or session.equipped == nil then
+		return
+	end
+	Net.fireExcept(player, "PoseOf", player.UserId, math.clamp(pitch, -1.5, 1.5), aiming)
 end
 
 -- Sets a function that sees every hit before damage is applied. Return a
@@ -532,6 +551,7 @@ function Combat.start()
 	end)
 	Net.on("Shoot", Combat.onShoot)
 	Net.on("Action", Combat.onAction)
+	Net.on("Pose", Combat.onPose)
 end
 
 function Combat.stop()
