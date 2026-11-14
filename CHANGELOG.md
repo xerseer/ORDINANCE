@@ -33,15 +33,33 @@ Decisions made without asking are listed under **Decisions** so they are easy to
 - **Example weapons** rigged from the gun kit: Glock 17 (semi pistol), G36C (select-fire rifle), Remington 700 (bolt action), Remington 870 (pump shotgun), M203 (grenade launcher).
 - `tools/studio/RigExamples.luau` and `tools/import-models.mjs` (rig the kit models in Studio and bring them into the repo as text), and `tools/studio/SelfTest.luau` (28 checks of the config and state logic).
 
+#### Phase 3: animation, first and third person, R6 and R15
+
+- **Encoded animations.** A weapon's `Animations` table holds keyframes as plain numbers (six per value: position, then rotation in degrees), with per-keyframe easing and optional sounds. Channels are `Weapon`, `Left`, `Right` and any named part of the model. The framework plays `Equip`, `Reload`, `ReloadEmpty`, `Cycle`, `Fire` and `Idle`. Bad animations are reported and skipped.
+- **Procedural animation.** With no keyframes at all, hands travel to the weapon's `Mag` and `Side` attachments to reload and cycle, parts named `Mag`, `Bolt`, `Slide` and `Pump` move by themselves, and the weapon tips and settles.
+- **`Animation.Mode`**: `Procedural`, `Encoded`, or `Both` (encoded where the weapon has one, procedural otherwise). `Both` is the default.
+- **Arm IK** for R15 (two-bone) and R6 (single arm), used for both views. It accepts `Motor6D` and the new `AnimationConstraint` joints.
+- **First-person viewmodel** built at runtime from the player's own arms (rig, skin and shirt), with aim-down-sights that lines the weapon's `Aim` attachment up with the camera.
+- **Procedural sway**: mouse lag, walk bob, breathing, landing dip, strafe tilt and per-shot kick, each a multiplier under `Sway`, on springs.
+- **Third person**: the trigger hand is placed where the weapon should be, the support hand is solved onto the weapon, arms follow the aim pitch, and R15 bodies turn side-on and lean with the aim while the head stays on target. Runs on every client for every visible character.
+- **Replication of pose**: aim pitch and aiming state ten times a second over an unreliable remote, and reload and cycle actions as events, so other players see the same animation.
+- **Camera**: `Camera.Mode` (`Both`, `FirstPerson`, `ThirdPerson`), an over-the-shoulder offset in third person, the character turning to face its aim, and aiming through the cursor when the mouse is free. The crosshair follows the aim point. Everything is restored when the weapon is put away.
+- **Debug**: the on-screen log (`Debug.Overlay`) and gizmos for IK targets and weapon attachments (`Debug.Visualize.IK`, `Debug.Visualize.Attachments`).
+- The Glock 17 carries an encoded `Fire` and `Reload` as a worked example; the other four weapons are fully procedural.
+- `tools/studio/PosePreview.luau` draws the first-person view as text, and the self-test grew to 40 checks.
+
 ### Fixed
 
+- Attachments that shared a name with a part (`Mag`, `Barrel`) were not found, so muzzle effects started at the head and reloads had no hand motion.
+- The world weapon stayed visible in first person; Roblox hides the character there but not its Tool.
 - Walk speed collapsed toward zero while a weapon was held, because the speed written and the 32-bit value read back differed and were mistaken for an outside change.
 
 ### Known gaps
 
 - Default sounds are placeholders built from the few sounds that ship with Roblox. Real gunshots need asset ids.
-- Arms are posed by Roblox's stock tool-hold animation until phase 3 adds the animation systems.
-- `Debug.Overlay` is accepted by the config but the on-screen log is not built yet.
+- In third person the trigger hand never leaves the grip (the weapon is welded to it, as every Roblox Tool is), so a bolt is worked by the right hand only in first person.
+- R6 bodies do not turn or lean; an R6 torso is one piece. R6 arms slide at the shoulder to reach instead.
+- With a long rifle an R15 support hand may still fall a little short of the handguard; it then holds the weapon as far forward as it can reach.
 
 ### Decisions
 
@@ -58,4 +76,9 @@ Decisions made without asking are listed under **Decisions** so they are easy to
 - **The G36C is the example rifle instead of the AKM**, because the kit's AK models contain MeshParts and the text model format was only verified for Parts with SpecialMeshes.
 - **The M203 example fires grenades only.** It uses the M4 with underbarrel launcher model; the rifle itself is not a second fire mode yet.
 - **Entry scripts moved** to `Framework/Server/Main` and `Framework/Client/Main`, and requiring the public module is what starts the framework.
+- **Custom arm solver instead of `IKControl`.** One solver serves the anchored first-person arms, live R15 characters and R6, none of which `IKControl` covers alone.
+- **Weapon parts are held by `Motor6D`, not welds**, each named after its part, so any part can be animated without rigging.
+- **Third-person arms are driven through joint `Transform`** in `PreSimulation`, which is what Roblox recommends for the new avatar joints. Nothing about the pose is written to the server.
+- **Aim follows the cursor when the mouse is free.** In third person without mouse lock the shot goes where the cursor is, as Roblox players expect; with the mouse locked or in first person it goes to the centre of the screen.
+- **The example grips sit low on the pistol grip** so an R15 hand, which is a large mitten, does not cover the weapon.
 - **Weapon attachment names:** `MainHandle` (trigger hand), `Barrel` (muzzle), `Grip` (support hand), `Side` (bolt or charging handle), `Mag`, plus `Aim` for the sight line.
