@@ -6,6 +6,10 @@ Decisions made without asking are listed under **Decisions** so they are easy to
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-14
+
+The first release.
+
 ### Added
 
 - Rojo project structure: `default.project.json` (place, for `rojo serve`), `framework.project.json` (the drop-in model) and `plugin.project.json` (the Studio plugin).
@@ -125,3 +129,6 @@ Decisions made without asking are listed under **Decisions** so they are easy to
 - **Aim follows the cursor when the mouse is free.** In third person without mouse lock the shot goes where the cursor is, as Roblox players expect; with the mouse locked or in first person it goes to the centre of the screen.
 - **The example grips sit low on the pistol grip** so an R15 hand, which is a large mitten, does not cover the weapon.
 - **Weapon attachment names:** `MainHandle` (trigger hand), `Barrel` (muzzle), `Grip` (support hand), `Side` (bolt or charging handle), `Mag`, plus `Aim` for the sight line.
+
+[Unreleased]: https://github.com/xerseer/ORDINANCE/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/xerseer/ORDINANCE/releases/tag/v0.1.0

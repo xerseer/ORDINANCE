@@ -42,10 +42,23 @@ jobs:
           rojo build plugin.project.json -o build/OrdnancePlugin.rbxm
           cp build/dist/ordnance.bundle.json build/dist/versions/$GITHUB_REF_NAME/
 
+      # The release notes are this version's section of CHANGELOG.md.
+      - name: Release notes
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          awk -v v="$version" '
+            index($0, "## [" v "]") == 1 { on = 1; next }
+            on && /^## \[/ { exit }
+            on && /^\[[^]]+\]: / { exit }
+            on { print }
+          ' CHANGELOG.md > build/NOTES.md
+          printf '\n---\n\nInstall: drop **Ordnance.rbxm** into ReplicatedStorage, or install **OrdnancePlugin.rbxm** and use its Install tab. Docs: https://xerseer.github.io/ORDINANCE/\n' >> build/NOTES.md
+          test -s build/NOTES.md
+
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          generate_release_notes: true
+          body_path: build/NOTES.md
           files: |
             build/Ordnance.rbxm
             build/OrdnancePlugin.rbxm
