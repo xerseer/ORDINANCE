@@ -51,7 +51,19 @@ local function build(node)
 	end
 	for property, value in node.p or {} do
 		local ok, message = pcall(function()
-			instance[property] = decode(value)
+			-- Rojo's implicit forms: twelve numbers are a CFrame, three are a
+			-- Vector3 or, where the property wants one, a Color3.
+			if type(value) == "table" and #value == 12 then
+				instance[property] = CFrame.new(table.unpack(value))
+			elseif type(value) == "table" and #value == 3 then
+				if not pcall(function()
+					instance[property] = Vector3.new(value[1], value[2], value[3])
+				end) then
+					instance[property] = Color3.new(value[1], value[2], value[3])
+				end
+			else
+				instance[property] = decode(value)
+			end
 		end)
 		if not ok then
 			problems += 1
