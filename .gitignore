@@ -8,6 +8,9 @@
 *.rbxlx.lock
 sourcemap.json
 
+# Generated into the plugin so it can install offline (tools/bundle.mjs --embed)
+/plugin/src/Embedded.json
+
 # Tooling
 /node_modules/
 roblox.yml
