@@ -65,6 +65,16 @@ Decisions made without asking are listed under **Decisions** so they are easy to
 
 **Not verified:** how the panel looks (Studio screenshots come back black to the tools used), the live HTTP update and catalogue (nothing has been released yet, and the test connection cannot make HTTP requests), and the previewer's camera framing.
 
+#### Phase 5: documentation site
+
+- **Nine pages**: start here, weapons, configuration, presets, animation, scripting API, security, Studio plugin, troubleshooting. Written for someone making a game, with the Roblox limits stated where they apply.
+- **Generated where it can be.** `tools/docs.mjs` reads `Defaults.luau` and `Schema.luau` with a small Luau table parser, so the configuration reference (160 settings: default, accepted values, description, scope), the preset comparison and the example-weapon table always match the code. The build fails if a config section or a public API function or signal has no entry, and CI runs it.
+- **Look.** The xnet docs' visual language: warm paper or warm near-black following the system theme, one olive accent, Schibsted Grotesk and JetBrains Mono, square corners, a left rail that lists the current page's sections. Code is highlighted at build time; the only scripts are copy buttons, the rail marker and a settings filter (press `/`).
+- **No dependencies.** Markdown dialect, highlighter and dev server (`--serve`, rebuilds on change) are in the one script.
+- `.github/workflows/docs.yml` publishes the site to GitHub Pages from `main`.
+
+**Checked:** every page at 1280 and 375 pixels wide has no horizontal overflow, every internal link and anchor resolves, there are no duplicate ids or stray Markdown, and the filter works. **Not checked:** how it looks to the eye. The browser available to me could not paint while the app was in the background.
+
 ### Fixed
 
 - Plugin: the Config, Presets and Converter tabs could not load, because the plugin root is a Script and `script.Parent.Parent.Source` read its `Source` property instead of the module of that name. The module is now `Writer`.
@@ -81,6 +91,9 @@ Decisions made without asking are listed under **Decisions** so they are easy to
 - With a long rifle an R15 support hand may still fall a little short of the handguard; it then holds the weapon as far forward as it can reach.
 
 ### Decisions
+
+- The docs site is plain HTML built by a dependency-free Node script rather than a site generator such as VitePress or Docusaurus. Those bring a look of their own that is hard to undo, and the brief asked for the xnet design and nothing that looks generated. The cost is a small Markdown dialect of our own.
+- Docs publish from `main` only, so the site always describes the latest release rather than work in progress.
 
 - **Name.** The framework is "Ordnance" (the weapons word). The GitHub repository is still `xerseer/ORDINANCE`.
 - **Root object is a ModuleScript**, not a Folder, so `require(ReplicatedStorage.Ordnance)` is the public API and the object is still a single instance.
