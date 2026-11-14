@@ -121,6 +121,22 @@ function Config.weapon(name: string, definition: any): Config
 		resolved.Name = name
 	end
 
+	-- Fold the tuning multipliers into the numbers, so nothing downstream has
+	-- to know they exist.
+	local tuning = resolved.Tuning
+	resolved.Damage.Base *= tuning.Damage
+	resolved.Ballistics.Explosive.Damage *= tuning.Damage
+	resolved.Recoil.Vertical *= tuning.Recoil
+	resolved.Recoil.Horizontal *= tuning.Recoil
+	for _, key in { "Hip", "Aim", "Moving", "Airborne", "PerShot", "Max" } do
+		resolved.Spread[key] *= tuning.Spread
+	end
+	resolved.Ammo.ReloadTime *= tuning.ReloadTime
+	resolved.Ammo.ReloadEmptyTime *= tuning.ReloadTime
+	resolved.Ammo.ShellTime *= tuning.ReloadTime
+	resolved.Fire.RPM *= tuning.FireRate
+	resolved.Fire.BurstRPM *= tuning.FireRate
+
 	-- A starting mode that is not selectable would strand the player in it.
 	if not table.find(resolved.Fire.Modes, resolved.Fire.Mode) then
 		local fire = clean.Fire

@@ -210,6 +210,12 @@ local RULES: { [string]: Rule } = {
 	["Realism.Malfunctions.Enabled"] = { doc = "The weapon can jam. Clear a jam with the Cycle key." },
 	["Realism.Malfunctions.Chance"] = { doc = "Chance per shot of a jam, 0 to 1.", min = 0, max = 1 },
 
+	["Tuning.Damage"] = { doc = "Multiplier on bullet and explosion damage.", min = 0, max = 100 },
+	["Tuning.Recoil"] = { doc = "Multiplier on camera kick.", min = 0, max = 10 },
+	["Tuning.Spread"] = { doc = "Multiplier on every spread angle.", min = 0, max = 10 },
+	["Tuning.ReloadTime"] = { doc = "Multiplier on reload and shell times.", min = 0.05, max = 10 },
+	["Tuning.FireRate"] = { doc = "Multiplier on rounds per minute.", min = 0.05, max = 10 },
+
 	["Keybinds.Fire"] = { doc = "Fire.", kind = "keys" },
 	["Keybinds.Aim"] = { doc = "Aim down sights.", kind = "keys" },
 	["Keybinds.Reload"] = { doc = "Reload.", kind = "keys" },

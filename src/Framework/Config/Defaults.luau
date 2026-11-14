@@ -151,6 +151,19 @@ local Defaults = {
 	},
 
 	------------------------------------------------------------------------
+	-- Multipliers laid over every weapon's own numbers. Set them in the
+	-- global config (or a preset) to retune the whole game without editing a
+	-- single weapon; set them in a weapon to nudge just that one.
+	------------------------------------------------------------------------
+	Tuning = {
+		Damage = 1,
+		Recoil = 1,
+		Spread = 1,
+		ReloadTime = 1,
+		FireRate = 1,
+	},
+
+	------------------------------------------------------------------------
 	-- Controls. Each action takes a list of Enum.KeyCode or
 	-- Enum.UserInputType names; the first keyboard/mouse entry and the first
 	-- gamepad entry are the ones shown in the HUD.
