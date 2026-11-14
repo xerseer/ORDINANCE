@@ -60,9 +60,7 @@ That serves the site on `http://127.0.0.1:4173` and rebuilds on every change. Pu
 
 ## Branches and releases
 
-- `main` holds tagged releases.
-- `dev` is where phases are integrated.
-- `phase/N-name` branches hold work in progress.
+All work happens on `main`.
 
 Pushing a tag `vX.Y.Z` that matches `src/Framework/Version.luau` builds a GitHub Release and publishes the bundle to the `dist` branch.
 
