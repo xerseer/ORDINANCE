@@ -58,7 +58,8 @@ return {
 	},
 
 	Effects = {
-		Sounds = { FirePitch = 1.2, FireVolume = 0.7 },
+		-- A launcher goes thump, not bang: a low, slowed explosion.
+		Sounds = { Fire = "rbxasset://sounds/impact_explosion_03.mp3", FirePitch = 1.6, FireVolume = 0.6 },
 		Tracer = { Enabled = false },
 	},
 }

@@ -33,6 +33,10 @@ return {
 		Horizontal = 0.5,
 	},
 
+	Effects = {
+		Sounds = { Fire = "rbxassetid://9117396996", FireVolume = 0.7 }, -- Pistol Single Shots 1 (Pro Sound Effects)
+	},
+
 	-- A pistol is held further out and nearer the middle than a rifle.
 	Viewmodel = {
 		Offset = { 0.42, -0.58, -1.6, 0, 0, 0 },

@@ -43,6 +43,12 @@ local function isSolid(instance: Instance): boolean
 	if instance:IsA("Terrain") then
 		return true
 	end
+	-- Hats and hair are not body parts. A bullet passes through them to the
+	-- body behind, as it does against the rewound hitboxes of players, so a
+	-- tall hat is not a bigger head.
+	if instance:FindFirstAncestorOfClass("Accessory") then
+		return false
+	end
 	if instance:IsA("BasePart") then
 		if instance.CanCollide then
 			return true

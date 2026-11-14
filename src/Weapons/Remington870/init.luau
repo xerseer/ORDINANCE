@@ -49,5 +49,7 @@ return {
 
 	Effects = {
 		Tracer = { Width = 0.04, Length = 5 },
+		-- A rifle shot slowed down: heavier and boomier, close to a 12 gauge.
+		Sounds = { Fire = "rbxassetid://9114726684", FirePitch = 0.72, FireVolume = 1 },
 	},
 }

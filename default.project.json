@@ -12,7 +12,10 @@
 			"OrdnanceDev": {
 				"$path": "tools/studio",
 				"PluginSource": {
-					"$path": "plugin/src"
+					"$path": "plugin/src",
+					"$properties": {
+						"Enabled": false
+					}
 				}
 			}
 		}
