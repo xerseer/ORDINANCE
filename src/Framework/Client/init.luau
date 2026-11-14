@@ -540,8 +540,10 @@ local function update(deltaTime: number)
 	local handling = config.Handling
 	local scale = handling.WalkSpeedScale
 		+ (handling.AimWalkSpeedScale - handling.WalkSpeedScale) * current.aim
-	current.lastSpeed = current.baseSpeed * scale
-	humanoid.WalkSpeed = current.lastSpeed
+	humanoid.WalkSpeed = current.baseSpeed * scale
+	-- Read it back: the property is a 32-bit float, so the value we wrote and
+	-- the value stored can differ, which would look like an outside change.
+	current.lastSpeed = humanoid.WalkSpeed
 
 	current.bloom = math.max(0, current.bloom - config.Spread.Recovery * deltaTime)
 
