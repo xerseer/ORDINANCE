@@ -306,6 +306,18 @@ local RULES: { [string]: Rule } = {
 	["Keybinds.Reload"] = { doc = "Reload.", kind = "keys" },
 	["Keybinds.FireMode"] = { doc = "Switch fire mode.", kind = "keys" },
 	["Keybinds.Cycle"] = { doc = "Cycle the action or clear a jam.", kind = "keys" },
+	["Keybinds.Light"] = { doc = "Turn the weapon's flashlights and lasers on and off.", kind = "keys" },
+	["Keybinds.Attachments"] = {
+		doc = "Open the attachment menu, when Attachments.Menu is on.",
+		kind = "keys",
+	},
+
+	["Attachments.Allowed"] = {
+		doc = "Per slot (Optic, Muzzle, Underbarrel, Side), the attachment ids this weapon accepts. A slot left out accepts any; an empty list accepts none.",
+		kind = "free",
+	},
+	["Attachments.Default"] = { doc = "Per slot, the attachment id the weapon comes with.", kind = "free" },
+	["Attachments.Menu"] = { doc = "Let players change attachments in game with the Attachments key." },
 
 	["Controls.AimToggle"] = { doc = "Press to aim instead of hold." },
 	["Controls.TouchButtons"] = { doc = "Show on-screen buttons on touch devices." },

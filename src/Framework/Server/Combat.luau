@@ -364,7 +364,7 @@ function Combat.onShoot(
 	end
 
 	local session = Sessions.get(player)
-	local entry = Registry.get(weaponId)
+	local entry = if session then Sessions.entryOf(session, weaponId) else nil
 	if session == nil or entry == nil then
 		return
 	end
@@ -489,7 +489,7 @@ function Combat.onAction(player: Player, weaponId: any, kind: any)
 		return
 	end
 	local session = Sessions.get(player)
-	local entry = Registry.get(weaponId)
+	local entry = if session then Sessions.entryOf(session, weaponId) else nil
 	if session == nil or entry == nil or session.equipped ~= weaponId then
 		return
 	end
@@ -542,6 +542,30 @@ function Combat.setDamageHandler(handler: DamageHandler?)
 	damageHandler = handler
 end
 
+-- Handles the "Attach" message: a player changing an attachment from the menu.
+function Combat.onAttach(player: Player, weaponId: any, slot: any, attachmentId: any)
+	if type(weaponId) ~= "string" or type(slot) ~= "string" then
+		return
+	end
+	if attachmentId ~= nil and type(attachmentId) ~= "string" then
+		return
+	end
+	local session = Sessions.get(player)
+	local entry = if session then Sessions.entryOf(session, weaponId) else nil
+	if session == nil or entry == nil or session.equipped ~= weaponId then
+		return
+	end
+	if not entry.config.Attachments.Menu then
+		return -- the game hands out attachments itself
+	end
+	Sessions.setAttachment(player, weaponId, slot, attachmentId)
+end
+
+-- Handles the "Light" message: the light key.
+function Combat.onLight(player: Player)
+	Sessions.toggleLight(player)
+end
+
 function Combat.start()
 	simulator = Projectile.newSimulator(projectileRaycast, function(projectile, event, result)
 		log:Try(onProjectileEvent, projectile, event, result)
@@ -552,6 +576,8 @@ function Combat.start()
 	Net.on("Shoot", Combat.onShoot)
 	Net.on("Action", Combat.onAction)
 	Net.on("Pose", Combat.onPose)
+	Net.on("Attach", Combat.onAttach)
+	Net.on("Light", Combat.onLight)
 end
 
 function Combat.stop()

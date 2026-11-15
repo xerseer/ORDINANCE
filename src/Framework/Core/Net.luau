@@ -31,6 +31,8 @@ local MESSAGES: { [string]: Message } = {
 	Shoot = { from = "Client", reliable = true, rate = 60 },
 	Action = { from = "Client", reliable = true, rate = 20 },
 	Pose = { from = "Client", reliable = false, rate = 20 },
+	Attach = { from = "Client", reliable = true, rate = 8 },
+	Light = { from = "Client", reliable = true, rate = 8 },
 	-- server -> client
 	Sync = { from = "Server", reliable = true },
 	Hit = { from = "Server", reliable = true },

@@ -111,12 +111,34 @@ function Config.presetName(): string
 	return presetName
 end
 
--- Resolves one weapon's config from its module table. Frozen.
-function Config.weapon(name: string, definition: any): Config
+export type Layer = {
+	config: { [string]: any }?, -- laid over the weapon's settings
+	tuning: { [string]: number }?, -- multiplied onto its Tuning
+}
+
+--[[
+	Resolves one weapon's config from its module table. Frozen.
+	`layers` are its fitted attachments, applied over the weapon in order.
+	Problems in the module are reported unless `quiet` is set (a weapon with
+	attachments was already reported when it loaded bare).
+]]
+function Config.weapon(name: string, definition: any, layers: { Layer }?, quiet: boolean?): Config
 	local clean, problems = Schema.validate(definition, "Weapon")
-	report(`Weapon "{name}"`, problems)
+	if not quiet then
+		report(`Weapon "{name}"`, problems)
+	end
 
 	local resolved = Merge.deep(base, clean)
+	for _, layer in layers or {} do
+		if layer.config then
+			resolved = Merge.deep(resolved, layer.config)
+		end
+		if layer.tuning then
+			for key, value in layer.tuning do
+				resolved.Tuning[key] *= value
+			end
+		end
+	end
 	if resolved.Name == "" then
 		resolved.Name = name
 	end

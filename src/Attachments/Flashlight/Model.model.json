@@ -1,0 +1,8 @@
+{
+	"ClassName": "Model",
+	"Children": [
+		{"Name":"Handle","ClassName":"Part","Properties":{"CanCollide":false,"Size":[0.05,0.05,0.05],"Transparency":1}},
+		{"Name":"Lens","ClassName":"Part","Properties":{"CFrame":[0.025,0.026,-0.35,0,0,1,0,1,0,-1,0,0],"Color":[0.639,0.635,0.647],"Material":"Neon","Size":[0.05,0.125,0.125]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshType":"Sphere","Scale":[1,1,1]}}]},
+		{"Name":"Body","ClassName":"Part","Properties":{"CFrame":[0,0,0,-1,0,0,0,-1,0,0,0,1],"Color":[0.184,0.184,0.184],"Material":"Metal","Size":[0.225,0.2,0.75]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://3538609311","MeshType":"FileMesh","Scale":[0.015,0.015,0.015]}}]}
+	]
+}

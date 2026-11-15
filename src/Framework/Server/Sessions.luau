@@ -27,6 +27,8 @@ export type Session = {
 	seed: number,
 	states: { [string]: State.State },
 	tools: { [string]: Tool },
+	fitted: { [string]: { [string]: string } }, -- weapon id -> slot -> attachment id
+	lights: { [string]: boolean }, -- weapon id -> light and laser switched on
 	equipped: string?,
 	heldModel: Model?, -- Custom mode only
 	lastShotId: number,
@@ -34,13 +36,16 @@ export type Session = {
 	fireTime: number,
 }
 
-local WEAPON_ATTRIBUTE = "OrdnanceWeapon"
+local WEAPON_ATTRIBUTE = Registry.WeaponAttribute
+local FITTED_ATTRIBUTE = Registry.FittedAttribute
+local LIGHT_ATTRIBUTE = "OrdnanceLight"
 
 local log = Logger.scope("Sessions")
 
 local Sessions = {}
 
 Sessions.WeaponAttribute = WEAPON_ATTRIBUTE
+Sessions.LightAttribute = LIGHT_ATTRIBUTE
 
 local sessions: { [Player]: Session } = {}
 local connections: { RBXScriptConnection } = {}
@@ -53,6 +58,21 @@ end
 
 function Sessions.get(player: Player): Session?
 	return sessions[player]
+end
+
+-- A player's weapon with their attachments fitted. Everything the server
+-- checks (rate of fire, spread, damage) is read from this.
+function Sessions.entryOf(session: Session, id: string): Registry.Entry?
+	local base = Registry.get(id)
+	if base == nil then
+		return nil
+	end
+	local fitted = session.fitted[id]
+	if fitted == nil then
+		fitted = Registry.defaults(base)
+		session.fitted[id] = fitted
+	end
+	return Registry.variant(id, fitted)
 end
 
 -- The authoritative state of a weapon, created full on first use.
@@ -103,6 +123,8 @@ local function buildTool(session: Session, entry: Registry.Entry): Tool
 	tool.CanBeDropped = false
 	tool.RequiresHandle = true
 	tool:SetAttribute(WEAPON_ATTRIBUTE, entry.id)
+	tool:SetAttribute(FITTED_ATTRIBUTE, entry.key)
+	tool:SetAttribute(LIGHT_ATTRIBUTE, session.lights[entry.id] == true)
 
 	local model = entry.template:Clone()
 	local handle = model.PrimaryPart :: BasePart
@@ -126,10 +148,10 @@ end
 -- their Backpack. Returns false if the weapon does not exist.
 function Sessions.give(player: Player, id: string): boolean
 	local session = sessions[player]
-	local entry = Registry.get(id)
 	if session == nil then
 		return false
 	end
+	local entry = Sessions.entryOf(session, id)
 	if entry == nil then
 		log:Warn(`cannot give "{id}" to {player.Name}: no weapon has that name`)
 		return false
@@ -180,7 +202,7 @@ end
 -- Custom mode it welds the weapon model to the character.
 function Sessions.equip(player: Player, id: string): boolean
 	local session = sessions[player]
-	local entry = Registry.get(id)
+	local entry = if session then Sessions.entryOf(session, id) else nil
 	local character = player.Character
 	local humanoid = if character then character:FindFirstChildOfClass("Humanoid") else nil
 	if session == nil or entry == nil or character == nil or humanoid == nil then
@@ -213,6 +235,8 @@ function Sessions.equip(player: Player, id: string): boolean
 	motor.C1 = Rig.gripCFrame(model)
 	motor.Parent = handle
 	model:SetAttribute(WEAPON_ATTRIBUTE, id)
+	model:SetAttribute(FITTED_ATTRIBUTE, entry.key)
+	model:SetAttribute(LIGHT_ATTRIBUTE, session.lights[id] == true)
 	model.Parent = character
 	session.heldModel = model
 
@@ -239,6 +263,87 @@ function Sessions.unequip(player: Player)
 	if id then
 		Net.fireClient(player, "Equip", nil)
 		onUnequipped(session, id)
+	end
+end
+
+--[[
+	Fits an attachment to one of a player's weapons, or empties the slot when
+	`attachmentId` is nil. The weapon is rebuilt with it, in their hands if it
+	was there. Returns false if the weapon cannot take it.
+]]
+function Sessions.setAttachment(player: Player, id: string, slot: string, attachmentId: string?): boolean
+	local session = sessions[player]
+	local base = Registry.get(id)
+	if session == nil or base == nil then
+		return false
+	end
+	if attachmentId ~= nil and not Registry.accepts(base, slot, attachmentId) then
+		return false
+	end
+	local current = Sessions.entryOf(session, id)
+	local fitted = table.clone(if current then current.fitted else {})
+	if fitted[slot] == attachmentId then
+		return true
+	end
+	fitted[slot] = attachmentId
+	session.fitted[id] = fitted
+	local entry = Sessions.entryOf(session, id) :: Registry.Entry
+
+	-- A smaller magazine cannot hold what the old one did.
+	local state = session.states[id]
+	if state and state.mag > entry.config.Ammo.Magazine then
+		state.reserve += state.mag - entry.config.Ammo.Magazine
+		state.mag = entry.config.Ammo.Magazine
+	end
+
+	local character = player.Character
+	local humanoid = if character then character:FindFirstChildOfClass("Humanoid") else nil
+	if Config.global().Inventory.Mode == "Tool" then
+		local old = session.tools[id]
+		if old and old.Parent ~= nil then
+			local held = old.Parent == character
+			local tool = buildTool(session, entry)
+			session.tools[id] = tool
+			local backpack = player:FindFirstChildOfClass("Backpack")
+			if held and humanoid then
+				old:Destroy()
+				tool.Parent = backpack
+				humanoid:EquipTool(tool)
+			else
+				tool.Parent = old.Parent
+				old:Destroy()
+			end
+		end
+	elseif session.equipped == id then
+		Sessions.equip(player, id)
+	end
+	if session.equipped == id then
+		Sessions.sync(session, id)
+	end
+	return true
+end
+
+-- What is fitted to a player's weapon: slot -> attachment id.
+function Sessions.getAttachments(player: Player, id: string): { [string]: string }
+	local session = sessions[player]
+	local entry = if session then Sessions.entryOf(session, id) else nil
+	return if entry then table.clone(entry.fitted) else {}
+end
+
+-- Switches the lights and lasers on the weapon in a player's hands.
+function Sessions.toggleLight(player: Player)
+	local session = sessions[player]
+	local id = if session then session.equipped else nil
+	if session == nil or id == nil then
+		return
+	end
+	local on = not session.lights[id]
+	session.lights[id] = on
+	local holder: Instance? = if Config.global().Inventory.Mode == "Tool"
+		then session.tools[id]
+		else session.heldModel
+	if holder then
+		holder:SetAttribute(LIGHT_ATTRIBUTE, on)
 	end
 end
 
@@ -272,6 +377,8 @@ local function onPlayer(player: Player)
 		seed = seedSource:NextInteger(1, 2 ^ 30),
 		states = {},
 		tools = {},
+		fitted = {},
+		lights = {},
 		equipped = nil,
 		heldModel = nil,
 		lastShotId = 0,

@@ -79,6 +79,30 @@ function Ordnance.GetConfig(weaponId: string?): Config.Config?
 	return if entry then entry.config else nil
 end
 
+--[[
+	Attachment ids. Give a weapon id to list only what that weapon accepts,
+	and a slot ("Optic", "Muzzle", "Underbarrel" or "Side") to list one slot.
+]]
+function Ordnance.ListAttachments(weaponId: string?, slot: string?): { string }
+	local Attachments = require(Framework.Weapons.Attachments) :: any
+	if weaponId == nil then
+		return Attachments.ids(slot)
+	end
+	local entry = Registry.get(weaponId)
+	if entry == nil then
+		return {}
+	end
+	local result = {}
+	for _, eachSlot in Attachments.Slots do
+		if slot == nil or slot == eachSlot then
+			for _, id in Registry.options(entry, eachSlot) do
+				table.insert(result, id)
+			end
+		end
+	end
+	return result
+end
+
 ------------------------------------------------------------------------------
 -- Server
 ------------------------------------------------------------------------------
@@ -89,6 +113,29 @@ local function server(method: string): any
 		return nil
 	end
 	return require(Framework.Server) :: any
+end
+
+--[[
+	Fits an attachment to one of a player's weapons, or empties the slot when
+	attachmentId is nil. The player keeps it for the rest of the session,
+	through respawns. Returns false if the weapon does not accept it.
+
+		Ordnance.SetAttachment(player, "G36C", "Optic", "RedDot")
+]]
+function Ordnance.SetAttachment(
+	player: Player,
+	weaponId: string,
+	slot: string,
+	attachmentId: string?
+): boolean
+	local module = server("SetAttachment")
+	return if module then module.Sessions.setAttachment(player, weaponId, slot, attachmentId) else false
+end
+
+-- What is fitted to one of a player's weapons, as { [slot] = attachmentId }.
+function Ordnance.GetAttachments(player: Player, weaponId: string): { [string]: string }
+	local module = server("GetAttachments")
+	return if module then module.Sessions.getAttachments(player, weaponId) else {}
 end
 
 -- Adds a weapon to a player's inventory.

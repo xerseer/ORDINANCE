@@ -153,8 +153,7 @@ local function findPartJoints(weapon: Instance): { [string]: Arms.Joint }
 end
 
 local function track(player: Player, character: Model, weapon: Instance)
-	local id = weapon:GetAttribute(WEAPON_ATTRIBUTE)
-	local entry = if type(id) == "string" then Registry.get(id) else nil
+	local entry = Registry.entryFor(weapon)
 	if entry == nil then
 		return
 	end
@@ -357,6 +356,18 @@ function Characters.fire(player: Player, replicated: boolean?)
 	if replicated and config.Fire.Action ~= "SelfLoading" and not config.Realism.ManualCycle then
 		entry.animator:setAction("Cycle", now, config.Fire.CycleTime)
 	end
+end
+
+-- Calls `each` for every character holding a weapon: (player, weapon instance, entry).
+function Characters.each(each: (Player, Instance, Registry.Entry) -> ())
+	for player, entry in tracked do
+		each(player, entry.weapon, entry.entry)
+	end
+end
+
+-- Whether the local player's own body is hidden for first person.
+function Characters.isLocalFirstPerson(): boolean
+	return localFirstPerson
 end
 
 -- The weapon instance a player is holding, if any.

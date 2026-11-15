@@ -85,6 +85,14 @@ local glock = Ordnance.GetConfig("Glock17")
 print(glock.Ammo.Magazine, glock.Damage.Base) -- 17 26
 ```
 
+### ListAttachments {#listattachments}
+
+```lua
+Ordnance.ListAttachments(weaponId: string?, slot: string?): { string }
+```
+
+Attachment ids. Give a weapon id for only the ones that weapon accepts, and a slot (`"Optic"`, `"Muzzle"`, `"Underbarrel"` or `"Side"`) for one slot. Use it to build your own loadout screen.
+
 ### Version
 
 `Ordnance.Version` is the framework's version string, such as `"{{version}}"`.
@@ -137,6 +145,27 @@ Sets the rounds loaded and in reserve. Leave either out to keep it. The magazine
 -- An ammo crate: top up the reserve of whatever they are holding.
 Ordnance.SetAmmo(player, weaponId, nil, 120)
 ```
+
+### SetAttachment {#setattachment}
+
+```lua
+Ordnance.SetAttachment(player: Player, weaponId: string, slot: string, attachmentId: string?): boolean
+```
+
+Fits an [attachment](attachments.html) to one of a player's weapons, or empties the slot when `attachmentId` is nil. The weapon is rebuilt with it straight away, in their hands if it was there. The player keeps it for the rest of their session, through respawns. Returns false if the weapon does not accept it.
+
+```lua
+-- A loadout screen sends the player's choice; check it is theirs to make first.
+Ordnance.SetAttachment(player, "G36C", "Optic", "ACOG")
+```
+
+### GetAttachments {#getattachments}
+
+```lua
+Ordnance.GetAttachments(player: Player, weaponId: string): { [string]: string }
+```
+
+What is fitted to one of a player's weapons, as `{ [slot] = attachmentId }`. Save it to a DataStore and pass it back to `SetAttachment` when they rejoin.
 
 ### SetDamageHandler {#setdamagehandler}
 

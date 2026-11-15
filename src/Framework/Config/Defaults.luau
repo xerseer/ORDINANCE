@@ -231,6 +231,20 @@ local Defaults = {
 		Reload = { "R", "ButtonX" },
 		FireMode = { "V", "DPadUp" },
 		Cycle = { "F", "ButtonY" },
+		Light = { "G", "DPadDown" },
+		Attachments = { "T", "DPadLeft" },
+	},
+
+	------------------------------------------------------------------------
+	-- Attachments: modules in Ordnance.Attachments. Allowed lists, per slot,
+	-- the attachment ids a weapon accepts (leave a slot out to accept any
+	-- that fits, or give it an empty list to accept none). Default is what
+	-- the weapon is handed out with.
+	------------------------------------------------------------------------
+	Attachments = {
+		Allowed = {} :: { [string]: { string } },
+		Default = {} :: { [string]: string },
+		Menu = true,
 	},
 
 	Controls = {

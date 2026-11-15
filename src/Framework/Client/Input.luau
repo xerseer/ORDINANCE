@@ -24,6 +24,8 @@ local TOUCH: { [string]: { position: UDim2, title: string } } = {
 	Reload = { position = UDim2.new(0.02, 0, 0.55, 0), title = "Reload" },
 	FireMode = { position = UDim2.new(0.02, 0, 0.18, 0), title = "Mode" },
 	Cycle = { position = UDim2.new(0.32, 0, -0.08, 0), title = "Cycle" },
+	Light = { position = UDim2.new(0.62, 0, 0.55, 0), title = "Light" },
+	Attachments = { position = UDim2.new(0.02, 0, -0.08, 0), title = "Kit" },
 }
 
 local log = Logger.scope("Input")

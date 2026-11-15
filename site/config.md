@@ -166,6 +166,12 @@ Players can have their own: call [`SetCrosshair`](api.html#setcrosshair) from a 
 
 {{config Crosshair}}
 
+## Attachments {#attachments}
+
+Which [attachments](attachments.html) a weapon accepts and comes with, and whether players can change them in game. Set it in a weapon module; set `Menu` in the global config to decide for the whole game.
+
+{{config Attachments}}
+
 ## Inventory {#inventory}
 
 In `Tool` mode every weapon is a Backpack Tool, so the hotbar, gamepad and mobile all work as players expect. In `Custom` mode nothing is handed out, and your code gives and equips weapons with the [server API](api.html#server).

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Attachments – Ordnance</title>
+<meta name="description" content="Scopes, sights, suppressors, grips, flashlights and lasers: how attachments are made, how they change a weapon, and how players and games fit them.">
+<meta property="og:title" content="Attachments – Ordnance">
+<meta property="og:description" content="Scopes, sights, suppressors, grips, flashlights and lasers: how attachments are made, how they change a weapon, and how players and games fit them.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" aria-label="Pages">
+    <a class="brand" href="index.html">Ordnance</a>
+    <span class="ver">v0.1.0</span>
+    <a class="get" href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">Get Ordnance&nbsp;↗</a>
+    <a class="item" href="index.html">Start here</a>
+    <a class="item" href="weapons.html">Weapons</a>
+    <a class="item here" href="attachments.html" aria-current="page">Attachments</a><div class="subs"><a class="sub" href="#module">The module</a><a class="sub" href="#model">The model</a><a class="sub" href="#mounts">On the weapon</a><a class="sub" href="#fitting">Fitting them</a></div>
+    <a class="item" href="config.html">Configuration</a>
+    <a class="item" href="presets.html">Presets</a>
+    <a class="item" href="animation.html">Animation</a>
+    <a class="item" href="api.html">Scripting API</a>
+    <a class="item" href="security.html">Security</a>
+    <a class="item" href="plugin.html">Studio plugin</a>
+    <a class="item" href="faq.html">Troubleshooting</a>
+    <a class="item out" href="https://github.com/xerseer/ORDINANCE" target="_blank" rel="noopener">Source&nbsp;↗</a>
+  </nav>
+  <main>
+<section id="top"><h1>Attachments</h1>
+<p class="lede">An attachment is a module in <code>Ordnance.Attachments</code> with its model inside it, like a weapon. It goes in one of four slots, and when it is fitted it sits on the weapon, in first and third person, and changes the weapon's settings.</p>
+<div class="tbl"><table><thead><tr><th>Slot</th><th>For</th><th>Takes over from the weapon</th></tr></thead><tbody><tr><td><code>Optic</code></td><td>Red dots, holographic sights, scopes</td><td>The sight line (<code>Aim</code>)</td></tr><tr><td><code>Muzzle</code></td><td>Suppressors, brakes</td><td>The muzzle (<code>Barrel</code>)</td></tr><tr><td><code>Underbarrel</code></td><td>Foregrips</td><td>Where the support hand holds (<code>Grip</code>)</td></tr><tr><td><code>Side</code></td><td>Flashlights and lasers</td><td>Nothing</td></tr></tbody></table></div>
+<p>Ordnance ships with eight, made from the attachment kit: <code>RedDot</code>, <code>Holographic</code>, <code>ACOG</code>, <code>SniperScope</code>, <code>Suppressor</code>, <code>VerticalGrip</code>, <code>Flashlight</code> and <code>Laser</code>.</p>
+</section>
+<section id="module"><h2>The module</h2>
+<div class="code"><div class="label">Attachments.ACOG</div><pre><code><span class="tk-kw">return</span> {
+	Name = <span class="tk-str">&quot;Trijicon ACOG 4x&quot;</span>,
+	Slot = <span class="tk-str">&quot;Optic&quot;</span>,
+	Config = {
+		Handling = { AimFOV = <span class="tk-num">24</span>, AimTime = <span class="tk-num">0.26</span> },
+	},
+}</code></pre></div>
+<p><code>Config</code> is laid over the weapon's own settings, with the same fields as a weapon module, so an attachment can change anything a weapon can except its name and model. <code>Tuning</code> is multiplied onto the weapon's <a href="config.html#tuning">tuning</a> instead of replacing it, so a grip that takes 15% off recoil does so on every weapon:</p>
+<div class="code"><div class="label">Attachments.VerticalGrip</div><pre><code><span class="tk-kw">return</span> {
+	Name = <span class="tk-str">&quot;Vertical Grip&quot;</span>,
+	Slot = <span class="tk-str">&quot;Underbarrel&quot;</span>,
+	Tuning = { Recoil = <span class="tk-num">0.85</span>, Spread = <span class="tk-num">0.95</span> },
+}</code></pre></div>
+<p>The server reads the same combined settings, so an attachment that tightens spread is checked against the tighter spread. Settings live in the module, not the model, so a client cannot fit itself a better one.</p>
+<h3 id="behaviour">Lights, lasers and scopes</h3>
+<p>Three optional tables give an attachment something to do. The Light key (<code>G</code> by default) switches lights and lasers on and off, and everyone sees them.</p>
+<div class="tbl"><table><thead><tr><th>Field</th><th>Settings</th><th>Does</th></tr></thead><tbody><tr><td><code>Light</code></td><td><code>Brightness</code>, <code>Range</code>, <code>Angle</code>, <code>Color</code></td><td>A spotlight from the Emitter.</td></tr><tr><td><code>Laser</code></td><td><code>Color</code>, <code>Width</code>, <code>Range</code></td><td>A beam from the Emitter to whatever it points at, with a dot where it lands.</td></tr><tr><td><code>Scope</code></td><td><code>Reticle</code>, <code>Overlay</code></td><td>Once aimed in first person, the screen shows the view through the scope and the weapon is hidden. Pair it with a low <code>Handling.AimFOV</code>.</td></tr></tbody></table></div>
+<div class="code"><div class="label">Attachments.Flashlight</div><pre><code><span class="tk-kw">return</span> {
+	Name = <span class="tk-str">&quot;SureFire Scout Light&quot;</span>,
+	Slot = <span class="tk-str">&quot;Side&quot;</span>,
+	Light = { Brightness = <span class="tk-num">5</span>, Range = <span class="tk-num">55</span>, Angle = <span class="tk-num">45</span> },
+}</code></pre></div>
+</section>
+<section id="model"><h2>The model</h2>
+<p>Face it the same way as a weapon: front toward −Z, top toward +Y. Attachments mark the places that matter, and anything missing is worked out from the model's shape:</p>
+<div class="tbl"><table><thead><tr><th>Attachment</th><th>Marks</th><th>Without it</th></tr></thead><tbody><tr><td><code>Mount</code></td><td>The point that sits on the weapon.</td><td>The face that touches it: the bottom of an optic, the back of a muzzle device, the top of a grip, the left of a side attachment.</td></tr><tr><td><code>Aim</code></td><td>The sight line through an optic, at the back.</td><td>A little above the middle, at the back.</td></tr><tr><td><code>Barrel</code></td><td>The new muzzle, on a muzzle device.</td><td>The front.</td></tr><tr><td><code>Grip</code></td><td>Where the support hand holds a grip.</td><td>Just below the middle.</td></tr><tr><td><code>Emitter</code></td><td>Where a light or laser shines from, facing forward.</td><td>The front.</td></tr></tbody></table></div>
+<p>An attachment is not resized with the weapon. Give it <code>Scale = 0.8</code> (in the module) if it is too big for a weapon set.</p>
+</section>
+<section id="mounts"><h2>On the weapon</h2>
+<p>A weapon can mark where each slot sits with <code>OpticMount</code>, <code>MuzzleMount</code>, <code>UnderMount</code> and <code>SideMount</code> attachments, facing forward. Without them the places are worked out: an optic on top of the receiver a little ahead of the grip, a muzzle device on the barrel, a grip under the handguard and a side attachment on the right of it. Mark them by hand where that guess is wrong; the plugin's <a href="plugin.html#helper">IK Helper</a> shows where they are.</p>
+<p>Which attachments a weapon accepts, and what it comes with, are weapon settings:</p>
+<div class="code"><div class="label">Weapons.Glock17 (part)</div><pre><code>Attachments = {
+	Allowed = {
+		Optic = { <span class="tk-str">&quot;RedDot&quot;</span> },
+		Underbarrel = {}, <span class="tk-com">-- no foregrip on a pistol</span>
+	},
+	Default = { Side = <span class="tk-str">&quot;Flashlight&quot;</span> },
+},</code></pre></div>
+<p>A slot left out of <code>Allowed</code> accepts every attachment for that slot. See the <a href="config.html#attachments">Attachments settings</a>.</p>
+</section>
+<section id="fitting"><h2>Fitting them</h2>
+<p>Players open the attachment menu with <code>T</code> and pick from what their weapon accepts. Turn that off with <code>Attachments.Menu = false</code> and fit them from your own scripts instead, for a loadout screen or an unlock system:</p>
+<div class="code"><div class="label">Script</div><pre><code><span class="tk-kw">local</span> Ordnance = <span class="tk-fn">require</span>(game.ReplicatedStorage.Ordnance)
+
+Ordnance.<span class="tk-fn">SetAttachment</span>(player, <span class="tk-str">&quot;G36C&quot;</span>, <span class="tk-str">&quot;Optic&quot;</span>, <span class="tk-str">&quot;ACOG&quot;</span>)
+<span class="tk-fn">print</span>(Ordnance.<span class="tk-fn">GetAttachments</span>(player, <span class="tk-str">&quot;G36C&quot;</span>)) <span class="tk-com">--&gt; { Optic = &quot;ACOG&quot; }</span></code></pre></div>
+<p>What a player has fitted lasts their session, through respawns. To keep it between sessions, save <a href="api.html#getattachments"><code>GetAttachments</code></a> and call <a href="api.html#setattachment"><code>SetAttachment</code></a> again when they join.</p>
+<div class="note limit"><span class="kicker">Roblox limit</span><p>A scope's view is the camera zoomed in with a picture over the screen. Roblox draws one camera at a time, so there is no true picture-in-picture lens with the world sharp around it.</p></div>
+</section>
+    <footer>
+      <span>Ordnance v0.1.0. MIT licence.</span>
+      <a href="https://github.com/xerseer/ORDINANCE/blob/main/site/attachments.md">Edit this page&nbsp;↗</a>
+    </footer>
+  </main>
+</div>
+<script src="site.js"></script>
+</body>
+</html>

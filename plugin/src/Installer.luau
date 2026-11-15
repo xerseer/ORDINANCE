@@ -244,7 +244,7 @@ end
 --[[
 	Installs `bundle`. On a fresh place the whole tree is created. On an
 	existing install only `Framework` and the root module are replaced, and
-	missing shipped presets are added; Config and Weapons are left alone.
+	missing shipped presets are added; Config, Weapons and Attachments are left alone.
 ]]
 function Installer.install(bundle: Bundle): Result
 	local problems: { string } = {}
@@ -278,7 +278,7 @@ function Installer.install(bundle: Bundle): Result
 				end
 			end
 		end
-		for _, name in { "Config", "Weapons", "Presets" } do
+		for _, name in { "Config", "Weapons", "Attachments", "Presets" } do
 			if existing:FindFirstChild(name) == nil and fresh:FindFirstChild(name) then
 				(fresh :: any)[name].Parent = existing
 			end
@@ -340,7 +340,7 @@ function Installer.userFiles(): { string }
 	local root = Installer.installed()
 	local names = {}
 	if root then
-		for _, name in { "Config", "Weapons", "Presets" } do
+		for _, name in { "Config", "Weapons", "Attachments", "Presets" } do
 			if root:FindFirstChild(name) then
 				table.insert(names, name)
 			end

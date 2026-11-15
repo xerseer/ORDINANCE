@@ -1,0 +1,7 @@
+{
+	"ClassName": "Model",
+	"Children": [
+		{"Name":"Handle","ClassName":"Part","Properties":{"CanCollide":false,"Size":[0.05,0.05,0.05],"Transparency":1}},
+		{"Name":"Part1","ClassName":"Part","Properties":{"CFrame":[0,0,0,1,0,0,0,1,0,0,0,1],"Color":[0.184,0.184,0.184],"Material":"Metal","Size":[0.175,0.45,0.2]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://2635277116","MeshType":"FileMesh","Scale":[1,1,1]}}]}
+	]
+}

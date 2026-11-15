@@ -21,6 +21,7 @@
     <a class="get" href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">Get Ordnance&nbsp;↗</a>
     <a class="item" href="index.html">Start here</a>
     <a class="item" href="weapons.html">Weapons</a>
+    <a class="item" href="attachments.html">Attachments</a>
     <a class="item" href="config.html">Configuration</a>
     <a class="item" href="presets.html">Presets</a>
     <a class="item" href="animation.html">Animation</a>
@@ -84,6 +85,9 @@ Players.PlayerAdded:<span class="tk-fn">Connect</span>(<span class="tk-kw">funct
 <p>A weapon's resolved config, after every layer and <code>Tuning</code> has been applied, or the global config when no id is given. The table is frozen; read it, do not write it. Returns nil for a weapon that does not exist.</p>
 <div class="code"><pre><code><span class="tk-kw">local</span> glock = Ordnance.<span class="tk-fn">GetConfig</span>(<span class="tk-str">&quot;Glock17&quot;</span>)
 <span class="tk-fn">print</span>(glock.Ammo.Magazine, glock.Damage.Base) <span class="tk-com">-- 17 26</span></code></pre></div>
+<h3 id="listattachments">ListAttachments</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">ListAttachments</span>(weaponId: string?, slot: string?): { string }</code></pre></div>
+<p>Attachment ids. Give a weapon id for only the ones that weapon accepts, and a slot (<code>&quot;Optic&quot;</code>, <code>&quot;Muzzle&quot;</code>, <code>&quot;Underbarrel&quot;</code> or <code>&quot;Side&quot;</code>) for one slot. Use it to build your own loadout screen.</p>
 <h3 id="version">Version</h3>
 <p><code>Ordnance.Version</code> is the framework's version string, such as <code>&quot;0.1.0&quot;</code>.</p>
 </section>
@@ -106,6 +110,14 @@ Players.PlayerAdded:<span class="tk-fn">Connect</span>(<span class="tk-kw">funct
 <p>Sets the rounds loaded and in reserve. Leave either out to keep it. The magazine is clamped to the weapon's capacity. The player's client is corrected straight away.</p>
 <div class="code"><pre><code><span class="tk-com">-- An ammo crate: top up the reserve of whatever they are holding.</span>
 Ordnance.<span class="tk-fn">SetAmmo</span>(player, weaponId, <span class="tk-kw">nil</span>, <span class="tk-num">120</span>)</code></pre></div>
+<h3 id="setattachment">SetAttachment</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">SetAttachment</span>(player: Player, weaponId: string, slot: string, attachmentId: string?): boolean</code></pre></div>
+<p>Fits an <a href="attachments.html">attachment</a> to one of a player's weapons, or empties the slot when <code>attachmentId</code> is nil. The weapon is rebuilt with it straight away, in their hands if it was there. The player keeps it for the rest of their session, through respawns. Returns false if the weapon does not accept it.</p>
+<div class="code"><pre><code><span class="tk-com">-- A loadout screen sends the player's choice; check it is theirs to make first.</span>
+Ordnance.<span class="tk-fn">SetAttachment</span>(player, <span class="tk-str">&quot;G36C&quot;</span>, <span class="tk-str">&quot;Optic&quot;</span>, <span class="tk-str">&quot;ACOG&quot;</span>)</code></pre></div>
+<h3 id="getattachments">GetAttachments</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">GetAttachments</span>(player: Player, weaponId: string): { [string]: string }</code></pre></div>
+<p>What is fitted to one of a player's weapons, as <code>{ [slot] = attachmentId }</code>. Save it to a DataStore and pass it back to <code>SetAttachment</code> when they rejoin.</p>
 <h3 id="setdamagehandler">SetDamageHandler</h3>
 <div class="code"><pre><code>Ordnance.<span class="tk-fn">SetDamageHandler</span>(handler: ((info: DamageInfo) -&gt; number | <span class="tk-kw">false</span> | <span class="tk-kw">nil</span>)?)</code></pre></div>
 <p>Sets one function that sees every hit before damage is applied, bullets and explosions alike. Return a number to change the damage, <code>false</code> to cancel it, or nothing to leave it alone. Pass nil to remove it. An error inside the handler is reported and the hit goes ahead unchanged.</p>

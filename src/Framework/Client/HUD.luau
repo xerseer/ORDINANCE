@@ -44,6 +44,8 @@ local hairs: { Frame } = {}
 local ring: Frame
 local ringOutline: Frame
 local dot: Frame
+local scopeOverlay: Frame? = nil
+local crosshairEnabled = true
 local playerCrosshair: { [string]: any }? = nil
 local styledFrom: any = nil -- the settings table the crosshair was last drawn with
 local styledWith: any = nil -- the player overrides it was drawn with
@@ -328,7 +330,8 @@ function HUD.show(config: Config)
 	mode.TextColor3 = accent
 	progressFill.BackgroundColor3 = accent
 	title.Text = string.upper(config.Name)
-	crosshair.Visible = config.HUD.Crosshair
+	crosshairEnabled = config.HUD.Crosshair
+	crosshair.Visible = crosshairEnabled
 	gui.Enabled = true
 end
 
@@ -418,10 +421,104 @@ function HUD.hitmarker(config: Config, now: number, headshot: boolean, killed: b
 	markerUntil = now + (if killed then 0.3 else 0.12)
 end
 
+--[[
+	The picture through a scope: a round lens with a reticle, black around
+	it. Pass the scope's settings to show it, nil to take it away. It sits
+	under the ammo display and the hitmarker.
+]]
+function HUD.scope(scope: { Reticle: Color3, Overlay: Color3 }?)
+	local screen = gui
+	if screen == nil then
+		return
+	end
+	if scope == nil then
+		if scopeOverlay then
+			scopeOverlay.Visible = false
+		end
+		crosshair.Visible = crosshairEnabled
+		return
+	end
+	local overlay = scopeOverlay
+	if overlay == nil or overlay.Parent == nil then
+		local made = Instance.new("Frame")
+		made.Name = "Scope"
+		made.Size = UDim2.fromScale(1, 1)
+		made.BackgroundTransparency = 1
+		made.ZIndex = 0
+		-- The lens: a square as tall as the screen, black outside it.
+		local lens = Instance.new("Frame")
+		lens.Name = "Lens"
+		lens.AnchorPoint = Vector2.new(0.5, 0.5)
+		lens.Position = UDim2.fromScale(0.5, 0.5)
+		lens.Size = UDim2.fromScale(0.92, 0.92)
+		lens.BackgroundTransparency = 1
+		local aspect = Instance.new("UIAspectRatioConstraint")
+		aspect.Parent = lens
+		local corner = Instance.new("UICorner")
+		corner.CornerRadius = UDim.new(0.5, 0)
+		corner.Parent = lens
+		-- A thick stroke round the circle blacks out the corners of the square.
+		local rim = Instance.new("UIStroke")
+		rim.Name = "Rim"
+		rim.Thickness = 400
+		rim.Parent = lens
+		lens.Parent = made
+		for index, name in { "Left", "Right", "Top", "Bottom" } do
+			local side = Instance.new("Frame")
+			side.Name = name
+			side.BorderSizePixel = 0
+			side.AnchorPoint = Vector2.new(
+				if index == 2 then 0 elseif index == 1 then 1 else 0.5,
+				if index == 4 then 0 elseif index == 3 then 1 else 0.5
+			)
+			side.Position = UDim2.fromScale(
+				if index == 1 then 0 elseif index == 2 then 1 else 0.5,
+				if index == 3 then 0 elseif index == 4 then 1 else 0.5
+			)
+			side.Size = if index <= 2 then UDim2.fromScale(1, 2) else UDim2.fromScale(2, 1)
+			side.Parent = lens
+		end
+		for _, name in { "Horizontal", "Vertical" } do
+			local line = Instance.new("Frame")
+			line.Name = name
+			line.BorderSizePixel = 0
+			line.AnchorPoint = Vector2.new(0.5, 0.5)
+			line.Position = UDim2.fromScale(0.5, 0.5)
+			line.Size = if name == "Horizontal" then UDim2.new(1, 0, 0, 2) else UDim2.new(0, 2, 1, 0)
+			line.Parent = lens
+		end
+		local centre = Instance.new("Frame")
+		centre.Name = "Centre"
+		centre.AnchorPoint = Vector2.new(0.5, 0.5)
+		centre.Position = UDim2.fromScale(0.5, 0.5)
+		centre.Size = UDim2.fromOffset(5, 5)
+		centre.BorderSizePixel = 0
+		local round = Instance.new("UICorner")
+		round.CornerRadius = UDim.new(0.5, 0)
+		round.Parent = centre
+		centre.Parent = lens
+		made.Parent = screen
+		scopeOverlay = made
+		overlay = made
+	end
+	local lens = (overlay :: Frame):FindFirstChild("Lens") :: Frame;
+	(lens:FindFirstChild("Rim") :: UIStroke).Color = scope.Overlay
+	for _, name in { "Left", "Right", "Top", "Bottom" } do
+		(lens:FindFirstChild(name) :: Frame).BackgroundColor3 = scope.Overlay
+	end
+	for _, name in { "Horizontal", "Vertical", "Centre" } do
+		(lens:FindFirstChild(name) :: Frame).BackgroundColor3 = scope.Reticle
+	end
+	(overlay :: Frame).Visible = true
+	-- The reticle is the crosshair now.
+	crosshair.Visible = false
+end
+
 function HUD.destroy()
 	if gui then
 		gui:Destroy()
 		gui = nil
+		scopeOverlay = nil
 	end
 end
 

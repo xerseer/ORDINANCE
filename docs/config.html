@@ -21,7 +21,8 @@
     <a class="get" href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">Get Ordnance&nbsp;↗</a>
     <a class="item" href="index.html">Start here</a>
     <a class="item" href="weapons.html">Weapons</a>
-    <a class="item here" href="config.html" aria-current="page">Configuration</a><div class="subs"><a class="sub" href="#how">How it works</a><a class="sub" href="#identity">Identity</a><a class="sub" href="#fire">Fire</a><a class="sub" href="#ammo">Ammo</a><a class="sub" href="#ballistics">Ballistics</a><a class="sub" href="#damage">Damage</a><a class="sub" href="#spread">Spread</a><a class="sub" href="#recoil">Recoil</a><a class="sub" href="#handling">Handling</a><a class="sub" href="#realism">Realism</a><a class="sub" href="#tuning-ref">Tuning</a><a class="sub" href="#camera">Camera</a><a class="sub" href="#viewmodel">Viewmodel</a><a class="sub" href="#thirdperson">Third person</a><a class="sub" href="#animation">Animation</a><a class="sub" href="#sway">Sway</a><a class="sub" href="#keybinds">Keybinds</a><a class="sub" href="#controls">Controls</a><a class="sub" href="#effects">Effects</a><a class="sub" href="#hud">HUD</a><a class="sub" href="#crosshair">Crosshair</a><a class="sub" href="#inventory">Inventory</a><a class="sub" href="#security">Security</a><a class="sub" href="#debug">Debug</a></div>
+    <a class="item" href="attachments.html">Attachments</a>
+    <a class="item here" href="config.html" aria-current="page">Configuration</a><div class="subs"><a class="sub" href="#how">How it works</a><a class="sub" href="#identity">Identity</a><a class="sub" href="#fire">Fire</a><a class="sub" href="#ammo">Ammo</a><a class="sub" href="#ballistics">Ballistics</a><a class="sub" href="#damage">Damage</a><a class="sub" href="#spread">Spread</a><a class="sub" href="#recoil">Recoil</a><a class="sub" href="#handling">Handling</a><a class="sub" href="#realism">Realism</a><a class="sub" href="#tuning-ref">Tuning</a><a class="sub" href="#camera">Camera</a><a class="sub" href="#viewmodel">Viewmodel</a><a class="sub" href="#thirdperson">Third person</a><a class="sub" href="#animation">Animation</a><a class="sub" href="#sway">Sway</a><a class="sub" href="#keybinds">Keybinds</a><a class="sub" href="#controls">Controls</a><a class="sub" href="#effects">Effects</a><a class="sub" href="#hud">HUD</a><a class="sub" href="#crosshair">Crosshair</a><a class="sub" href="#attachments">Attachments</a><a class="sub" href="#inventory">Inventory</a><a class="sub" href="#security">Security</a><a class="sub" href="#debug">Debug</a></div>
     <a class="item" href="presets.html">Presets</a>
     <a class="item" href="animation.html">Animation</a>
     <a class="item" href="api.html">Scripting API</a>
@@ -239,6 +240,8 @@
 <tr data-search="keybinds.reload reload."><td><code id="keybinds-reload">Reload</code></td><td><code>{ &quot;R&quot;, &quot;ButtonX&quot; }</code></td><td>list of key names</td><td>Reload.</td></tr>
 <tr data-search="keybinds.firemode switch fire mode."><td><code id="keybinds-firemode">FireMode</code></td><td><code>{ &quot;V&quot;, &quot;DPadUp&quot; }</code></td><td>list of key names</td><td>Switch fire mode.</td></tr>
 <tr data-search="keybinds.cycle cycle the action or clear a jam."><td><code id="keybinds-cycle">Cycle</code></td><td><code>{ &quot;F&quot;, &quot;ButtonY&quot; }</code></td><td>list of key names</td><td>Cycle the action or clear a jam.</td></tr>
+<tr data-search="keybinds.light turn the weapon's flashlights and lasers on and off."><td><code id="keybinds-light">Light</code></td><td><code>{ &quot;G&quot;, &quot;DPadDown&quot; }</code></td><td>list of key names</td><td>Turn the weapon's flashlights and lasers on and off.</td></tr>
+<tr data-search="keybinds.attachments open the attachment menu, when attachments.menu is on."><td><code id="keybinds-attachments">Attachments</code></td><td><code>{ &quot;T&quot;, &quot;DPadLeft&quot; }</code></td><td>list of key names</td><td>Open the attachment menu, when Attachments.Menu is on.</td></tr>
 </tbody></table></div>
 </section>
 <section id="controls"><h2>Controls</h2>
@@ -309,6 +312,14 @@
 <tr data-search="crosshair.outlinethickness width of the border, in pixels."><td><code id="crosshair-outlinethickness">OutlineThickness</code></td><td><code>1</code></td><td>1 to 6</td><td>Width of the border, in pixels.</td></tr>
 <tr data-search="crosshair.dynamic open the crosshair with the weapon's current spread. off keeps it a fixed size."><td><code id="crosshair-dynamic">Dynamic</code></td><td><code>true</code></td><td>true or false</td><td>Open the crosshair with the weapon's current spread. Off keeps it a fixed size.</td></tr>
 <tr data-search="crosshair.aimstyle what it becomes when aiming. auto: a dot, or nothing in first person when the weapon has a sight (an aim attachment or an optic). dot: always a dot. hidden: nothing. same: no change."><td><code id="crosshair-aimstyle">AimStyle</code></td><td><code>&quot;Auto&quot;</code></td><td><code>Auto</code> <code>Dot</code> <code>Hidden</code> <code>Same</code></td><td>What it becomes when aiming. Auto: a dot, or nothing in first person when the weapon has a sight (an Aim attachment or an optic). Dot: always a dot. Hidden: nothing. Same: no change.</td></tr>
+</tbody></table></div>
+</section>
+<section id="attachments"><h2>Attachments</h2>
+<p>Which <a href="attachments.html">attachments</a> a weapon accepts and comes with, and whether players can change them in game. Set it in a weapon module; set <code>Menu</code> in the global config to decide for the whole game.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="attachments.allowed per slot (optic, muzzle, underbarrel, side), the attachment ids this weapon accepts. a slot left out accepts any; an empty list accepts none."><td><code id="attachments-allowed">Allowed</code></td><td><code>{}</code></td><td>table</td><td>Per slot (Optic, Muzzle, Underbarrel, Side), the attachment ids this weapon accepts. A slot left out accepts any; an empty list accepts none.</td></tr>
+<tr data-search="attachments.default per slot, the attachment id the weapon comes with."><td><code id="attachments-default">Default</code></td><td><code>{}</code></td><td>table</td><td>Per slot, the attachment id the weapon comes with.</td></tr>
+<tr data-search="attachments.menu let players change attachments in game with the attachments key."><td><code id="attachments-menu">Menu</code></td><td><code>true</code></td><td>true or false</td><td>Let players change attachments in game with the Attachments key.</td></tr>
 </tbody></table></div>
 </section>
 <section id="inventory"><h2>Inventory</h2>

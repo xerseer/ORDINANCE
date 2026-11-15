@@ -16,7 +16,9 @@ local Characters = require(script.Characters)
 local Config = require(Framework.Config)
 local Damage = require(Framework.Ballistics.Damage)
 local DebugOverlay = require(script.DebugOverlay)
+local AttachmentMenu = require(script.AttachmentMenu)
 local Effects = require(script.Effects)
+local Gadgets = require(script.Gadgets)
 local Events = require(Framework.Core.Events)
 local Hitscan = require(Framework.Ballistics.Hitscan)
 local HUD = require(script.HUD)
@@ -390,6 +392,10 @@ local function unequip()
 	Input.unbind()
 	HUD.hide()
 	Viewmodel.hide()
+	AttachmentMenu.closeSoon()
+	Gadgets.setHeld(nil, nil)
+	HUD.scope(nil)
+	Viewmodel.setHidden(false)
 
 	local camera = workspace.CurrentCamera
 	if camera then
@@ -464,6 +470,9 @@ local function equip(entry: Entry, instance: Instance)
 	local config = entry.config
 	local handlers: { [string]: Input.Handler } = {
 		Fire = function(pressed)
+			if pressed and AttachmentMenu.isOpen() then
+				return
+			end
 			current.triggerHeld = pressed
 			if pressed then
 				current.pressedAt = clock()
@@ -494,6 +503,23 @@ local function equip(entry: Entry, instance: Instance)
 			end
 		end
 	end
+	local gadgets = entry.gadgets
+	if gadgets.light or gadgets.laser then
+		handlers.Light = function(pressed)
+			if pressed then
+				Net.fire("Light")
+			end
+		end
+	end
+	if config.Attachments.Menu then
+		handlers.Attachments = function(pressed)
+			if pressed then
+				AttachmentMenu.toggle(entry, function(slot: string, attachmentId: string?)
+					Net.fire("Attach", entry.id, slot, attachmentId)
+				end)
+			end
+		end
+	end
 	if config.Realism.ManualCycle or config.Realism.Malfunctions.Enabled then
 		handlers.Cycle = function(pressed)
 			local state = current.state
@@ -505,6 +531,8 @@ local function equip(entry: Entry, instance: Instance)
 
 	Input.bind(config.Keybinds :: any, config.Controls.TouchButtons, handlers)
 	HUD.show(config)
+	AttachmentMenu.refresh(entry)
+	Gadgets.setHeld(instance, entry)
 	Events.Equipped:Fire(entry.id)
 end
 
@@ -513,7 +541,7 @@ local function onChildAdded(child: Instance)
 	if type(id) ~= "string" then
 		return
 	end
-	local entry = Registry.get(id)
+	local entry = Registry.entryFor(child)
 	if entry == nil then
 		log:WarnOnce(`missing:{id}`, `the server gave a weapon "{id}" that this client does not have`)
 		return
@@ -623,6 +651,11 @@ local function update(deltaTime: number)
 
 	local pose = current.animator:update(now)
 	local velocity = if root then root.AssemblyLinearVelocity else Vector3.zero
+	-- A scope with a full-screen picture takes over once it is up to the eye.
+	local scope = current.entry.gadgets.scope
+	local scoped = scope ~= nil and firstPerson and current.aim >= 0.9
+	Viewmodel.setHidden(scoped)
+	HUD.scope(if scoped then scope else nil)
 	Viewmodel.update(deltaTime, pose, current.aim, velocity, not airborne)
 
 	-- Tell this client's third-person view, and ten times a second everyone
@@ -690,7 +723,9 @@ local function onReplicate(
 			end
 		end
 	end
-	drawShot(entry, character, weapon, userId, origin, aim, angle, seed, shotId)
+	-- Their attachments change how the shot looks and sounds (a suppressor).
+	local fitted = if weapon then Registry.entryFor(weapon) else nil
+	drawShot(fitted or entry, character, weapon, userId, origin, aim, angle, seed, shotId)
 	Characters.fire(shooter, true)
 end
 
@@ -765,7 +800,7 @@ local function onEquipMessage(id: string?)
 		for _ = 1, 40 do
 			for _, child in character:GetChildren() do
 				if child:IsA("Model") and child:GetAttribute(WEAPON_ATTRIBUTE) == id then
-					equip(entry, child)
+					equip(Registry.entryFor(child) or entry, child)
 					return
 				end
 			end
@@ -843,6 +878,7 @@ function Client.start(root: Instance)
 
 			Recoil.start()
 			Characters.start()
+			Gadgets.start()
 			if Config.global().Debug.Overlay then
 				DebugOverlay.start()
 			end
@@ -889,6 +925,8 @@ function Client.stop()
 	end)
 	Recoil.stop()
 	Characters.stop()
+	Gadgets.stop()
+	AttachmentMenu.close()
 	DebugOverlay.stop()
 	Viewmodel.hide()
 	Input.unbind()

@@ -60,6 +60,7 @@ local Viewmodel = {}
 
 local view: View? = nil
 local visible = false
+local hidden = false -- behind a scope picture
 local sway = Sway.new()
 local lastCamera: CFrame? = nil
 local swayInput: Sway.Input = { look = Vector2.zero, velocity = Vector3.zero, grounded = true, aim = 0 }
@@ -184,7 +185,7 @@ local function applyVisibility()
 		return
 	end
 	local camera = workspace.CurrentCamera
-	current.model.Parent = if visible and camera then camera else nil
+	current.model.Parent = if visible and not hidden and camera then camera else nil
 end
 
 -- Builds the viewmodel for a weapon the local player has drawn.
@@ -213,6 +214,20 @@ function Viewmodel.setVisible(shown: boolean)
 		lastCamera = nil
 		applyVisibility()
 	end
+end
+
+-- Hides the viewmodel while it keeps updating, for a full-screen scope.
+function Viewmodel.setHidden(hide: boolean)
+	if hidden ~= hide then
+		hidden = hide
+		applyVisibility()
+	end
+end
+
+-- The viewmodel's model while it is on screen, for lights and lasers.
+function Viewmodel.getModel(): Model?
+	local current = view
+	return if current and visible and not hidden then current.model else nil
 end
 
 function Viewmodel.isVisible(): boolean
