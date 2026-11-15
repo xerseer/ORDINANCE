@@ -1,0 +1,10 @@
+{
+	"ClassName": "Model",
+	"Children": [
+		{"Name":"Handle","ClassName":"Part","Properties":{"CanCollide":false,"Size":[0.2,0.2,0.2],"Transparency":1},"Children":[{"Name":"MainHandle","ClassName":"Attachment"},{"Name":"Barrel","ClassName":"Attachment","Properties":{"CFrame":[0,0.49,-1.92,1,0,0,0,1,0,0,0,1]}},{"Name":"Mag","ClassName":"Attachment","Properties":{"CFrame":[0,0.55,-0.48,1,0,0,0,1,0,0,0,1]}},{"Name":"Aim","ClassName":"Attachment","Properties":{"CFrame":[0,0.9,-0.18,1,0,0,0,1,0,0,0,1]}}]},
+		{"Name":"Part1","ClassName":"Part","Properties":{"CFrame":[0.001,0.144,0.088,0,0,-1,0,1,0,1,0,0],"Color":[0.392,0.263,0.263],"Material":"SmoothPlastic","Size":[0.543,0.982,0.189]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9170550289","MeshType":"FileMesh","Scale":[0.247069,0.247069,0.247069]}}]},
+		{"Name":"Part2","ClassName":"Part","Properties":{"CFrame":[0,0.449,-0.928,0,0,-1,0,1,0,1,0,0],"Color":[0.365,0.361,0.369],"Material":"SmoothPlastic","Size":[1.983,0.794,0.277]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9170563755","MeshType":"FileMesh","Scale":[0.247069,0.247069,0.247069]}}]},
+		{"Name":"Part3","ClassName":"Part","Properties":{"CFrame":[0.001,0.485,-0.894,0,0,-1,0,1,0,1,0,0],"Color":[0.345,0.341,0.349],"Material":"SmoothPlastic","Size":[2.038,0.644,0.156]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9170551041","MeshType":"FileMesh","Scale":[0.247069,0.247069,0.247069]}}]},
+		{"Name":"Part4","ClassName":"Part","Properties":{"CFrame":[0.001,0.55,-1.051,0,0,-1,0,1,0,1,0,0],"Color":[0.263,0.263,0.267],"Material":"SmoothPlastic","Size":[1.724,0.508,0.267]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9170562872","MeshType":"FileMesh","Scale":[0.247069,0.247069,0.247069]}}]}
+	]
+}

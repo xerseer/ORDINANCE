@@ -102,6 +102,12 @@ Multipliers on the numbers above. 1 changes nothing.
 
 {{config Camera}}
 
+## Scope {#scope}
+
+For a weapon whose model has a scope built in, such as the example sniper rifles: once it is aimed in first person the screen shows the view through the lens and the weapon is hidden. A [scope attachment](attachments.html#behaviour) does the same for any weapon it is fitted to.
+
+{{config Scope}}
+
 ## Viewmodel {#viewmodel}
 
 The first-person weapon and arms. Offsets are six numbers: position right, up and back in studs, then rotation x, y, z in degrees.

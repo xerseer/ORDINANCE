@@ -1,0 +1,10 @@
+{
+	"ClassName": "Model",
+	"Children": [
+		{"Name":"Handle","ClassName":"Part","Properties":{"CanCollide":false,"Size":[0.2,0.2,0.2],"Transparency":1},"Children":[{"Name":"MainHandle","ClassName":"Attachment"},{"Name":"Barrel","ClassName":"Attachment","Properties":{"CFrame":[0,0.69,-1.81,1,0,0,0,1,0,0,0,1]}},{"Name":"Grip","ClassName":"Attachment","Properties":{"CFrame":[0,0.1,-1.17,1,0,0,0,1,0,0,0,1]}},{"Name":"Mag","ClassName":"Attachment","Properties":{"CFrame":[0,-0.35,-0.03,1,0,0,0,1,0,0,0,1]}},{"Name":"Aim","ClassName":"Attachment","Properties":{"CFrame":[0,1.13,0.25,1,0,0,0,1,0,0,0,1]}}]},
+		{"Name":"Part1","ClassName":"Part","Properties":{"CFrame":[0.014,0.406,-0.219,0,0,-1,0,1,0,1,0,0],"Color":[0.384,0.38,0.388],"Material":"SmoothPlastic","Size":[2.227,1.157,0.316]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9119906975","MeshType":"FileMesh","Scale":[0.474528,0.474528,0.474528]}}]},
+		{"Name":"Part2","ClassName":"Part","Properties":{"CFrame":[-0.006,0.506,0.552,0,0,-1,0,1,0,1,0,0],"Color":[0.161,0.161,0.165],"Material":"SmoothPlastic","Size":[4.224,1.256,0.316]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9119915432","MeshType":"FileMesh","Scale":[0.474528,0.474528,0.474528]}}]},
+		{"Name":"Part3","ClassName":"Part","Properties":{"CFrame":[-0.006,-0.061,-0.028,0,0,-1,0,1,0,1,0,0],"Color":[0.471,0.467,0.475],"Material":"SmoothPlastic","Size":[0.501,1.463,0.192]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9119910463","MeshType":"FileMesh","Scale":[0.474528,0.474528,0.474528]}}]},
+		{"Name":"Part4","ClassName":"Part","Properties":{"CFrame":[-0.006,0.713,0.45,0,0,-1,0,1,0,1,0,0],"Color":[0.275,0.275,0.278],"Material":"SmoothPlastic","Size":[4.526,1.16,0.332]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9119909513","MeshType":"FileMesh","Scale":[0.474528,0.474528,0.474528]}}]}
+	]
+}

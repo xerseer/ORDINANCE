@@ -103,7 +103,7 @@ local function loadWeapon(module: ModuleScript)
 		definition = definition,
 		fitted = {},
 		key = "",
-		gadgets = {},
+		gadgets = { scope = if config.Scope.Enabled then config.Scope :: any else nil },
 	}
 	table.insert(order, id)
 end
@@ -219,6 +219,7 @@ function Registry.variant(id: string, fitted: { [string]: string }?): Entry?
 	local layers: { Config.Layer } = {}
 	local gadgets: Gadgets = {}
 	local template = base.template:Clone()
+	local ownScope = base.gadgets.scope
 	for _, slot in Attachments.Slots do
 		local attachmentId = clean[slot]
 		local attachment = if attachmentId then Attachments.get(attachmentId) else nil
@@ -229,6 +230,10 @@ function Registry.variant(id: string, fitted: { [string]: string }?): Entry?
 			gadgets.laser = gadgets.laser or attachment.laser
 			gadgets.scope = gadgets.scope or attachment.scope
 		end
+	end
+
+	if gadgets.scope == nil and clean.Optic == nil then
+		gadgets.scope = ownScope -- a built-in scope, unless an optic replaced it
 	end
 
 	local entry: Entry = {

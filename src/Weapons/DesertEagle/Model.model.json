@@ -1,0 +1,11 @@
+{
+	"ClassName": "Model",
+	"Children": [
+		{"Name":"Handle","ClassName":"Part","Properties":{"CanCollide":false,"Size":[0.2,0.2,0.2],"Transparency":1},"Children":[{"Name":"MainHandle","ClassName":"Attachment"},{"Name":"Barrel","ClassName":"Attachment","Properties":{"CFrame":[0,0.73,-1.59,1,0,0,0,1,0,0,0,1]}},{"Name":"Mag","ClassName":"Attachment","Properties":{"CFrame":[0,0.15,-0.05,1,0,0,0,1,0,0,0,1]}},{"Name":"Aim","ClassName":"Attachment","Properties":{"CFrame":[0,0.93,0.15,1,0,0,0,1,0,0,0,1]}}]},
+		{"Name":"Part1","ClassName":"Part","Properties":{"CFrame":[-0.001,0.234,-0.038,0,0,-1,0,1,0,1,0,0],"Color":[0.224,0.224,0.224],"Material":"SmoothPlastic","Size":[0.572,0.704,0.23]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9119069601","MeshType":"FileMesh","Scale":[0.733847,0.733847,0.733847]}}]},
+		{"Name":"Slide","ClassName":"Part","Properties":{"CFrame":[0,0.732,-0.584,0,0,-1,0,1,0,1,0,0],"Color":[0.388,0.384,0.392],"Material":"SmoothPlastic","Size":[1.58,0.271,0.21]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9119062062","MeshType":"FileMesh","Scale":[0.733847,0.733847,0.733847]}}]},
+		{"Name":"Part2","ClassName":"Part","Properties":{"CFrame":[-0.01,0.616,-0.673,0,0,-1,0,1,0,1,0,0],"Color":[0.2,0.2,0.204],"Material":"SmoothPlastic","Size":[1.759,0.573,0.265]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9119068649","MeshType":"FileMesh","Scale":[0.733847,0.733847,0.733847]}}]},
+		{"Name":"Part3","ClassName":"Part","Properties":{"CFrame":[0,0.342,-0.6,0,0,-1,0,1,0,1,0,0],"Color":[0.329,0.325,0.333],"Material":"SmoothPlastic","Size":[1.979,1.048,0.21]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9119058539","MeshType":"FileMesh","Scale":[0.733847,0.733847,0.733847]}}]},
+		{"Name":"Part4","ClassName":"Part","Properties":{"CFrame":[0,0.312,-0.191,0,0,-1,0,1,0,1,0,0],"Color":[0.188,0.188,0.192],"Material":"SmoothPlastic","Size":[0.905,1.028,0.295]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9119066911","MeshType":"FileMesh","Scale":[0.733847,0.733847,0.733847]}}]}
+	]
+}

@@ -1,0 +1,11 @@
+{
+	"ClassName": "Model",
+	"Children": [
+		{"Name":"Handle","ClassName":"Part","Properties":{"CanCollide":false,"Size":[0.2,0.2,0.2],"Transparency":1},"Children":[{"Name":"MainHandle","ClassName":"Attachment"},{"Name":"Barrel","ClassName":"Attachment","Properties":{"CFrame":[0,0.78,-3.9,1,0,0,0,1,0,0,0,1]}},{"Name":"Grip","ClassName":"Attachment","Properties":{"CFrame":[0,0.2,-1.7,1,0,0,0,1,0,0,0,1]}},{"Name":"Mag","ClassName":"Attachment","Properties":{"CFrame":[0,0.25,0.8,1,0,0,0,1,0,0,0,1]}},{"Name":"Aim","ClassName":"Attachment","Properties":{"CFrame":[0,1.5,-0.2,1,0,0,0,1,0,0,0,1]}}]},
+		{"Name":"Part1","ClassName":"Part","Properties":{"CFrame":[0,0.57,-0.808,0,0,-1,0,1,0,1,0,0],"Color":[0.271,0.271,0.275],"Material":"SmoothPlastic","Size":[4.469,0.857,0.419]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9128298039","MeshType":"FileMesh","Scale":[1.034839,1.034839,1.034839]}}]},
+		{"Name":"Part2","ClassName":"Part","Properties":{"CFrame":[0,0.55,-0.839,0,0,-1,0,1,0,1,0,0],"Color":[0.412,0.408,0.416],"Material":"SmoothPlastic","Size":[6.117,1.801,1.066]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9128281727","MeshType":"FileMesh","Scale":[1.034839,1.034839,1.034839]}}]},
+		{"Name":"Part3","ClassName":"Part","Properties":{"CFrame":[0,0.703,-0.716,0,0,-1,0,1,0,1,0,0],"Color":[0.216,0.216,0.22],"Material":"SmoothPlastic","Size":[3.331,0.708,0.419]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9128299123","MeshType":"FileMesh","Scale":[1.034839,1.034839,1.034839]}}]},
+		{"Name":"Part4","ClassName":"Part","Properties":{"CFrame":[0,0.485,0.819,0,0,-1,0,1,0,1,0,0],"Color":[0.365,0.361,0.369],"Material":"SmoothPlastic","Size":[0.654,0.954,0.954]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9128298526","MeshType":"FileMesh","Scale":[1.034839,1.034839,1.034839]}}]},
+		{"Name":"Part5","ClassName":"Part","Properties":{"CFrame":[0,0.365,-0.521,0,0,-1,0,1,0,1,0,0],"Color":[0.275,0.275,0.278],"Material":"SmoothPlastic","Size":[5.638,1.321,0.533]},"Children":[{"Name":"Mesh","ClassName":"SpecialMesh","Properties":{"MeshId":"rbxassetid://9128297479","MeshType":"FileMesh","Scale":[1.034839,1.034839,1.034839]}}]}
+	]
+}

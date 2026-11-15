@@ -174,6 +174,16 @@ local Defaults = {
 		FaceAim = true,
 	},
 
+	------------------------------------------------------------------------
+	-- A full-screen scope picture when aimed in first person, for weapons
+	-- with a scope built into the model. Scope attachments bring their own.
+	------------------------------------------------------------------------
+	Scope = {
+		Enabled = false,
+		Reticle = Color3.fromRGB(10, 10, 10),
+		Overlay = Color3.fromRGB(0, 0, 0),
+	},
+
 	Viewmodel = {
 		Enabled = true,
 		Offset = { 0.7, -0.85, -1.4, 0, 0, 0 },

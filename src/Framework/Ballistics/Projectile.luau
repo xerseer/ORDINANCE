@@ -22,6 +22,7 @@
 
 -- selene: allow(unused_variable)
 local Defaults = require(script.Parent.Parent.Config.Defaults)
+local Hitscan = require(script.Parent.Hitscan)
 
 type Ballistics = typeof(Defaults.Ballistics)
 
@@ -109,7 +110,13 @@ local function advance(projectile: Projectile, dt: number, raycast: Raycast, onE
 	end
 
 	local speed = velocity.Magnitude
-	if projectile.bounces < ballistics.Bounce.Count and speed >= ballistics.Bounce.MinSpeed then
+	-- Rounds bounce off the world, never off people: a character always stops one.
+	local character = Hitscan.humanoidOf(result.Instance) ~= nil
+	if
+		not character
+		and projectile.bounces < ballistics.Bounce.Count
+		and speed >= ballistics.Bounce.MinSpeed
+	then
 		local normal = result.Normal
 		projectile.velocity = (velocity - 2 * velocity:Dot(normal) * normal) * ballistics.Bounce.Elasticity
 		projectile.bounces += 1

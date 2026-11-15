@@ -231,6 +231,12 @@ local RULES: { [string]: Rule } = {
 	},
 	["Camera.FaceAim"] = { doc = "In third person the character turns to face where it is aiming." },
 
+	["Scope.Enabled"] = {
+		doc = "Show the view through a scope, and hide the weapon, once aimed in first person. Pair it with a low Handling.AimFOV.",
+	},
+	["Scope.Reticle"] = { doc = "Colour of the scope's crosshairs." },
+	["Scope.Overlay"] = { doc = "Colour around the lens." },
+
 	["Viewmodel.Enabled"] = {
 		doc = "Show first-person arms and weapon. Off leaves first person to the plain character.",
 	},
