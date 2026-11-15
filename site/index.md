@@ -87,13 +87,14 @@ A setting you misspell or give the wrong type is reported in the Output window w
 
 ## Examples {#examples}
 
-Five weapons ship with the framework, one for each kind of gun. Read them as templates.
+Thirty weapons ship with the framework: pistols, submachine guns, rifles, shotguns, a machine gun, sniper and anti-materiel rifles, launchers, and one nobody can explain. Read them as templates, and delete the ones you do not want. Eight [attachments](attachments.html) ship with them.
 
 {{weapons}}
 
 ## Where next {#next}
 
 - [Weapons](weapons.html): models, attachments, fire modes, actions, reloads, projectiles.
+- [Attachments](attachments.html): scopes, sights, suppressors, grips, lights and lasers.
 - [Configuration](config.html): every setting, with its default and range.
 - [Animation](animation.html): procedural motion, encoded keyframes, first and third person.
 - [Scripting API](api.html): give weapons, react to kills, change damage.

@@ -6,6 +6,38 @@ Decisions made without asking are listed under **Decisions** so they are easy to
 
 ## [Unreleased]
 
+### Added
+
+- **Attachments.** Modules in `Ordnance.Attachments` with a model, in four slots: `Optic`, `Muzzle`, `Underbarrel` and `Side`. An attachment's `Config` is laid over the weapon's settings and its `Tuning` multiplied in; its model is mounted on the weapon in first and third person. Optics take over the sight line, muzzle devices the muzzle, grips the support hand. `Light` (a flashlight), `Laser` (a beam and a dot) and `Scope` (a full-screen view through the lens) give them something to do; the Light key (`G`) switches lights and lasers, and everyone sees them. Eight examples from the attachment kit: `RedDot`, `Holographic`, `ACOG`, `SniperScope`, `Suppressor`, `VerticalGrip`, `Flashlight` and `Laser`.
+- Weapon settings `Attachments.Allowed` (what each slot accepts), `Attachments.Default` (what it comes with) and `Attachments.Menu` (an in-game picker on `T`). Mount points are read from `OpticMount`, `MuzzleMount`, `UnderMount` and `SideMount` attachments, or worked out from the weapon's shape.
+- `Ordnance.SetAttachment`, `Ordnance.GetAttachments` (server) and `Ordnance.ListAttachments` (shared).
+- **Crosshair settings.** A `Crosshair` section: `Style` (Cross, T, Circle, Dot, None), `CenterDot`, `Color`, `Opacity`, `Length`, `Thickness`, `Gap`, `DotSize`, `Outline`, `Dynamic` and `AimStyle`. Aiming no longer fades the crosshair away: by default it becomes a dot, and goes only in first person on a weapon with a sight to look through. `Ordnance.SetCrosshair` gives a player their own.
+- `Scope` section, for weapons with a scope built into the model.
+- `Scale`, for a weapon model built too big or too small.
+- `Viewmodel.ArmWidth`, `Viewmodel.HandScale` and `Viewmodel.ArmLength`.
+- **24 more example weapons**, 30 in all: Anzio 20mm, Armsel Striker, HK416A5, WARSPORT LVOA, Panzerfaust 3, SVD, Honeybadger, Barrett M99, Snipex T-Rex, an Unknown Prototype, MP5, Kriss Vector, P90, MP7, Uzi, Desert Eagle, M1911, Chiappa Rhino, SPAS-12, AA-12, PKM, SCAR-L, AUG A3 and FN FAL, plus the AK-47.
+- **Plugin: Setup tab.** Select a model, name it, click the grip, muzzle and sight (and optionally the magazine, support hand and slide or bolt), and it becomes a weapon module.
+- `tools/studio/RigKit.luau` and `KitSpecs.luau`: turn kit models into weapon models, MeshParts included.
+
+### Changed
+
+- **First-person arms are slimmer** than the character's (`ArmWidth` 0.3, `HandScale` 0.45), SmoothPlastic, and their upper arms run off the edge of the screen. They leave the screen down and to the sides instead of passing close to the camera.
+- `HUD.Crosshair` still turns the crosshair on and off; how it looks moved to the new `Crosshair` section.
+
+### Fixed
+
+- A projectile with `Bounce.Count` above 0 bounced off characters instead of hitting them.
+
+### Decisions
+
+- **A weapon with attachments is a separate variant**, built once and cached, with its own config and model. The server builds the player's tool from it and checks shots against it; clients rebuild the same variant from a short text key on the tool. Settings come from the attachment modules, never from the client.
+- **Fitting an attachment rebuilds the tool.** Simpler and more reliable than changing a held tool in place; the weapon is re-drawn, which costs its equip time.
+- **Attachments are not resized with the weapon's `Scale`.** The attachment kit and the scaled weapons are already the same size; an attachment can have its own `Scale`.
+- **A scope's view is a camera zoom with a picture over the screen.** Roblox draws one camera, so there is no picture-in-picture lens.
+- **Kit models are stored as Parts with SpecialMeshes**, as the first examples were: a plugin cannot set a MeshPart's mesh, so Rojo cannot sync MeshParts.
+- **The AK-47 lives in the repository.** It had been made in Studio only, and Rojo removes anything under `ReplicatedStorage.Ordnance` that is not in `src/`.
+- **The MeshPart kit is used at Scale 0.62**, which brings its rifles to the size of the first examples.
+
 ## [0.1.0] - 2026-11-14
 
 The first release.

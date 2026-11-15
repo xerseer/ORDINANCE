@@ -4,7 +4,7 @@ A modular gun framework for Roblox. Drop one object into ReplicatedStorage and y
 
 **Documentation: [xerseer.github.io/ORDINANCE](https://xerseer.github.io/ORDINANCE/)**
 
-> **Status: 0.1.0, the first release.** Download it from [Releases](https://github.com/xerseer/ORDINANCE/releases/latest). The framework, the Studio plugin and the docs site are complete: config, weapons, hitscan and projectiles, server-authoritative damage, encoded and procedural animation, first and third person on R6 and R15, five example weapons with real sounds. Known gaps are listed in the [changelog](CHANGELOG.md).
+> **Status: 0.1.0, the first release.** Download it from [Releases](https://github.com/xerseer/ORDINANCE/releases/latest). The framework, the Studio plugin and the docs site are complete: config, weapons, hitscan and projectiles, server-authoritative damage, encoded and procedural animation, first and third person on R6 and R15, thirty example weapons with real sounds, and attachments. Known gaps are listed in the [changelog](CHANGELOG.md).
 
 ## What it is
 
