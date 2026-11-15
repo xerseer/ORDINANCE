@@ -1,14 +1,95 @@
 {
 	"format": 1,
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"entries": [
+		{
+			"id": "AA12",
+			"kind": "weapon",
+			"name": "AA12",
+			"description": "A fully automatic shotgun fed from a box magazine.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/AA12.json"
+		},
+		{
+			"id": "AK47",
+			"kind": "weapon",
+			"name": "AK47",
+			"description": "A select-fire rifle. The fire mode key switches between automatic and semi-automatic.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/AK47.json"
+		},
+		{
+			"id": "Anzio20mm",
+			"kind": "weapon",
+			"name": "Anzio20mm",
+			"description": "The largest rifle here: a bolt-action 20mm with a three-round magazine. Heavy enough to slow you right down.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/Anzio20mm.json"
+		},
+		{
+			"id": "ArmselStriker",
+			"kind": "weapon",
+			"name": "ArmselStriker",
+			"description": "A shotgun with a twelve-round drum. It fires as fast as you pull the trigger and reloads a shell at a time.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/ArmselStriker.json"
+		},
+		{
+			"id": "AUGA3",
+			"kind": "weapon",
+			"name": "AUGA3",
+			"description": "A bullpup rifle: a long barrel in a short weapon. It has its own foregrip.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/AUGA3.json"
+		},
+		{
+			"id": "BarrettM99",
+			"kind": "weapon",
+			"name": "BarrettM99",
+			"description": "A single-shot .50 calibre rifle: one round, then a reload.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/BarrettM99.json"
+		},
+		{
+			"id": "ChiappaRhino",
+			"kind": "weapon",
+			"name": "ChiappaRhino",
+			"description": "A revolver that fires from the bottom chamber, so it kicks less than it should. Six rounds, loaded one at a time.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/ChiappaRhino.json"
+		},
+		{
+			"id": "DesertEagle",
+			"kind": "weapon",
+			"name": "DesertEagle",
+			"description": "A heavy semi-automatic pistol: few rounds, a lot of kick, a lot of damage.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/DesertEagle.json"
+		},
+		{
+			"id": "FNFAL",
+			"kind": "weapon",
+			"name": "FNFAL",
+			"description": "A battle rifle: a heavy round that goes through cover, and kick to match.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/FNFAL.json"
+		},
 		{
 			"id": "G36C",
 			"kind": "weapon",
 			"name": "G36C",
 			"description": "A select-fire rifle. The fire mode key switches between automatic, burst and semi-automatic.",
 			"author": "xerseer",
-			"version": "0.1.0",
+			"version": "0.2.0",
 			"path": "catalogue/weapons/G36C.json"
 		},
 		{
@@ -17,8 +98,53 @@
 			"name": "Glock17",
 			"description": "The simplest kind of weapon: a model and a handful of numbers. Everything not written here comes from the global config and the framework defaults.",
 			"author": "xerseer",
-			"version": "0.1.0",
+			"version": "0.2.0",
 			"path": "catalogue/weapons/Glock17.json"
+		},
+		{
+			"id": "HK416A5",
+			"kind": "weapon",
+			"name": "HK416A5",
+			"description": "A modern carbine, handed out with a red dot.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/HK416A5.json"
+		},
+		{
+			"id": "Honeybadger",
+			"kind": "weapon",
+			"name": "Honeybadger",
+			"description": "A rifle with a suppressor built in: quiet, no muzzle flash, short reach.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/Honeybadger.json"
+		},
+		{
+			"id": "KrissVector",
+			"kind": "weapon",
+			"name": "KrissVector",
+			"description": "A very fast-firing submachine gun with little kick.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/KrissVector.json"
+		},
+		{
+			"id": "LVOA",
+			"kind": "weapon",
+			"name": "LVOA",
+			"description": "A rifle with no iron sights, so it comes with a holographic sight and a laser.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/LVOA.json"
+		},
+		{
+			"id": "M1911",
+			"kind": "weapon",
+			"name": "M1911",
+			"description": "A .45 service pistol. Eight rounds that hit hard.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/M1911.json"
 		},
 		{
 			"id": "M203",
@@ -26,8 +152,62 @@
 			"name": "M203",
 			"description": "A grenade launcher. The round is a physical projectile: it leaves slowly, arcs under gravity and explodes on the first thing it touches.",
 			"author": "xerseer",
-			"version": "0.1.0",
+			"version": "0.2.0",
 			"path": "catalogue/weapons/M203.json"
+		},
+		{
+			"id": "MP5",
+			"kind": "weapon",
+			"name": "MP5",
+			"description": "A 9mm submachine gun: accurate and easy to control. Its magazine drops out on a reload.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/MP5.json"
+		},
+		{
+			"id": "MP7",
+			"kind": "weapon",
+			"name": "MP7",
+			"description": "A compact personal defence weapon. Its rounds go through light cover.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/MP7.json"
+		},
+		{
+			"id": "P90",
+			"kind": "weapon",
+			"name": "P90",
+			"description": "A bullpup personal defence weapon with a fifty-round magazine on top.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/P90.json"
+		},
+		{
+			"id": "Panzerfaust3",
+			"kind": "weapon",
+			"name": "Panzerfaust3",
+			"description": "A rocket launcher. One rocket that flies, drops a little and explodes on whatever it hits.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/Panzerfaust3.json"
+		},
+		{
+			"id": "PKM",
+			"kind": "weapon",
+			"name": "PKM",
+			"description": "A belt-fed machine gun with a hundred-round box. Slow to move with, slow to reload, and it does not stop.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/PKM.json"
+		},
+		{
+			"id": "Prototype",
+			"kind": "weapon",
+			"name": "Prototype",
+			"description": "The kit called it \"I have no idea what this is\", so it got to be something nobody expects: it fires slow glowing rounds that bounce off walls three times before they give up.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/Prototype.json"
 		},
 		{
 			"id": "Remington700",
@@ -35,7 +215,7 @@
 			"name": "Remington700",
 			"description": "A bolt-action rifle with the realism options on: the chambered round is tracked separately from the magazine, and every shot needs the bolt cycled before the next.",
 			"author": "xerseer",
-			"version": "0.1.0",
+			"version": "0.2.0",
 			"path": "catalogue/weapons/Remington700.json"
 		},
 		{
@@ -44,8 +224,53 @@
 			"name": "Remington870",
 			"description": "A pump-action shotgun: several pellets per shell, a pump between shots, and shells loaded one at a time. Firing interrupts the reload.",
 			"author": "xerseer",
-			"version": "0.1.0",
+			"version": "0.2.0",
 			"path": "catalogue/weapons/Remington870.json"
+		},
+		{
+			"id": "SCARL",
+			"kind": "weapon",
+			"name": "SCARL",
+			"description": "A steady rifle at a measured rate of fire.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/SCARL.json"
+		},
+		{
+			"id": "SnipexTRex",
+			"kind": "weapon",
+			"name": "SnipexTRex",
+			"description": "A single-shot 14.5mm rifle. It goes through nearly anything.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/SnipexTRex.json"
+		},
+		{
+			"id": "SPAS12",
+			"kind": "weapon",
+			"name": "SPAS12",
+			"description": "A pump-action shotgun. Pump between shots; shells load one at a time.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/SPAS12.json"
+		},
+		{
+			"id": "SVD",
+			"kind": "weapon",
+			"name": "SVD",
+			"description": "A semi-automatic marksman rifle with its own PSO-1 scope.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/SVD.json"
+		},
+		{
+			"id": "Uzi",
+			"kind": "weapon",
+			"name": "Uzi",
+			"description": "An open-bolt submachine gun: slow-firing for its class and loose from the hip.",
+			"author": "xerseer",
+			"version": "0.2.0",
+			"path": "catalogue/weapons/Uzi.json"
 		},
 		{
 			"id": "Arcade",
@@ -53,7 +278,7 @@
 			"name": "Arcade",
 			"description": "Point and click. No reserve to manage, generous accuracy, gentle recoil, quick reloads and nothing to learn beyond aim, shoot and reload.",
 			"author": "xerseer",
-			"version": "0.1.0",
+			"version": "0.2.0",
 			"path": "catalogue/presets/Arcade.json"
 		},
 		{
@@ -62,7 +287,7 @@
 			"name": "Realistic",
 			"description": "Everything on. The chamber is tracked, bolts and pumps are worked by hand, a dropped magazine takes its rounds with it, weapons can jam, and there is no crosshair or hitmarker to lean on. Hits are lethal.",
 			"author": "xerseer",
-			"version": "0.1.0",
+			"version": "0.2.0",
 			"path": "catalogue/presets/Realistic.json"
 		},
 		{
@@ -71,7 +296,7 @@
 			"name": "Standard",
 			"description": "The framework defaults, unchanged. This preset exists so \"the defaults\" is something you can pick by name and copy as a starting point for your own.",
 			"author": "xerseer",
-			"version": "0.1.0",
+			"version": "0.2.0",
 			"path": "catalogue/presets/Standard.json"
 		},
 		{
@@ -80,7 +305,7 @@
 			"name": "Tactical",
 			"description": "Slower and more deliberate. Hip fire is loose, aimed fire is rewarded, recoil has to be controlled, and an early reload keeps the round in the chamber.",
 			"author": "xerseer",
-			"version": "0.1.0",
+			"version": "0.2.0",
 			"path": "catalogue/presets/Tactical.json"
 		}
 	]
