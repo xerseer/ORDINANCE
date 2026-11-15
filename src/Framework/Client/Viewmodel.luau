@@ -6,8 +6,14 @@
 
 	Nothing here is uploaded or pre-built. The arms are cloned from the
 	player's character when a weapon is drawn, so they match its rig (R15 or
-	R6), skin and, optionally, its shirt. Every frame the weapon is placed
-	relative to the camera and the arms are solved to reach it.
+	R6), skin and, optionally, its shirt. They are drawn slimmer than the real
+	ones (Viewmodel.ArmWidth, Viewmodel.HandScale): a character's arms are
+	built to be seen from a distance and fill the screen when held at the
+	camera. Every frame the weapon is placed relative to the camera and the
+	arms are solved to reach it.
+
+	Only the local player sees this. Everyone else, and the player too in
+	third person, sees the character holding the world weapon.
 
 	The viewmodel is local, anchored and cannot be hit by raycasts.
 ]]
@@ -30,7 +36,8 @@ type View = {
 	weaponNames: { string },
 	weaponRests: { CFrame },
 	weaponFrames: { CFrame },
-	rig: Arms.Rig?,
+	right: Arms.Arm?,
+	left: Arms.Arm?,
 	rightParts: { BasePart },
 	leftParts: { BasePart },
 	hip: CFrame,
@@ -40,8 +47,11 @@ type View = {
 
 -- Which way each shoulder lies from its wrist, in camera space. The
 -- shoulders are not fixed points: they are placed so the arms always reach.
-local RIGHT_SHOULDER = Vector3.new(0.38, -0.62, 0.7).Unit
-local LEFT_SHOULDER = Vector3.new(-0.5, -0.55, 0.68).Unit
+-- They point down and out more than back, so the arms leave the bottom of the
+-- screen instead of passing close to the camera, where they would fill it.
+local RIGHT_SHOULDER = Vector3.new(0.42, -0.8, 0.42).Unit
+-- The support arm comes in from the left, across under the weapon.
+local LEFT_SHOULDER = Vector3.new(-0.62, -0.62, 0.48).Unit
 local RIGHT_POLE = Vector3.new(0.75, -0.65, 0.1)
 local LEFT_POLE = Vector3.new(-0.75, -0.65, 0.1)
 local REACH = 0.93
@@ -63,10 +73,11 @@ local function ghost(part: BasePart)
 	part.Massless = true
 end
 
-local function cloneArm(arm: Arms.Arm, parent: Instance): { BasePart }
+local function cloneArm(arm: Arms.Arm, scales: { Vector3 }, parent: Instance): { BasePart }
 	local clones = {}
-	for _, part in arm.parts do
+	for index, part in arm.parts do
 		local clone = part:Clone()
+		clone.Size *= scales[index] or Vector3.one
 		for _, descendant in clone:GetDescendants() do
 			if
 				descendant:IsA("JointInstance")
@@ -77,6 +88,11 @@ local function cloneArm(arm: Arms.Arm, parent: Instance): { BasePart }
 			end
 		end
 		ghost(clone)
+		-- Plastic's grain is meant to be seen from a distance; up close it
+		-- reads as noise.
+		if clone.Material == Enum.Material.Plastic then
+			clone.Material = Enum.Material.SmoothPlastic
+		end
 		clone.Parent = parent
 		table.insert(clones, clone)
 	end
@@ -114,9 +130,14 @@ local function build(entry: Registry.Entry, attachments: Animator.Attachments, c
 	local rig = Arms.describe(character)
 	local rightParts: { BasePart } = {}
 	local leftParts: { BasePart } = {}
+	local right: Arms.Arm?, left: Arms.Arm? = nil, nil
 	if rig then
-		rightParts = cloneArm(rig.right, model)
-		leftParts = cloneArm(rig.left, model)
+		local settings = config.Viewmodel
+		local rightScales, leftScales
+		right, rightScales = Arms.scaled(rig.right, settings.ArmWidth, settings.HandScale)
+		left, leftScales = Arms.scaled(rig.left, settings.ArmWidth, settings.HandScale)
+		rightParts = cloneArm(rig.right, rightScales, model)
+		leftParts = cloneArm(rig.left, leftScales, model)
 		if config.Viewmodel.Sleeves then
 			-- Clothing only renders inside a model that has a Humanoid.
 			local shirt = character:FindFirstChildOfClass("Shirt")
@@ -147,7 +168,8 @@ local function build(entry: Registry.Entry, attachments: Animator.Attachments, c
 		weaponNames = names,
 		weaponRests = rests,
 		weaponFrames = table.create(#parts, CFrame.identity),
-		rig = rig,
+		right = right,
+		left = left,
 		rightParts = rightParts,
 		leftParts = leftParts,
 		hip = hip,
@@ -274,10 +296,10 @@ function Viewmodel.update(
 	end
 	workspace:BulkMoveTo(current.weaponParts, frames, Enum.BulkMoveMode.FireCFrameChanged)
 
-	local rig = current.rig
-	if rig then
-		solveArm(rig.right, current.rightParts, base, handle * pose.right, RIGHT_SHOULDER, RIGHT_POLE)
-		solveArm(rig.left, current.leftParts, base, handle * pose.left, LEFT_SHOULDER, LEFT_POLE)
+	local right, left = current.right, current.left
+	if right and left then
+		solveArm(right, current.rightParts, base, handle * pose.right, RIGHT_SHOULDER, RIGHT_POLE)
+		solveArm(left, current.leftParts, base, handle * pose.left, LEFT_SHOULDER, LEFT_POLE)
 	end
 
 	-- Debug gizmos, redrawn every frame so they follow the weapon.

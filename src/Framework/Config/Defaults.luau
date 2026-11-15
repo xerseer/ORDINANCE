@@ -15,13 +15,14 @@
 
 local Defaults = {
 	------------------------------------------------------------------------
-	-- Identity. Name, Description, Model and Custom are only meaningful inside
+	-- Identity. Name, Description, Model, Scale and Custom are only meaningful inside
 	-- a weapon module; Preset only in the global config.
 	------------------------------------------------------------------------
 	Preset = "",
 	Name = "",
 	Description = "",
 	Model = "Model",
+	Scale = 1,
 	Custom = {} :: { [string]: any },
 
 	------------------------------------------------------------------------
@@ -178,6 +179,8 @@ local Defaults = {
 		Offset = { 0.7, -0.85, -1.4, 0, 0, 0 },
 		AimDistance = 1.25,
 		Sleeves = true,
+		ArmWidth = 0.3,
+		HandScale = 0.45,
 	},
 
 	ThirdPerson = {

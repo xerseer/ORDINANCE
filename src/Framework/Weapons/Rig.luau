@@ -125,7 +125,7 @@ end
 	its handle, with MainHandle and Barrel attachments guaranteed. The source
 	is not modified. Never fails; a hopeless model becomes the placeholder.
 ]]
-function Rig.prepare(source: Instance?, weaponName: string): Model
+function Rig.prepare(source: Instance?, weaponName: string, scale: number?): Model
 	local model: Model
 	if source == nil then
 		model = Rig.placeholder()
@@ -159,6 +159,10 @@ function Rig.prepare(source: Instance?, weaponName: string): Model
 	end
 	model.Name = weaponName
 	model.PrimaryPart = handle
+	if scale and scale ~= 1 then
+		-- Scales parts, meshes, attachments and joint offsets together.
+		model:ScaleTo(model:GetScale() * scale)
+	end
 
 	-- Parts already held by a joint keep it (moving parts rigged by hand).
 	local jointed: { [Instance]: boolean } = {}

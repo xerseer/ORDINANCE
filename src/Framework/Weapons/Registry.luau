@@ -75,7 +75,7 @@ local function loadWeapon(module: ModuleScript)
 		id = id,
 		module = module,
 		config = config,
-		template = Rig.prepare(source, id),
+		template = Rig.prepare(source, id, config.Scale),
 	}
 	table.insert(order, id)
 end

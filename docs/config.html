@@ -60,6 +60,7 @@
 <tr data-search="name display name. defaults to the weapon module's name."><td><code id="name">Name</code></td><td><code>&quot;&quot;</code></td><td>Weapon</td><td>Display name. Defaults to the weapon module's name.</td></tr>
 <tr data-search="description short text shown in menus and the catalogue."><td><code id="description">Description</code></td><td><code>&quot;&quot;</code></td><td>Weapon</td><td>Short text shown in menus and the catalogue.</td></tr>
 <tr data-search="model the weapon model: a child of the weapon module by name, or an instance."><td><code id="model">Model</code></td><td><code>&quot;Model&quot;</code></td><td>Weapon</td><td>The weapon model: a child of the weapon module by name, or an Instance.</td></tr>
+<tr data-search="scale resizes the weapon model, in first and third person alike. use it when a model was built too big or too small for a character."><td><code id="scale">Scale</code></td><td><code>1</code></td><td>Weapon</td><td>Resizes the weapon model, in first and third person alike. Use it when a model was built too big or too small for a character.</td></tr>
 <tr data-search="custom your own data. ordnance copies it through untouched."><td><code id="custom">Custom</code></td><td><code>{}</code></td><td>Weapon</td><td>Your own data. Ordnance copies it through untouched.</td></tr>
 <tr data-search="animations encoded animations: keyframe tables by action name."><td><code id="animations">Animations</code></td><td><code>{}</code></td><td>Weapon</td><td>Encoded animations: keyframe tables by action name.</td></tr>
 </tbody></table></div>
@@ -195,6 +196,8 @@
 <tr data-search="viewmodel.offset where the weapon's handle sits relative to the camera at the hip."><td><code id="viewmodel-offset">Offset</code></td><td><code>{ 0.7, -0.85, -1.4, 0, 0, 0 }</code></td><td>six numbers</td><td>Where the weapon's handle sits relative to the camera at the hip.</td></tr>
 <tr data-search="viewmodel.aimdistance studs from the camera to the weapon's aim attachment when aiming."><td><code id="viewmodel-aimdistance">AimDistance</code></td><td><code>1.25</code></td><td>0.2 to 6</td><td>Studs from the camera to the weapon's Aim attachment when aiming.</td></tr>
 <tr data-search="viewmodel.sleeves show the character's shirt on the first-person arms."><td><code id="viewmodel-sleeves">Sleeves</code></td><td><code>true</code></td><td>true or false</td><td>Show the character's shirt on the first-person arms.</td></tr>
+<tr data-search="viewmodel.armwidth thickness of the first-person arms compared with the character's. lower takes up less of the screen."><td><code id="viewmodel-armwidth">ArmWidth</code></td><td><code>0.3</code></td><td>0.2 to 1</td><td>Thickness of the first-person arms compared with the character's. Lower takes up less of the screen.</td></tr>
+<tr data-search="viewmodel.handscale size of the first-person hands compared with the character's."><td><code id="viewmodel-handscale">HandScale</code></td><td><code>0.45</code></td><td>0.3 to 1</td><td>Size of the first-person hands compared with the character's.</td></tr>
 </tbody></table></div>
 </section>
 <section id="thirdperson"><h2>Third person</h2>

@@ -247,6 +247,32 @@ function Arms.describe(character: Model): Rig?
 end
 
 --[[
+	A slimmer copy of an arm's measurements, for the first-person viewmodel.
+	`width` scales how thick the arm is (its length is kept, so it still
+	reaches from off screen) and `hand` scales the hand in every direction.
+	Returns the new measurements and, per part, the factor to scale its Size by.
+]]
+function Arms.scaled(arm: Arm, width: number, hand: number): (Arm, { Vector3 })
+	local limb = Vector3.new(width, 1, width)
+	local copy = table.clone(arm)
+	if arm.rig == "R6" then
+		copy.grip = CFrame.new(arm.grip.Position * limb) * arm.grip.Rotation
+		copy.pivot = arm.pivot * limb
+		return copy, { limb }
+	end
+	local palm = Vector3.new(hand, hand, hand)
+	copy.upperTop = arm.upperTop * limb
+	copy.upperBottom = arm.upperBottom * limb
+	copy.lowerTop = arm.lowerTop * limb
+	copy.lowerBottom = arm.lowerBottom * limb
+	copy.handTop = arm.handTop * palm
+	copy.grip = CFrame.new(arm.grip.Position * palm) * arm.grip.Rotation
+	copy.upperLength = (copy.upperBottom - copy.upperTop).Magnitude
+	copy.lowerLength = (copy.lowerBottom - copy.lowerTop).Magnitude
+	return copy, { limb, limb, palm }
+end
+
+--[[
 	Works out where each part of an arm goes so the hand's grip frame lands on
 	`grip` (world space). `shoulder` is the shoulder's world position and
 	`pole` hints which way the elbow points. Returns one CFrame per part, in

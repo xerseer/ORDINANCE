@@ -42,6 +42,11 @@ local RULES: { [string]: Rule } = {
 		doc = "The weapon model: a child of the weapon module by name, or an Instance.",
 		kind = "model",
 	},
+	["Scale"] = {
+		doc = "Resizes the weapon model, in first and third person alike. Use it when a model was built too big or too small for a character.",
+		min = 0.1,
+		max = 10,
+	},
 	["Custom"] = { doc = "Your own data. Ordnance copies it through untouched.", kind = "free" },
 
 	["Fire.Mode"] = { doc = "Fire mode the weapon starts in.", choices = FIRE_MODES },
@@ -239,6 +244,16 @@ local RULES: { [string]: Rule } = {
 		max = 6,
 	},
 	["Viewmodel.Sleeves"] = { doc = "Show the character's shirt on the first-person arms." },
+	["Viewmodel.ArmWidth"] = {
+		doc = "Thickness of the first-person arms compared with the character's. Lower takes up less of the screen.",
+		min = 0.2,
+		max = 1,
+	},
+	["Viewmodel.HandScale"] = {
+		doc = "Size of the first-person hands compared with the character's.",
+		min = 0.3,
+		max = 1,
+	},
 
 	["ThirdPerson.Offset"] = {
 		doc = "Where the handle sits relative to the character's eyes at the hip.",
@@ -413,6 +428,7 @@ local WEAPON_ONLY: { [string]: boolean } = {
 	Name = true,
 	Description = true,
 	Model = true,
+	Scale = true,
 	Custom = true,
 	Animations = true,
 }
