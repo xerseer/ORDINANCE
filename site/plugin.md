@@ -1,11 +1,11 @@
 title: Studio plugin
-description: The Ordnance Studio plugin: install and update, a config editor, presets, an animation previewer and converter, an attachment helper and a catalogue of weapons.
+description: The Ordnance Studio plugin: install and update, a step-by-step weapon setup, a config editor, presets, an animation previewer and converter, an attachment helper and a catalogue of weapons.
 order: 8
 ---
 
 # Studio plugin
 
-One panel with seven tabs. Everything it does, you could do by editing modules by hand; the plugin just makes it quicker and catches mistakes.
+One panel with eight tabs. Everything it does, you could do by editing modules by hand; the plugin just makes it quicker and catches mistakes.
 
 ## Getting it {#install}
 
@@ -17,12 +17,29 @@ Every change the plugin makes is one step in Studio's undo history.
 
 Shows the installed version and the latest release, and installs, updates or removes the framework.
 
-- **Update & Install** puts `Ordnance` in ReplicatedStorage, with the example weapons and presets, or updates the copy that is there. An update replaces `Framework` and the root module only. Your `Config`, your weapons and your presets are never touched; presets that shipped with the new version and are missing are added.
+- **Update & Install** puts `Ordnance` in ReplicatedStorage, with the example weapons, attachments and presets, or updates the copy that is there. An update replaces `Framework` and the root module only. Your `Config`, your weapons, your attachments and your presets are never touched; presets that shipped with the new version and are missing are added.
 - **Check for updates** asks GitHub for the latest version.
 - **Install the bundled copy** uses the copy of the framework the plugin carries, so installing works offline, or when you decline its HTTP request.
 - **Remove Ordnance from this place** deletes the framework completely. Nothing is left behind.
 
 > Limit: Studio plugins can download text over HTTP but cannot load model files that way. So releases also ship the framework as a JSON description of its instances, and the plugin rebuilds it. Studio asks once whether the plugin may contact `raw.githubusercontent.com`; that is the only site it uses.
+
+## Setup {#setup}
+
+Turns any gun model into a weapon, one step at a time. The model can be made of anything (MeshParts, Parts with meshes, unions, models inside models) and can be lying in any direction.
+
+1. Select the model and press **Start setup**.
+2. Type the weapon's name and press **Next**. Every part is gathered directly under one model and the empty folders and models inside it are removed.
+3. Click a part in the viewport and press **Select**, once for each of:
+   - **Grip**: where the trigger hand holds.
+   - **Muzzle**: the very front of the barrel.
+   - **Sight**: the rear sight, or the top of the receiver.
+   - **Magazine**, **Support hand** and **Slide or bolt**, which can each be skipped.
+4. Pick what kind of weapon it is (Rifle, SMG, Pistol, Shotgun or Sniper) for its starting numbers, set a **Scale** if the model was built too big or too small, and press **Finish**.
+
+Where you click on a part is what counts, not the part's centre, because kit models often put a whole gun in one mesh. The grip, muzzle and sight together say which way the weapon faces and which way is up.
+
+Finish adds an invisible `Handle` with the [attachments](weapons.html#attachments) the animation system reads, names the magazine and the slide or bolt so they move, renames every other part `Part1`, `Part2` and so on, and puts the model inside a new module in `Ordnance.Weapons`, ready for the next Play. The attachments are left visible so you can drag any that are a little off. Each step is one undo.
 
 ## Config {#config}
 

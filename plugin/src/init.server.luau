@@ -2,7 +2,8 @@
 --[[
 	Ordnance Studio plugin.
 
-	One dock widget, seven tabs: install and update, a visual config editor,
+	One dock widget, eight tabs: install and update, a step-by-step weapon
+	setup, a visual config editor,
 	presets, an animation previewer, an animation converter, an IK attachment
 	helper and a catalogue. Each tab lives in its own module under Tabs and
 	exposes { name, build(parent), onShow? }.
@@ -14,7 +15,8 @@
 local Theme = require(script.Theme)
 local UI = require(script.UI)
 
-local TAB_MODULES = { "Install", "Config", "Presets", "Previewer", "Converter", "Helper", "Catalogue" }
+local TAB_MODULES =
+	{ "Install", "Setup", "Config", "Presets", "Previewer", "Converter", "Helper", "Catalogue" }
 
 Theme.start()
 
@@ -60,7 +62,13 @@ UI.paint(rule, { BackgroundColor3 = "line" })
 
 local body = UI.make("Frame", { Size = UDim2.new(1, 0, 1, -37), Position = UDim2.fromOffset(0, 37) }, root)
 
-type Tab = { name: string, build: (parent: Frame) -> (), onShow: (() -> ())?, onHide: (() -> ())? }
+type Tab = {
+	name: string,
+	build: (parent: Frame) -> (),
+	onShow: (() -> ())?,
+	onHide: (() -> ())?,
+	setPlugin: ((Plugin) -> ())?,
+}
 
 local pages: { [string]: Frame } = {}
 local headers: { [string]: TextButton } = {}
@@ -108,6 +116,9 @@ for index, moduleName in TAB_MODULES do
 	local ok, result = pcall(function()
 		local tab = require(script.Tabs[moduleName]) :: Tab
 		tabs[moduleName] = tab
+		if tab.setPlugin then
+			tab.setPlugin(plugin)
+		end
 		tab.build(page)
 	end)
 	if not ok then

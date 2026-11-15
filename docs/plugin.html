@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Studio plugin – Ordnance</title>
-<meta name="description" content="The Ordnance Studio plugin: install and update, a config editor, presets, an animation previewer and converter, an attachment helper and a catalogue of weapons.">
+<meta name="description" content="The Ordnance Studio plugin: install and update, a step-by-step weapon setup, a config editor, presets, an animation previewer and converter, an attachment helper and a catalogue of weapons.">
 <meta property="og:title" content="Studio plugin – Ordnance">
-<meta property="og:description" content="The Ordnance Studio plugin: install and update, a config editor, presets, an animation previewer and converter, an attachment helper and a catalogue of weapons.">
+<meta property="og:description" content="The Ordnance Studio plugin: install and update, a step-by-step weapon setup, a config editor, presets, an animation previewer and converter, an attachment helper and a catalogue of weapons.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,13 +27,13 @@
     <a class="item" href="animation.html">Animation</a>
     <a class="item" href="api.html">Scripting API</a>
     <a class="item" href="security.html">Security</a>
-    <a class="item here" href="plugin.html" aria-current="page">Studio plugin</a><div class="subs"><a class="sub" href="#install">Getting it</a><a class="sub" href="#install-tab">Install</a><a class="sub" href="#config">Config</a><a class="sub" href="#presets">Presets</a><a class="sub" href="#previewer">Previewer</a><a class="sub" href="#converter">Converter</a><a class="sub" href="#helper">IK Helper</a><a class="sub" href="#catalogue">Catalogue</a></div>
+    <a class="item here" href="plugin.html" aria-current="page">Studio plugin</a><div class="subs"><a class="sub" href="#install">Getting it</a><a class="sub" href="#install-tab">Install</a><a class="sub" href="#setup">Setup</a><a class="sub" href="#config">Config</a><a class="sub" href="#presets">Presets</a><a class="sub" href="#previewer">Previewer</a><a class="sub" href="#converter">Converter</a><a class="sub" href="#helper">IK Helper</a><a class="sub" href="#catalogue">Catalogue</a></div>
     <a class="item" href="faq.html">Troubleshooting</a>
     <a class="item out" href="https://github.com/xerseer/ORDINANCE" target="_blank" rel="noopener">Source&nbsp;↗</a>
   </nav>
   <main>
 <section id="top"><h1>Studio plugin</h1>
-<p class="lede">One panel with seven tabs. Everything it does, you could do by editing modules by hand; the plugin just makes it quicker and catches mistakes.</p>
+<p class="lede">One panel with eight tabs. Everything it does, you could do by editing modules by hand; the plugin just makes it quicker and catches mistakes.</p>
 </section>
 <section id="install"><h2>Getting it</h2>
 <p>Download <code>OrdnancePlugin.rbxm</code> from the <a href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">latest release&nbsp;↗</a>, open Studio's Plugins tab, choose <strong>Plugins Folder</strong>, and put the file there. An <strong>Ordnance</strong> button appears in the Plugins tab and opens the panel. The panel follows Studio's light or dark theme.</p>
@@ -41,8 +41,14 @@
 </section>
 <section id="install-tab"><h2>Install</h2>
 <p>Shows the installed version and the latest release, and installs, updates or removes the framework.</p>
-<ul><li><strong>Update &amp; Install</strong> puts <code>Ordnance</code> in ReplicatedStorage, with the example weapons and presets, or updates the copy that is there. An update replaces <code>Framework</code> and the root module only. Your <code>Config</code>, your weapons and your presets are never touched; presets that shipped with the new version and are missing are added.</li><li><strong>Check for updates</strong> asks GitHub for the latest version.</li><li><strong>Install the bundled copy</strong> uses the copy of the framework the plugin carries, so installing works offline, or when you decline its HTTP request.</li><li><strong>Remove Ordnance from this place</strong> deletes the framework completely. Nothing is left behind.</li></ul>
+<ul><li><strong>Update &amp; Install</strong> puts <code>Ordnance</code> in ReplicatedStorage, with the example weapons, attachments and presets, or updates the copy that is there. An update replaces <code>Framework</code> and the root module only. Your <code>Config</code>, your weapons, your attachments and your presets are never touched; presets that shipped with the new version and are missing are added.</li><li><strong>Check for updates</strong> asks GitHub for the latest version.</li><li><strong>Install the bundled copy</strong> uses the copy of the framework the plugin carries, so installing works offline, or when you decline its HTTP request.</li><li><strong>Remove Ordnance from this place</strong> deletes the framework completely. Nothing is left behind.</li></ul>
 <div class="note limit"><span class="kicker">Roblox limit</span><p>Studio plugins can download text over HTTP but cannot load model files that way. So releases also ship the framework as a JSON description of its instances, and the plugin rebuilds it. Studio asks once whether the plugin may contact <code>raw.githubusercontent.com</code>; that is the only site it uses.</p></div>
+</section>
+<section id="setup"><h2>Setup</h2>
+<p>Turns any gun model into a weapon, one step at a time. The model can be made of anything (MeshParts, Parts with meshes, unions, models inside models) and can be lying in any direction.</p>
+<ol><li>Select the model and press <strong>Start setup</strong>.</li><li>Type the weapon's name and press <strong>Next</strong>. Every part is gathered directly under one model and the empty folders and models inside it are removed.</li><li>Click a part in the viewport and press <strong>Select</strong>, once for each of: - <strong>Grip</strong>: where the trigger hand holds. - <strong>Muzzle</strong>: the very front of the barrel. - <strong>Sight</strong>: the rear sight, or the top of the receiver. - <strong>Magazine</strong>, <strong>Support hand</strong> and <strong>Slide or bolt</strong>, which can each be skipped.</li><li>Pick what kind of weapon it is (Rifle, SMG, Pistol, Shotgun or Sniper) for its starting numbers, set a <strong>Scale</strong> if the model was built too big or too small, and press <strong>Finish</strong>.</li></ol>
+<p>Where you click on a part is what counts, not the part's centre, because kit models often put a whole gun in one mesh. The grip, muzzle and sight together say which way the weapon faces and which way is up.</p>
+<p>Finish adds an invisible <code>Handle</code> with the <a href="weapons.html#attachments">attachments</a> the animation system reads, names the magazine and the slide or bolt so they move, renames every other part <code>Part1</code>, <code>Part2</code> and so on, and puts the model inside a new module in <code>Ordnance.Weapons</code>, ready for the next Play. The attachments are left visible so you can drag any that are a little off. Each step is one undo.</p>
 </section>
 <section id="config"><h2>Config</h2>
 <p>A form for <code>Ordnance.Config</code>, built from the installed framework's own schema: every setting with its range, its choices and a line saying what it does. New settings in a future version appear without a plugin update.</p>
