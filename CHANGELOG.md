@@ -6,6 +6,8 @@ Decisions made without asking are listed under **Decisions** so they are easy to
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-15
+
 ### Added
 
 - **Attachments.** Modules in `Ordnance.Attachments` with a model, in four slots: `Optic`, `Muzzle`, `Underbarrel` and `Side`. An attachment's `Config` is laid over the weapon's settings and its `Tuning` multiplied in; its model is mounted on the weapon in first and third person. Optics take over the sight line, muzzle devices the muzzle, grips the support hand. `Light` (a flashlight), `Laser` (a beam and a dot) and `Scope` (a full-screen view through the lens) give them something to do; the Light key (`G`) switches lights and lasers, and everyone sees them. Eight examples from the attachment kit: `RedDot`, `Holographic`, `ACOG`, `SniperScope`, `Suppressor`, `VerticalGrip`, `Flashlight` and `Laser`.
@@ -162,5 +164,6 @@ The first release.
 - **The example grips sit low on the pistol grip** so an R15 hand, which is a large mitten, does not cover the weapon.
 - **Weapon attachment names:** `MainHandle` (trigger hand), `Barrel` (muzzle), `Grip` (support hand), `Side` (bolt or charging handle), `Mag`, plus `Aim` for the sight line.
 
-[Unreleased]: https://github.com/xerseer/ORDINANCE/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/xerseer/ORDINANCE/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/xerseer/ORDINANCE/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/xerseer/ORDINANCE/releases/tag/v0.1.0
