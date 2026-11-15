@@ -190,6 +190,20 @@ function Ordnance.IsAiming(): boolean
 	return if module then module.isAiming() else false
 end
 
+--[[
+	Gives the local player their own crosshair, laid over the game's for every
+	weapon. Takes the same fields as the Crosshair config section; pass nil to
+	go back to the game's.
+
+		Ordnance.SetCrosshair({ Style = "Circle", Color = Color3.new(0, 1, 0) })
+]]
+function Ordnance.SetCrosshair(settings: { [string]: any }?)
+	local module = client("SetCrosshair")
+	if module then
+		module.setCrosshair(settings)
+	end
+end
+
 ------------------------------------------------------------------------------
 -- Start
 ------------------------------------------------------------------------------

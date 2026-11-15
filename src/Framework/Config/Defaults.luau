@@ -181,6 +181,7 @@ local Defaults = {
 		Sleeves = true,
 		ArmWidth = 0.3,
 		HandScale = 0.45,
+		ArmLength = 1.8,
 	},
 
 	ThirdPerson = {
@@ -284,6 +285,26 @@ local Defaults = {
 		Crosshair = true,
 		Hitmarker = true,
 		Accent = Color3.fromRGB(179, 191, 125),
+	},
+
+	------------------------------------------------------------------------
+	-- The crosshair's look. Sizes are in pixels. HUD.Crosshair turns it on
+	-- and off; players can be given their own look with Ordnance.SetCrosshair.
+	------------------------------------------------------------------------
+	Crosshair = {
+		Style = "Cross",
+		CenterDot = false,
+		Color = Color3.fromRGB(232, 231, 226),
+		Opacity = 1,
+		Length = 8,
+		Thickness = 2,
+		Gap = 4,
+		DotSize = 4,
+		Outline = true,
+		OutlineColor = Color3.fromRGB(22, 22, 21),
+		OutlineThickness = 1,
+		Dynamic = true,
+		AimStyle = "Auto",
 	},
 
 	------------------------------------------------------------------------

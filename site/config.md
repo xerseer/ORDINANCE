@@ -148,6 +148,24 @@ The built-in display is small on purpose: ammo, fire mode, a reload bar, a cross
 
 {{config HUD}}
 
+## Crosshair {#crosshair}
+
+How the crosshair looks, set in the global config, a preset or a single weapon (a shotgun can have a ring while rifles keep a cross). When aiming it becomes a small dot by default, and disappears in first person on a weapon that has a sight to look through: an `Aim` attachment for its iron sights, or an optic.
+
+```lua Ordnance.Config
+Crosshair = {
+	Style = "T",
+	Color = Color3.fromRGB(120, 255, 160),
+	Length = 6,
+	Gap = 3,
+	CenterDot = true,
+},
+```
+
+Players can have their own: call [`SetCrosshair`](api.html#setcrosshair) from a settings menu and their choices are laid over the game's for every weapon.
+
+{{config Crosshair}}
+
 ## Inventory {#inventory}
 
 In `Tool` mode every weapon is a Backpack Tool, so the hotbar, gamepad and mobile all work as players expect. In `Custom` mode nothing is handed out, and your code gives and equips weapons with the [server API](api.html#server).

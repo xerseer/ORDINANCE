@@ -172,6 +172,24 @@ Rounds loaded and in reserve for the held weapon. With chambering on, the loaded
 Ordnance.IsAiming(): boolean
 ```
 
+### SetCrosshair {#setcrosshair}
+
+```lua
+Ordnance.SetCrosshair(settings: { [string]: any }?)
+```
+
+Gives the local player their own crosshair, laid over the game's [Crosshair settings](config.html#crosshair) for every weapon. It takes the same fields; anything left out keeps the game's value. Pass nil to go back to the game's. Invalid fields are reported in the output and ignored. Nothing is saved: store the choice yourself (a DataStore, an attribute) and call this again when the player joins.
+
+```lua LocalScript
+local Ordnance = require(game.ReplicatedStorage.Ordnance)
+
+Ordnance.SetCrosshair({
+	Style = "Circle",
+	Color = Color3.fromRGB(120, 255, 160),
+	AimStyle = "Dot",
+})
+```
+
 ## Signals {#signals}
 
 Connect with `:Connect(handler)`, which returns a connection with `:Disconnect()`. `:Once` and `:Wait` work too. Handlers run in their own thread, so an error in one never stops the others.

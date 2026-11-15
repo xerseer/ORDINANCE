@@ -21,7 +21,7 @@
     <a class="get" href="https://github.com/xerseer/ORDINANCE/releases" target="_blank" rel="noopener">Get Ordnance&nbsp;↗</a>
     <a class="item" href="index.html">Start here</a>
     <a class="item" href="weapons.html">Weapons</a>
-    <a class="item here" href="config.html" aria-current="page">Configuration</a><div class="subs"><a class="sub" href="#how">How it works</a><a class="sub" href="#identity">Identity</a><a class="sub" href="#fire">Fire</a><a class="sub" href="#ammo">Ammo</a><a class="sub" href="#ballistics">Ballistics</a><a class="sub" href="#damage">Damage</a><a class="sub" href="#spread">Spread</a><a class="sub" href="#recoil">Recoil</a><a class="sub" href="#handling">Handling</a><a class="sub" href="#realism">Realism</a><a class="sub" href="#tuning-ref">Tuning</a><a class="sub" href="#camera">Camera</a><a class="sub" href="#viewmodel">Viewmodel</a><a class="sub" href="#thirdperson">Third person</a><a class="sub" href="#animation">Animation</a><a class="sub" href="#sway">Sway</a><a class="sub" href="#keybinds">Keybinds</a><a class="sub" href="#controls">Controls</a><a class="sub" href="#effects">Effects</a><a class="sub" href="#hud">HUD</a><a class="sub" href="#inventory">Inventory</a><a class="sub" href="#security">Security</a><a class="sub" href="#debug">Debug</a></div>
+    <a class="item here" href="config.html" aria-current="page">Configuration</a><div class="subs"><a class="sub" href="#how">How it works</a><a class="sub" href="#identity">Identity</a><a class="sub" href="#fire">Fire</a><a class="sub" href="#ammo">Ammo</a><a class="sub" href="#ballistics">Ballistics</a><a class="sub" href="#damage">Damage</a><a class="sub" href="#spread">Spread</a><a class="sub" href="#recoil">Recoil</a><a class="sub" href="#handling">Handling</a><a class="sub" href="#realism">Realism</a><a class="sub" href="#tuning-ref">Tuning</a><a class="sub" href="#camera">Camera</a><a class="sub" href="#viewmodel">Viewmodel</a><a class="sub" href="#thirdperson">Third person</a><a class="sub" href="#animation">Animation</a><a class="sub" href="#sway">Sway</a><a class="sub" href="#keybinds">Keybinds</a><a class="sub" href="#controls">Controls</a><a class="sub" href="#effects">Effects</a><a class="sub" href="#hud">HUD</a><a class="sub" href="#crosshair">Crosshair</a><a class="sub" href="#inventory">Inventory</a><a class="sub" href="#security">Security</a><a class="sub" href="#debug">Debug</a></div>
     <a class="item" href="presets.html">Presets</a>
     <a class="item" href="animation.html">Animation</a>
     <a class="item" href="api.html">Scripting API</a>
@@ -198,6 +198,7 @@
 <tr data-search="viewmodel.sleeves show the character's shirt on the first-person arms."><td><code id="viewmodel-sleeves">Sleeves</code></td><td><code>true</code></td><td>true or false</td><td>Show the character's shirt on the first-person arms.</td></tr>
 <tr data-search="viewmodel.armwidth thickness of the first-person arms compared with the character's. lower takes up less of the screen."><td><code id="viewmodel-armwidth">ArmWidth</code></td><td><code>0.3</code></td><td>0.2 to 1</td><td>Thickness of the first-person arms compared with the character's. Lower takes up less of the screen.</td></tr>
 <tr data-search="viewmodel.handscale size of the first-person hands compared with the character's."><td><code id="viewmodel-handscale">HandScale</code></td><td><code>0.45</code></td><td>0.3 to 1</td><td>Size of the first-person hands compared with the character's.</td></tr>
+<tr data-search="viewmodel.armlength stretches the first-person upper arms so they run off the screen. only the viewmodel changes."><td><code id="viewmodel-armlength">ArmLength</code></td><td><code>1.8</code></td><td>1 to 4</td><td>Stretches the first-person upper arms so they run off the screen. Only the viewmodel changes.</td></tr>
 </tbody></table></div>
 </section>
 <section id="thirdperson"><h2>Third person</h2>
@@ -282,6 +283,32 @@
 <tr data-search="hud.crosshair show the built-in crosshair."><td><code id="hud-crosshair">Crosshair</code></td><td><code>true</code></td><td>true or false</td><td>Show the built-in crosshair.</td></tr>
 <tr data-search="hud.hitmarker flash a marker when a shot lands."><td><code id="hud-hitmarker">Hitmarker</code></td><td><code>true</code></td><td>true or false</td><td>Flash a marker when a shot lands.</td></tr>
 <tr data-search="hud.accent accent colour of the built-in hud."><td><code id="hud-accent">Accent</code></td><td><span class="swatch" style="background:rgb(179,191,125)"></span><code>Color3.fromRGB(179, 191, 125)</code></td><td>Color3</td><td>Accent colour of the built-in HUD.</td></tr>
+</tbody></table></div>
+</section>
+<section id="crosshair"><h2>Crosshair</h2>
+<p>How the crosshair looks, set in the global config, a preset or a single weapon (a shotgun can have a ring while rifles keep a cross). When aiming it becomes a small dot by default, and disappears in first person on a weapon that has a sight to look through: an <code>Aim</code> attachment for its iron sights, or an optic.</p>
+<div class="code"><div class="label">Ordnance.Config</div><pre><code>Crosshair = {
+	Style = <span class="tk-str">&quot;T&quot;</span>,
+	Color = Color3.<span class="tk-fn">fromRGB</span>(<span class="tk-num">120</span>, <span class="tk-num">255</span>, <span class="tk-num">160</span>),
+	Length = <span class="tk-num">6</span>,
+	Gap = <span class="tk-num">3</span>,
+	CenterDot = <span class="tk-kw">true</span>,
+},</code></pre></div>
+<p>Players can have their own: call <a href="api.html#setcrosshair"><code>SetCrosshair</code></a> from a settings menu and their choices are laid over the game's for every weapon.</p>
+<div class="tbl"><table class="ref"><thead><tr><th>Setting</th><th>Default</th><th>Accepts</th><th>What it does</th></tr></thead><tbody>
+<tr data-search="crosshair.style cross: four lines. t: no top line. circle: a ring. dot: only a dot. none: nothing at the hip."><td><code id="crosshair-style">Style</code></td><td><code>&quot;Cross&quot;</code></td><td><code>Cross</code> <code>T</code> <code>Circle</code> <code>Dot</code> <code>None</code></td><td>Cross: four lines. T: no top line. Circle: a ring. Dot: only a dot. None: nothing at the hip.</td></tr>
+<tr data-search="crosshair.centerdot add a dot in the middle of the cross, t or circle."><td><code id="crosshair-centerdot">CenterDot</code></td><td><code>false</code></td><td>true or false</td><td>Add a dot in the middle of the Cross, T or Circle.</td></tr>
+<tr data-search="crosshair.color colour of the lines and the dot."><td><code id="crosshair-color">Color</code></td><td><span class="swatch" style="background:rgb(232,231,226)"></span><code>Color3.fromRGB(232, 231, 226)</code></td><td>Color3</td><td>Colour of the lines and the dot.</td></tr>
+<tr data-search="crosshair.opacity 1 is solid, 0 is invisible."><td><code id="crosshair-opacity">Opacity</code></td><td><code>1</code></td><td>0 to 1</td><td>1 is solid, 0 is invisible.</td></tr>
+<tr data-search="crosshair.length length of each line, in pixels."><td><code id="crosshair-length">Length</code></td><td><code>8</code></td><td>1 to 60</td><td>Length of each line, in pixels.</td></tr>
+<tr data-search="crosshair.thickness width of the lines and the ring, in pixels."><td><code id="crosshair-thickness">Thickness</code></td><td><code>2</code></td><td>1 to 12</td><td>Width of the lines and the ring, in pixels.</td></tr>
+<tr data-search="crosshair.gap space between the centre and the lines, in pixels, before spread is added."><td><code id="crosshair-gap">Gap</code></td><td><code>4</code></td><td>0 to 60</td><td>Space between the centre and the lines, in pixels, before spread is added.</td></tr>
+<tr data-search="crosshair.dotsize size of the centre dot and of the aimed dot, in pixels."><td><code id="crosshair-dotsize">DotSize</code></td><td><code>4</code></td><td>1 to 16</td><td>Size of the centre dot and of the aimed dot, in pixels.</td></tr>
+<tr data-search="crosshair.outline draw a thin border around the crosshair so it shows on any background."><td><code id="crosshair-outline">Outline</code></td><td><code>true</code></td><td>true or false</td><td>Draw a thin border around the crosshair so it shows on any background.</td></tr>
+<tr data-search="crosshair.outlinecolor colour of the border."><td><code id="crosshair-outlinecolor">OutlineColor</code></td><td><span class="swatch" style="background:rgb(22,22,21)"></span><code>Color3.fromRGB(22, 22, 21)</code></td><td>Color3</td><td>Colour of the border.</td></tr>
+<tr data-search="crosshair.outlinethickness width of the border, in pixels."><td><code id="crosshair-outlinethickness">OutlineThickness</code></td><td><code>1</code></td><td>1 to 6</td><td>Width of the border, in pixels.</td></tr>
+<tr data-search="crosshair.dynamic open the crosshair with the weapon's current spread. off keeps it a fixed size."><td><code id="crosshair-dynamic">Dynamic</code></td><td><code>true</code></td><td>true or false</td><td>Open the crosshair with the weapon's current spread. Off keeps it a fixed size.</td></tr>
+<tr data-search="crosshair.aimstyle what it becomes when aiming. auto: a dot, or nothing in first person when the weapon has a sight (an aim attachment or an optic). dot: always a dot. hidden: nothing. same: no change."><td><code id="crosshair-aimstyle">AimStyle</code></td><td><code>&quot;Auto&quot;</code></td><td><code>Auto</code> <code>Dot</code> <code>Hidden</code> <code>Same</code></td><td>What it becomes when aiming. Auto: a dot, or nothing in first person when the weapon has a sight (an Aim attachment or an optic). Dot: always a dot. Hidden: nothing. Same: no change.</td></tr>
 </tbody></table></div>
 </section>
 <section id="inventory"><h2>Inventory</h2>

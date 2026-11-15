@@ -134,8 +134,8 @@ local function build(entry: Registry.Entry, attachments: Animator.Attachments, c
 	if rig then
 		local settings = config.Viewmodel
 		local rightScales, leftScales
-		right, rightScales = Arms.scaled(rig.right, settings.ArmWidth, settings.HandScale)
-		left, leftScales = Arms.scaled(rig.left, settings.ArmWidth, settings.HandScale)
+		right, rightScales = Arms.scaled(rig.right, settings.ArmWidth, settings.HandScale, settings.ArmLength)
+		left, leftScales = Arms.scaled(rig.left, settings.ArmWidth, settings.HandScale, settings.ArmLength)
 		rightParts = cloneArm(rig.right, rightScales, model)
 		leftParts = cloneArm(rig.left, leftScales, model)
 		if config.Viewmodel.Sleeves then

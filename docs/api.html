@@ -120,6 +120,16 @@ Ordnance.<span class="tk-fn">SetAmmo</span>(player, weaponId, <span class="tk-kw
 <p>Rounds loaded and in reserve for the held weapon. With chambering on, the loaded count includes the chambered round.</p>
 <h3 id="isaiming">IsAiming</h3>
 <div class="code"><pre><code>Ordnance.<span class="tk-fn">IsAiming</span>(): boolean</code></pre></div>
+<h3 id="setcrosshair">SetCrosshair</h3>
+<div class="code"><pre><code>Ordnance.<span class="tk-fn">SetCrosshair</span>(settings: { [string]: any }?)</code></pre></div>
+<p>Gives the local player their own crosshair, laid over the game's <a href="config.html#crosshair">Crosshair settings</a> for every weapon. It takes the same fields; anything left out keeps the game's value. Pass nil to go back to the game's. Invalid fields are reported in the output and ignored. Nothing is saved: store the choice yourself (a DataStore, an attribute) and call this again when the player joins.</p>
+<div class="code"><div class="label">LocalScript</div><pre><code><span class="tk-kw">local</span> Ordnance = <span class="tk-fn">require</span>(game.ReplicatedStorage.Ordnance)
+
+Ordnance.<span class="tk-fn">SetCrosshair</span>({
+	Style = <span class="tk-str">&quot;Circle&quot;</span>,
+	Color = Color3.<span class="tk-fn">fromRGB</span>(<span class="tk-num">120</span>, <span class="tk-num">255</span>, <span class="tk-num">160</span>),
+	AimStyle = <span class="tk-str">&quot;Dot&quot;</span>,
+})</code></pre></div>
 </section>
 <section id="signals"><h2>Signals</h2>
 <p>Connect with <code>:Connect(handler)</code>, which returns a connection with <code>:Disconnect()</code>. <code>:Once</code> and <code>:Wait</code> work too. Handlers run in their own thread, so an error in one never stops the others.</p>

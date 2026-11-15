@@ -248,12 +248,14 @@ end
 
 --[[
 	A slimmer copy of an arm's measurements, for the first-person viewmodel.
-	`width` scales how thick the arm is (its length is kept, so it still
-	reaches from off screen) and `hand` scales the hand in every direction.
+	`width` scales how thick the arm is, `hand` scales the hand in every
+	direction, and `upperLength` stretches the upper arm so it runs off the
+	edge of the screen instead of ending in view.
 	Returns the new measurements and, per part, the factor to scale its Size by.
 ]]
-function Arms.scaled(arm: Arm, width: number, hand: number): (Arm, { Vector3 })
+function Arms.scaled(arm: Arm, width: number, hand: number, upperLength: number?): (Arm, { Vector3 })
 	local limb = Vector3.new(width, 1, width)
+	local upper = Vector3.new(width, upperLength or 1, width)
 	local copy = table.clone(arm)
 	if arm.rig == "R6" then
 		copy.grip = CFrame.new(arm.grip.Position * limb) * arm.grip.Rotation
@@ -261,15 +263,15 @@ function Arms.scaled(arm: Arm, width: number, hand: number): (Arm, { Vector3 })
 		return copy, { limb }
 	end
 	local palm = Vector3.new(hand, hand, hand)
-	copy.upperTop = arm.upperTop * limb
-	copy.upperBottom = arm.upperBottom * limb
+	copy.upperTop = arm.upperTop * upper
+	copy.upperBottom = arm.upperBottom * upper
 	copy.lowerTop = arm.lowerTop * limb
 	copy.lowerBottom = arm.lowerBottom * limb
 	copy.handTop = arm.handTop * palm
 	copy.grip = CFrame.new(arm.grip.Position * palm) * arm.grip.Rotation
 	copy.upperLength = (copy.upperBottom - copy.upperTop).Magnitude
 	copy.lowerLength = (copy.lowerBottom - copy.lowerTop).Magnitude
-	return copy, { limb, limb, palm }
+	return copy, { upper, limb, palm }
 end
 
 --[[

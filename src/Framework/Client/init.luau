@@ -640,7 +640,11 @@ local function update(deltaTime: number)
 		now,
 		Spread.angle(config, current.aim, moving, airborne, current.bloom),
 		current.aim,
-		View.screenPoint()
+		View.screenPoint(),
+		-- Looking through a sight: first person, on a weapon that has one.
+		firstPerson
+			and Viewmodel.isVisible()
+			and current.animator.attachments.aim ~= nil
 	)
 end
 
@@ -795,6 +799,20 @@ end
 
 function Client.isAiming(): boolean
 	return held ~= nil and held.aiming
+end
+
+-- The local player's own crosshair settings, checked against the config
+-- rules. Unknown or invalid fields are reported and left out.
+function Client.setCrosshair(settings: { [string]: any }?)
+	if settings == nil then
+		HUD.setPlayerCrosshair(nil)
+		return
+	end
+	local clean, problems = Config.Schema.validate({ Crosshair = settings }, "Weapon")
+	for _, problem in problems do
+		log:Warn(`SetCrosshair: {problem.path} {problem.message}`)
+	end
+	HUD.setPlayerCrosshair(clean.Crosshair or {})
 end
 
 function Client.start(root: Instance)

@@ -4,6 +4,10 @@
 	The built-in heads-up display: ammo, fire mode, a reload bar, a crosshair
 	that opens with spread, and a hitmarker.
 
+	The crosshair is drawn from the Crosshair settings, with the player's own
+	choices (Ordnance.SetCrosshair) laid over the game's. When aiming it turns
+	into a dot, or goes away when there is a sight to look through.
+
 	It is deliberately small. Turn it off with HUD.Enabled = false and build
 	your own from Ordnance's client API if the game needs more.
 ]]
@@ -11,6 +15,7 @@
 local Players = game:GetService("Players")
 
 local Defaults = require(script.Parent.Parent.Config.Defaults)
+local Merge = require(script.Parent.Parent.Config.Merge)
 local State = require(script.Parent.Parent.Weapons.State)
 
 type Config = Defaults.Config
@@ -36,6 +41,13 @@ local progressTrack: Frame
 local progressFill: Frame
 local crosshair: Frame
 local hairs: { Frame } = {}
+local ring: Frame
+local ringOutline: Frame
+local dot: Frame
+local playerCrosshair: { [string]: any }? = nil
+local styledFrom: any = nil -- the settings table the crosshair was last drawn with
+local styledWith: any = nil -- the player overrides it was drawn with
+local crosshairStyle: { [string]: any } = Defaults.Crosshair :: any
 local marker: Frame
 local markerLines: { Frame } = {}
 local markerUntil = 0
@@ -120,7 +132,8 @@ local function build()
 	status.Position = UDim2.new(0, 0, 0, 82)
 	status.Size = UDim2.new(1, 0, 0, 14)
 
-	-- Crosshair: four hairs around the centre of the screen.
+	-- Crosshair: four lines (top, bottom, left, right), a ring and a dot,
+	-- shown and sized by the Crosshair settings.
 	crosshair = Instance.new("Frame")
 	crosshair.Name = "Crosshair"
 	crosshair.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -128,17 +141,41 @@ local function build()
 	crosshair.Size = UDim2.fromOffset(2, 2)
 	crosshair.BackgroundTransparency = 1
 	crosshair.Parent = screen
-	for index = 1, 4 do
+	for index, name in { "Top", "Bottom", "Left", "Right" } do
 		local hair = bar(crosshair, INK)
+		hair.Name = name
 		hair.AnchorPoint = Vector2.new(0.5, 0.5)
-		hair.Size = if index <= 2 then UDim2.fromOffset(2, 9) else UDim2.fromOffset(9, 2)
 		local outline = Instance.new("UIStroke")
-		outline.Color = SHADE
-		outline.Transparency = 0.5
-		outline.Thickness = 1
+		outline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		outline.Parent = hair
 		hairs[index] = hair
 	end
+	local function circle(name: string): Frame
+		local frame = Instance.new("Frame")
+		frame.Name = name
+		frame.AnchorPoint = Vector2.new(0.5, 0.5)
+		frame.BackgroundTransparency = 1
+		local corner = Instance.new("UICorner")
+		corner.CornerRadius = UDim.new(0.5, 0)
+		corner.Parent = frame
+		local stroke = Instance.new("UIStroke")
+		stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		stroke.Parent = frame
+		frame.Parent = crosshair
+		return frame
+	end
+	ringOutline = circle("RingOutline")
+	ring = circle("Ring")
+	dot = bar(crosshair, INK)
+	dot.Name = "Dot"
+	dot.AnchorPoint = Vector2.new(0.5, 0.5)
+	local dotCorner = Instance.new("UICorner")
+	dotCorner.CornerRadius = UDim.new(0.5, 0)
+	dotCorner.Parent = dot
+	local dotOutline = Instance.new("UIStroke")
+	dotOutline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	dotOutline.Parent = dot
+	styledFrom = nil
 
 	-- Hitmarker: four short diagonals.
 	marker = Instance.new("Frame")
@@ -162,6 +199,118 @@ local function build()
 
 	screen.Parent = playerGui
 	gui = screen
+end
+
+local function paint(frame: GuiObject, color: Color3, transparency: number, style: { [string]: any })
+	local stroke = frame:FindFirstChildOfClass("UIStroke")
+	if frame.Name == "Ring" then
+		frame.BackgroundTransparency = 1
+		if stroke then
+			stroke.Color = color
+			stroke.Thickness = style.Thickness
+			stroke.Transparency = transparency
+		end
+		return
+	elseif frame.Name == "RingOutline" then
+		frame.BackgroundTransparency = 1
+		if stroke then
+			stroke.Color = style.OutlineColor
+			stroke.Thickness = style.Thickness + style.OutlineThickness * 2
+			stroke.Transparency = if style.Outline then transparency else 1
+		end
+		return
+	end
+	frame.BackgroundColor3 = color
+	frame.BackgroundTransparency = transparency
+	if stroke then
+		stroke.Color = style.OutlineColor
+		stroke.Thickness = style.OutlineThickness
+		stroke.Transparency = if style.Outline then transparency else 1
+	end
+end
+
+-- The crosshair settings in effect: the weapon's, with the player's on top.
+local function resolveStyle(config: Config): { [string]: any }
+	local from = config.Crosshair
+	if from ~= styledFrom or playerCrosshair ~= styledWith then
+		styledFrom = from
+		styledWith = playerCrosshair
+		crosshairStyle = if playerCrosshair then Merge.deep(from :: any, playerCrosshair) else from :: any
+	end
+	return crosshairStyle
+end
+
+local function updateCrosshair(config: Config, spreadDegrees: number, aim: number, sighted: boolean?)
+	local style = resolveStyle(config)
+	local camera = workspace.CurrentCamera
+
+	local gap = style.Gap
+	if style.Dynamic and camera then
+		local halfFov = math.rad(camera.FieldOfView) / 2
+		gap += math.tan(math.rad(spreadDegrees)) / math.tan(halfFov) * camera.ViewportSize.Y / 2
+	end
+	gap = math.clamp(gap, 0, 260)
+
+	-- What aiming turns the crosshair into.
+	local aimed = style.AimStyle
+	if aimed == "Auto" then
+		aimed = if sighted then "Hidden" else "Dot"
+	end
+	local blend = if aimed == "Same" then 0 else math.clamp((aim - 0.15) / 0.6, 0, 1)
+	local base = 1 - style.Opacity
+	local hipFade = base + (1 - base) * blend -- transparency of the hip crosshair
+	local aimedDot = if aimed == "Dot" then base + (1 - base) * (1 - blend) else 1
+
+	local kind = style.Style
+	local length = style.Length
+	local thickness = style.Thickness
+	local color = style.Color
+
+	local lines = kind == "Cross" or kind == "T"
+	local half = gap + length / 2
+	for index, hair in hairs do
+		local shown = lines and not (kind == "T" and index == 1) and hipFade < 0.99
+		hair.Visible = shown
+		if shown then
+			if index <= 2 then
+				hair.Size = UDim2.fromOffset(thickness, length)
+				hair.Position = UDim2.fromOffset(0, if index == 1 then -half else half)
+			else
+				hair.Size = UDim2.fromOffset(length, thickness)
+				hair.Position = UDim2.fromOffset(if index == 3 then -half else half, 0)
+			end
+			paint(hair, color, hipFade, style)
+		end
+	end
+
+	local showRing = kind == "Circle" and hipFade < 0.99
+	ring.Visible = showRing
+	ringOutline.Visible = showRing and style.Outline
+	if showRing then
+		local diameter = math.max(gap * 2, 4)
+		ring.Size = UDim2.fromOffset(diameter, diameter)
+		ringOutline.Size = ring.Size
+		paint(ring, color, hipFade, style)
+		paint(ringOutline, color, hipFade, style)
+	end
+
+	-- The dot: the centre dot at the hip, and the whole crosshair when aimed.
+	local hipDot = (style.CenterDot and kind ~= "None") or kind == "Dot"
+	local dotTransparency = math.min(if hipDot then hipFade else 1, aimedDot)
+	dot.Visible = dotTransparency < 0.99
+	if dot.Visible then
+		dot.Size = UDim2.fromOffset(style.DotSize, style.DotSize)
+		paint(dot, color, dotTransparency, style)
+	end
+end
+
+--[[
+	Sets the local player's own crosshair settings, laid over the game's for
+	every weapon. Pass nil to go back to the game's. Fields are the same as
+	the Crosshair section of the config.
+]]
+function HUD.setPlayerCrosshair(settings: { [string]: any }?)
+	playerCrosshair = settings
 end
 
 function HUD.show(config: Config)
@@ -189,15 +338,17 @@ function HUD.hide()
 	end
 end
 
--- Refreshes the display. `spreadDegrees` drives the crosshair gap; `aim` is
--- 0 (hip) to 1 (aimed) and fades the crosshair out.
+-- Refreshes the display. `spreadDegrees` opens the crosshair; `aim` is
+-- 0 (hip) to 1 (aimed); `sighted` is true when the player is looking
+-- through a sight, which the crosshair makes way for.
 function HUD.update(
 	state: State.State?,
 	config: Config,
 	now: number,
 	spreadDegrees: number,
 	aim: number,
-	point: Vector2
+	point: Vector2,
+	sighted: boolean?
 )
 	if gui == nil or not gui.Enabled then
 		return
@@ -246,25 +397,7 @@ function HUD.update(
 	end
 
 	if config.HUD.Crosshair then
-		local camera = workspace.CurrentCamera
-		local gap = 6
-		if camera then
-			local halfFov = math.rad(camera.FieldOfView) / 2
-			gap = math.tan(math.rad(spreadDegrees)) / math.tan(halfFov) * camera.ViewportSize.Y / 2
-		end
-		gap = math.clamp(gap, 3, 220) + 5
-		hairs[1].Position = UDim2.fromOffset(0, -gap)
-		hairs[2].Position = UDim2.fromOffset(0, gap)
-		hairs[3].Position = UDim2.fromOffset(-gap, 0)
-		hairs[4].Position = UDim2.fromOffset(gap, 0)
-		local fade = math.clamp(aim * 1.6, 0, 1)
-		for _, hair in hairs do
-			hair.BackgroundTransparency = fade
-			local outline = hair:FindFirstChildOfClass("UIStroke")
-			if outline then
-				outline.Transparency = 0.5 + fade * 0.5
-			end
-		end
+		updateCrosshair(config, spreadDegrees, aim, sighted)
 	end
 
 	if marker.Visible and now >= markerUntil then

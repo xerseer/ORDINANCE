@@ -249,6 +249,11 @@ local RULES: { [string]: Rule } = {
 		min = 0.2,
 		max = 1,
 	},
+	["Viewmodel.ArmLength"] = {
+		doc = "Stretches the first-person upper arms so they run off the screen. Only the viewmodel changes.",
+		min = 1,
+		max = 4,
+	},
 	["Viewmodel.HandScale"] = {
 		doc = "Size of the first-person hands compared with the character's.",
 		min = 0.3,
@@ -346,6 +351,36 @@ local RULES: { [string]: Rule } = {
 	["HUD.Crosshair"] = { doc = "Show the built-in crosshair." },
 	["HUD.Hitmarker"] = { doc = "Flash a marker when a shot lands." },
 	["HUD.Accent"] = { doc = "Accent colour of the built-in HUD." },
+
+	["Crosshair.Style"] = {
+		doc = "Cross: four lines. T: no top line. Circle: a ring. Dot: only a dot. None: nothing at the hip.",
+		choices = { "Cross", "T", "Circle", "Dot", "None" },
+	},
+	["Crosshair.CenterDot"] = { doc = "Add a dot in the middle of the Cross, T or Circle." },
+	["Crosshair.Color"] = { doc = "Colour of the lines and the dot." },
+	["Crosshair.Opacity"] = { doc = "1 is solid, 0 is invisible.", min = 0, max = 1 },
+	["Crosshair.Length"] = { doc = "Length of each line, in pixels.", min = 1, max = 60 },
+	["Crosshair.Thickness"] = { doc = "Width of the lines and the ring, in pixels.", min = 1, max = 12 },
+	["Crosshair.Gap"] = {
+		doc = "Space between the centre and the lines, in pixels, before spread is added.",
+		min = 0,
+		max = 60,
+	},
+	["Crosshair.DotSize"] = {
+		doc = "Size of the centre dot and of the aimed dot, in pixels.",
+		min = 1,
+		max = 16,
+	},
+	["Crosshair.Outline"] = { doc = "Draw a thin border around the crosshair so it shows on any background." },
+	["Crosshair.OutlineColor"] = { doc = "Colour of the border." },
+	["Crosshair.OutlineThickness"] = { doc = "Width of the border, in pixels.", min = 1, max = 6 },
+	["Crosshair.Dynamic"] = {
+		doc = "Open the crosshair with the weapon's current spread. Off keeps it a fixed size.",
+	},
+	["Crosshair.AimStyle"] = {
+		doc = "What it becomes when aiming. Auto: a dot, or nothing in first person when the weapon has a sight (an Aim attachment or an optic). Dot: always a dot. Hidden: nothing. Same: no change.",
+		choices = { "Auto", "Dot", "Hidden", "Same" },
+	},
 
 	["Inventory.Mode"] = {
 		doc = "Tool gives weapons as Backpack tools. Custom gives nothing; use Ordnance.Equip yourself.",
